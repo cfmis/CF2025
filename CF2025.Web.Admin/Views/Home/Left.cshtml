@@ -1,0 +1,112 @@
+﻿@using CF2025.Sys.Contract;
+@model List<AdminMenuGroupAll>
+@{
+    //var adminMenuGroup = Factory.GenAdminiMenu().getAdminMenuDetailsList();
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <link href="~/Content/sharestyle.css" rel="stylesheet" />
+    <link href="~/Content/main.css" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+    <script src="~/Scripts/jquery-2.1.1.min.js"></script>
+
+</head>
+<body>
+
+    @foreach (var group1 in Model)
+    {
+        <div class="leftbar" id=@group1.DivId>
+            @foreach (var group2 in group1.AdminMenuGroup)
+            {
+                <dl>
+                    <dt id=@group2.WebId class=@group2.Class onclick='ShowMenuList("@group2.UlId")'>@group2.Name</dt>
+                    <ul class="box_n" id=@group2.UlId>
+                        @foreach (var group3 in @group2.AdminMenuArray)
+                        {
+                            var hasUrl = group3.Url == "";
+                            var Url = (hasUrl ? "/Base/Dep/Info" : group3.Url);
+                            @*<li><a target="mainFrame" id=@group3.WebId onclick="goNewPage('@group3.Url', '@group3.Name');">@group3.Name</a></li>*@
+                            <li><a target="mainFrame" id=@group3.WebId onclick="goNewPage('@Url', '@group3.Name');">@group3.Name</a></li>
+                        }
+                    </ul>
+                </dl>
+            }
+        </div>
+    }
+
+    <script type="text/javascript">
+        //显示菜单下面的选项
+        function ShowMenuList(id) {
+            var objectobj = document.getElementById(id);
+            var dtObj = document.getElementById("dt_" + id);
+            if (objectobj.style.display == "none") {
+                objectobj.style.display = "";
+                dtObj.setAttribute("class", "head2");
+                //其它菜单折叠
+                $(dtObj).parent().parent().find("dt").not(dtObj).attr("class", "head1"); //折叠
+                $(objectobj).parent().parent().find("ul").not(objectobj).css("display", "none"); //隐藏菜单子项
+            }
+            else {
+                objectobj.style.display = "none";
+                dtObj.setAttribute("class", "head1");
+            }
+        }
+        //控制菜单模块的显示和隐藏
+        function showDivMenu(divId) {
+            $("#" + divId).css("visibility", "visible");
+            $("#" + divId).siblings("div").css("visibility", "hidden");
+        }
+        $(function () {
+            $(".box_n li a").click(function () {
+                $(".box_n li a").removeClass("nav_sub");
+                $(this).addClass("nav_sub");
+            });
+        });
+        function goNewPage(url, name) {
+            if (!checkLogin()) {
+                self.parent.location.href = '/Home/Login';
+                return;
+            }
+            else
+                self.parent.frames["mainFrame"].addTab(url, name);
+        }
+        function checkLogin() {
+            var isLogin = true;
+            $.ajax({
+                url: "/Home/CheckLogin",
+                //data: postData,
+                processData: false,
+                contentType: false,
+                type: "post",
+                dataType: "json",
+                async: false,//改为同步方式
+                //beforeSend: BefLoadFunction, //加载执行方法
+                error: function () {
+                    alert("用戶沒有登錄!");
+                    isLogin = false;
+                },//erryFunction, //错误执行方法
+                success: function (data) {
+                    if (data == "OK") {
+                    }
+                    else {
+                        alert("用戶沒有登錄!");
+                        isLogin = false;
+                    }
+                }
+
+            });
+            return isLogin;
+        }
+    </script>
+</body>
+</html>
