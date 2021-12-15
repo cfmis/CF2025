@@ -265,6 +265,7 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Areas\Sale\js\Invoice.js" />
     <Content Include="Config\AdminMenuConfig.xml" />
     <Content Include="Config\CacheConfig.xml" />
     <Content Include="Config\DaoConfig.xml" />
