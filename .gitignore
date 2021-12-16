@@ -7,6 +7,8 @@ CF2025.Sys.Contract/bin/
 CF2025.Sys.Contract/obj/
 CF2025.Sys.DAL/bin/
 CF2025.Sys.DAL/obj/
+CF2025.Base.DAL/bin/
+CF2025.Base.DAL/obj/
 CF.SQLServer.DAL/bin/
 CF.SQLServer.DAL/obj/
 CF.Framework.Web/bin/

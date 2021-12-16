@@ -22,416 +22,594 @@
         </template>
     </vxe-toolbar>
 <div>
-                <vxe-form :data="formData" @@submit="submitSearch" size="mini"  title-align="right" title-width="100px" prevent-submit title-colon custom-layout>@**@
-                        <vxe-form-item title="編號" field="ID" ::item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.ID" class="input-customize" style="width:76%"></vxe-input>
-                                <vxe-input v-model="data.Ver" class="input-customize" style="width:20%"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="發票日期" field="oi_date" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input type="date" v-model="data.oi_date" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="來源" field="separate" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-select v-model="data.separate" size="mini">
-                                    <vxe-option v-for="item in DocSourceTypeList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
-                                </vxe-select>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="店鋪編號" field="Shop_no" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.Shop_no" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="客戶編號" field="it_customer" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.it_customer" class="input-customize" style="width:70%"></vxe-input>
-                                <vxe-button icon="fa fa-search" style="width:20%;height:18px;font-size:10px"></vxe-button>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="電話" field="phone" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.phone" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="傳真" field="fax" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.RequestDate" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="付款日期" field="payment_date" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.payment_date" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="聯繫人" field="linkman" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-select v-model="data.linkman" placeholder="請選擇聯繫人" size="mini">
-                                    <vxe-option v-for="num in 10" :key="num" :value="num" :label="`选项${num}`"></vxe-option>
-                                </vxe-select>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="聯繫人電話" field="l_phone" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.l_phone" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="部門" field="department_id" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.department_id" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="電郵地址" field="email" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.email" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="出貨倉位" field="issues_wh" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-select v-model="data.issues_wh" size="mini">
-                                    <vxe-option v-for="item in OutStoreList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
-                                </vxe-select>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="單據種類" field="bill_type_no" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-select v-model="data.bill_type_no" size="mini">
-                                    <vxe-option v-for="item in InvSourceTypeList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
-                                </vxe-select>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="跟單員" field="merchandiser" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-select v-model="data.merchandiser" size="mini">
-                                    <vxe-option v-for="item in SalesmanList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
-                                </vxe-select>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="跟單員電話" field="merchandiser_phone" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.merchandiser_phone" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="訂單編號" field="po_no" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.po_no" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="Via" field="shipping_methods" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.shipping_methods" @@blur="productMoBlurEvent()" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                    <vxe-form-item title="銷售員編號" field="seller_id" :item-render="{}" span="6" class="vxe-form-item-customize">
-                        <template #default="{ data }">
-                            <vxe-select v-model="data.seller_id" size="mini">
-                                <vxe-option v-for="item in SalesmanList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
-                            </vxe-select>
-                        </template>
-                    </vxe-form-item>
-                        <vxe-form-item title="貨幣編號" field="m_id" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-select v-model="data.m_id" size="mini">
-                                    <vxe-option v-for="item in CurrList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
-                                </vxe-select>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="比率" field="exchange_rate" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.exchange_rate" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="發票貨品總金額" field="goods_sum" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.goods_sum" class="input-customize" disabled></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="其它費用" field="other_fare" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.other_fare" class="input-customize" disabled></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="折扣(%)" field="disc_rate" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.disc_rate" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="折扣額" field="disc_amt" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.disc_amt" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="折扣後金額" field="disc_spare" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.disc_spare" class="input-customize" disabled></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="總金額" field="total_sum" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.total_sum" class="input-customize" disabled></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="稅種編號" field="tax_ticket" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.tax_ticket" class="input-customize" style="width:78%"></vxe-input>
-                                <vxe-input v-model="data.tax_ticket" class="input-customize" disabled style="width:20%"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="稅款總額" field="tax_sum" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.tax_sum" class="input-customize" disabled></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="總數量" field="amount" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.amount" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="新模模費" field="other_fee" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.other_fee" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="總包數" field="total_package_num" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.total_package_num" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="總重量" field="total_weight" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.total_weight" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="備註" field="remark2" :item-render="{}" span="12" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.remark2" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="裝運嘜頭" field="ship_remark" :item-render="{}" span="12" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.ship_remark" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="裝運嘜頭" field="ship_remark2" :item-render="{}" span="12" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.ship_remark2" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="裝運嘜頭" field="ship_remark3" :item-render="{}" span="12" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.ship_remark3" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="客戶編號" field="CustomerID" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.CustomerID" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="附帶條款" field="remark" :item-render="{}" span="12" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.remark" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="付款方式" field="p_id" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-select v-model="data.p_id" size="mini">
-                                    <vxe-option v-for="item in PaymentTypeList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
-                                </vxe-select>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="價格條件" field="pc_id" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-select v-model="data.pc_id" size="mini">
-                                    <vxe-option v-for="item in PriceCondList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
-                                </vxe-select>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="裝運方式" field="sm_id" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-select v-model="data.sm_id" size="mini">
-                                    <vxe-option v-for="item in ShipModeList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
-                                </vxe-select>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="銀行賬號" field="accounts" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-select v-model="data.accounts" size="mini">
-                                    <vxe-option v-for="item in AccountList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
-                                </vxe-select>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="Per" field="per" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.per" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="最終目的地" field="final_destination" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.final_destination" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="發貨狀態" field="issues_state" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.issues_state" class="input-customize" disabled></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="運輸途徑" field="transport_style" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-select v-model="data.transport_style" size="mini">
-                                    <vxe-option v-for="item in ShipWayList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
-                                </vxe-select>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="船期" field="ship_date" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.ship_date" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="裝貨港口" field="loading_port" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-select v-model="data.loading_port" size="mini">
-                                    <vxe-option v-for="item in ShipPortList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
-                                </vxe-select>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="目的港口" field="ap_id" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-select v-model="data.ap_id" size="mini">
-                                    <vxe-option v-for="item in ShipPortList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
-                                </vxe-select>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="換船港口" field="tranship_port" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.tranship_port" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="最終客戶" field="finally_buyer" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.finally_buyer" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="負責組別" field="mo_group" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-select v-model="data.mo_group" size="mini">
-                                    <vxe-option v-for="item in MoGroupList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
-                                </vxe-select>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="裝箱單號" field="packinglistno" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.packinglistno" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="箱號" field="box_no" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.box_no" class="input-customize"></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="建檔人" field="create_by" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.create_by" class="input-customize" disabled></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="建檔日期" field="create_date" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.create_date" class="input-customize" disabled></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="修改人" field="update_by" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.update_by" class="input-customize" disabled></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="修改日期" field="update_date" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.update_date" class="input-customize" disabled></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="狀態" field="state" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.state" class="input-customize" disabled></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                        <vxe-form-item title="批准日期" field="check_date" :item-render="{}" span="6" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.check_date" class="input-customize" disabled></vxe-input>
-                            </template>
-                        </vxe-form-item>
-                </vxe-form>
-</div>
-<div style="margin-top:20px">
-        <vxe-table border
-                   show-overflow
-                   height="350"
-                   size="mini"
-                   :row-config="{height: 20}"
-                   highlight-current-row
-                   ref="xTable"
-                   :loading="loading3"
-                   :sync-resize="selectTab"
-                   :checkbox-config="{highlight: true, range: true}"
-                   :data="tableData"
-                   :keyboard-config="{isArrow: true}"
-                   :edit-config="{trigger: 'click', mode: 'cell', icon: 'fa fa-pencil', showStatus: true}">
-            <vxe-table-column type="seq" title="序號" width="60"></vxe-table-column>
-            <vxe-column field="name" title="Name" width="80" :edit-render="{autofocus: '.myinput'}">
-                <template #edit="{ row }">
-                    <vxe-input v-model="row.name" class="myinput" style="height:20px" @@blur="showRowValue(row.name)"></vxe-input>
+    <vxe-form :data="formData" @@submit="submitSearch" size="mini"  title-align="right" title-width="100px" prevent-submit title-colon custom-layout>@**@
+            <vxe-form-item title="編號" field="ID" ::item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.ID" class="input-customize" style="width:76%"></vxe-input>
+                    <vxe-input v-model="data.Ver" class="input-customize" style="width:20%"></vxe-input>
                 </template>
-            </vxe-column>
-            <vxe-table-column field="id" title="物料編號" width="180" :edit-render="{name: '$input', events: {blur: showMsg}}"></vxe-table-column>
-            <vxe-table-column field="name" title="物料描述" width="260"></vxe-table-column>
-            <vxe-table-column field="role" title="負責部門" width="160"></vxe-table-column>
-            <vxe-table-column field="sex" title="收貨部門" width="160"></vxe-table-column>
-            <vxe-table-column field="age" title="要求數量" width="160"></vxe-table-column>
-            <vxe-table-column field="address" title="要求完成日期" width="160"></vxe-table-column>
-            <vxe-table-column field="CompleteQty" title="完成數量" width="160"></vxe-table-column>
-            <vxe-table-column field="CompleteDate" title="完成日期" width="160"></vxe-table-column>
-            <vxe-column field="sex" title="Sex" width="80" :edit-render="{}">
-                @*<template #default="{ row }">
-                    <span>{{ formatSex(row.sex) }}</span>
-                </template>*@
-                <template #edit="{ row }">
-                    <vxe-select v-model="row.sex" size="mini">
+            </vxe-form-item>
+            <vxe-form-item title="發票日期" field="oi_date" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input type="date" v-model="data.oi_date" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="來源" field="separate" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-select v-model="data.separate" size="mini">
+                        <vxe-option v-for="item in DocSourceTypeList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                    </vxe-select>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="店鋪編號" field="Shop_no" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.Shop_no" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="客戶編號" field="it_customer" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.it_customer" class="input-customize" style="width:70%"></vxe-input>
+                    <vxe-button icon="fa fa-search" style="width:20%;height:18px;font-size:10px"></vxe-button>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="電話" field="phone" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.phone" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="傳真" field="fax" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.fax" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="付款日期" field="payment_date" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.payment_date" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="聯繫人" field="linkman" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.linkman" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="聯繫人電話" field="l_phone" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.l_phone" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="部門" field="department_id" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.department_id" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="電郵地址" field="email" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.email" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="出貨倉位" field="issues_wh" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-select v-model="data.issues_wh" size="mini">
+                        <vxe-option v-for="item in OutStoreList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                    </vxe-select>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="單據種類" field="bill_type_no" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-select v-model="data.bill_type_no" size="mini">
+                        <vxe-option v-for="item in InvSourceTypeList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                    </vxe-select>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="跟單員" field="merchandiser" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-select v-model="data.merchandiser" size="mini">
                         <vxe-option v-for="item in SalesmanList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
                     </vxe-select>
                 </template>
-            </vxe-column>
-            <vxe-table-column title="修改" width="60" :resizable="false" show-overflow>
-                <template #default="{ row }">
-                    <vxe-button type="text" icon="fa fa-edit" @@click="editRowEvent(row)"></vxe-button>
+            </vxe-form-item>
+            <vxe-form-item title="跟單員電話" field="merchandiser_phone" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.merchandiser_phone" class="input-customize"></vxe-input>
                 </template>
-            </vxe-table-column>
-        </vxe-table>
-</div>
-        <vxe-modal ref="xModal" v-model="showEdit" title="编辑&保存" width="800" resize destroy-on-close>
-            
-                <template #default>
-                    @*<div class="div-cont">*@
-                        <vxe-form :data="editPlanDetails" title-align="right" title-width="100" @@submit="updateEvent">
-                            <vxe-form-item title="物料編號" field="GoodsID" span="12" ::item-render="{name: 'input', attrs: {placeholder: '请输入名称'}, events: {blur: getGoodsByID}}"></vxe-form-item>
-                            <vxe-form-item title="物料描述" field="GoodsCname" span="12" ::item-render="{name: 'input', attrs: {placeholder: '请输入昵称'}}"></vxe-form-item>
-                            <vxe-form-item title="負責部門" field="WipID" span="12" ::item-render="{name: '$select', options: wipList}"></vxe-form-item>
-                            <vxe-form-item title="收貨部門" field="NextWipID" span="12" ::item-render="{name: '$select', options: wipList}"></vxe-form-item>
-                            <vxe-form-item title="要求數量" field="RequestQty" span="12" ::item-render="{name: 'input', attrs: {type:'number',placeholder: '请输入數量'}}"></vxe-form-item>
-                            <vxe-form-item title="要求完成日期" field="RequestDate" span="12" ::item-render="{name: '$input',props: {type: 'date'}, attrs: {placeholder: '请输入要求日期'}}"></vxe-form-item>
-                            <vxe-form-item align="center" span="24">
-                                <template #default>
-                                    <vxe-button v-if="selectRow" type="submit" status="primary">確定</vxe-button>
-                                    <vxe-button v-else type="submit" status="primary">新增</vxe-button>
-                                    @*<vxe-button type="reset">重置</vxe-button>*@
-                                    <vxe-button @@click="$refs.xModal.close()">取消</vxe-button>
-                                </template>
-                            </vxe-form-item>
-                        </vxe-form>
-                    @*</div>*@
+            </vxe-form-item>
+            <vxe-form-item title="訂單編號" field="po_no" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.po_no" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="Via" field="shipping_methods" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.shipping_methods" @@blur="productMoBlurEvent()" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+        <vxe-form-item title="銷售員編號" field="seller_id" :item-render="{}" span="6" class="vxe-form-item-customize">
+            <template #default="{ data }">
+                <vxe-select v-model="data.seller_id" size="mini">
+                    <vxe-option v-for="item in SalesmanList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                </vxe-select>
             </template>
-            
-        </vxe-modal>
+        </vxe-form-item>
+            <vxe-form-item title="貨幣編號" field="m_id" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-select v-model="data.m_id" size="mini">
+                        <vxe-option v-for="item in CurrList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                    </vxe-select>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="比率" field="exchange_rate" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.exchange_rate" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="發票貨品總金額" field="goods_sum" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.goods_sum" class="input-customize" disabled></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="其它費用" field="other_fare" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.other_fare" class="input-customize" disabled></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="折扣(%)" field="disc_rate" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.disc_rate" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="折扣額" field="disc_amt" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.disc_amt" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="折扣後金額" field="disc_spare" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.disc_spare" class="input-customize" disabled></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="總金額" field="total_sum" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.total_sum" class="input-customize" disabled></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="稅種編號" field="tax_ticket" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.tax_ticket" class="input-customize" style="width:78%"></vxe-input>
+                    <vxe-input v-model="data.tax_ticket" class="input-customize" disabled style="width:20%"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="稅款總額" field="tax_sum" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.tax_sum" class="input-customize" disabled></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="總數量" field="amount" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.amount" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="新模模費" field="other_fee" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.other_fee" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="總包數" field="total_package_num" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.total_package_num" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="總重量" field="total_weight" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.total_weight" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="備註" field="remark2" :item-render="{}" span="12" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.remark2" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="裝運嘜頭" field="ship_remark" :item-render="{}" span="12" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.ship_remark" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="裝運嘜頭" field="ship_remark2" :item-render="{}" span="12" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.ship_remark2" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="裝運嘜頭" field="ship_remark3" :item-render="{}" span="12" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.ship_remark3" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="附帶條款" field="remark" :item-render="{}" span="12" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.remark" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="付款方式" field="p_id" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-select v-model="data.p_id" size="mini">
+                        <vxe-option v-for="item in PaymentTypeList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                    </vxe-select>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="價格條件" field="pc_id" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-select v-model="data.pc_id" size="mini">
+                        <vxe-option v-for="item in PriceCondList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                    </vxe-select>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="裝運方式" field="sm_id" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-select v-model="data.sm_id" size="mini">
+                        <vxe-option v-for="item in ShipModeList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                    </vxe-select>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="銀行賬號" field="accounts" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-select v-model="data.accounts" size="mini">
+                        <vxe-option v-for="item in AccountList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                    </vxe-select>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="Per" field="per" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.per" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="最終目的地" field="final_destination" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.final_destination" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="發貨狀態" field="issues_state" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.issues_state" class="input-customize" disabled></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="運輸途徑" field="transport_style" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-select v-model="data.transport_style" size="mini">
+                        <vxe-option v-for="item in ShipWayList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                    </vxe-select>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="船期" field="ship_date" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.ship_date" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="裝貨港口" field="loading_port" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-select v-model="data.loading_port" size="mini">
+                        <vxe-option v-for="item in ShipPortList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                    </vxe-select>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="目的港口" field="ap_id" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-select v-model="data.ap_id" size="mini">
+                        <vxe-option v-for="item in ShipPortList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                    </vxe-select>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="換船港口" field="tranship_port" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.tranship_port" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="最終客戶" field="finally_buyer" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.finally_buyer" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="負責組別" field="mo_group" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-select v-model="data.mo_group" size="mini">
+                        <vxe-option v-for="item in MoGroupList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                    </vxe-select>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="裝箱單號" field="packinglistno" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.packinglistno" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="箱號" field="box_no" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.box_no" class="input-customize"></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="建檔人" field="create_by" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.create_by" class="input-customize" disabled></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="建檔日期" field="create_date" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.create_date" class="input-customize" disabled></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="修改人" field="update_by" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.update_by" class="input-customize" disabled></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="修改日期" field="update_date" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.update_date" class="input-customize" disabled></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="狀態" field="state" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.state" class="input-customize" disabled></vxe-input>
+                </template>
+            </vxe-form-item>
+            <vxe-form-item title="批准日期" field="check_date" :item-render="{}" span="6" class="vxe-form-item-customize">
+                <template #default="{ data }">
+                    <vxe-input v-model="data.check_date" class="input-customize" disabled></vxe-input>
+                </template>
+            </vxe-form-item>
+    </vxe-form>
+</div>
+<div style="margin-top:20px">
+    <vxe-table border
+               show-overflow
+               height="350"
+               size="mini"
+               :row-config="{height: 20}"
+               highlight-current-row
+               ref="xTable"
+               :loading="loading3"
+               :sync-resize="selectTab"
+               :checkbox-config="{highlight: true, range: true}"
+               :data="tableData"
+               :keyboard-config="{isArrow: true}"
+               :edit-config="{trigger: 'click', mode: 'cell', icon: 'fa fa-pencil', showStatus: true}">
+        <vxe-table-column type="seq" title="序號" width="60"></vxe-table-column>
+        <vxe-column field="name" title="Name" width="80" :edit-render="{autofocus: '.myinput'}">
+            <template #edit="{ row }">
+                <vxe-input v-model="row.name" class="myinput" style="height:20px" @@blur="showRowValue(row.name)"></vxe-input>
+            </template>
+        </vxe-column>
+        <vxe-table-column field="id" title="物料編號" width="180" :edit-render="{name: '$input', events: {blur: showMsg}}"></vxe-table-column>
+        <vxe-table-column field="name" title="物料描述" width="260"></vxe-table-column>
+        <vxe-table-column field="role" title="負責部門" width="160"></vxe-table-column>
+        <vxe-table-column field="sex" title="收貨部門" width="160"></vxe-table-column>
+        <vxe-table-column field="age" title="要求數量" width="160"></vxe-table-column>
+        <vxe-table-column field="address" title="要求完成日期" width="160"></vxe-table-column>
+        <vxe-table-column field="CompleteQty" title="完成數量" width="160"></vxe-table-column>
+        <vxe-table-column field="CompleteDate" title="完成日期" width="160"></vxe-table-column>
+        <vxe-column field="sex" title="Sex" width="80" :edit-render="{}">
+            @*<template #default="{ row }">
+                <span>{{ formatSex(row.sex) }}</span>
+            </template>*@
+            <template #edit="{ row }">
+                <vxe-select v-model="row.sex" size="mini">
+                    <vxe-option v-for="item in SalesmanList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                </vxe-select>
+            </template>
+        </vxe-column>
+        <vxe-table-column title="修改" width="60" :resizable="false" show-overflow>
+            <template #default="{ row }">
+                <vxe-button type="text" icon="fa fa-edit" @@click="editRowEvent(row)"></vxe-button>
+            </template>
+        </vxe-table-column>
+    </vxe-table>
+</div>
+<vxe-modal ref="xModal" v-model="showEdit" title="编辑&保存" width="900" height="600" resize destroy-on-close>
+    
+        <template #default>
+            @*<div class="div-cont">*@
+                <vxe-form :data="editDetails" title-align="right" title-width="100" @@submit="updateEvent" custom-layout>
+                    <vxe-form-item align="left" span="24">
+                        <template #default>
+                            <vxe-button v-if="selectRow" type="submit" status="primary">確定</vxe-button>
+                            <vxe-button v-else type="submit" status="primary" icon="fa fa-plus">新增</vxe-button>
+                            @*<vxe-button type="reset">重置</vxe-button>*@
+                            <vxe-button type="submit" icon="fa fa-undo" @@click="$refs.xModal.close()">取消</vxe-button>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="頁數" field="mo_id" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.mo_id" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="貨品編碼" field="goods_id" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-select v-model="data.goods_id" size="mini">
+                                <vxe-option v-for="item in MoGroupList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                            </vxe-select>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="客戶款號" field="table_head" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.table_head" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="貨品名稱" field="goods_name" span="16" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.goods_name" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="發貨數量" field="u_invoice_qty" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.u_invoice_qty" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="單位" field="goods_unit" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-select v-model="data.goods_unit" size="mini">
+                                <vxe-option v-for="item in QtyUnitList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                            </vxe-select>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="重量" field="sec_qty" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.sec_qty" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="重量單位" field="sec_unit" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.sec_unit" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="銷售單價" field="invoice_price" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.invoice_price" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="折扣(%)" field="disc_rate" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.disc_rate" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="折後單價" field="disc_price" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.disc_price" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="總金額" field="total_sum" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.total_sum" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="折扣額" field="disc_amt" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.disc_amt" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="報價單編號" field="buy_id" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.buy_id" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="OC No" field="order_id" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.order_id" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="出貨單號" field="issues_id" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.issues_id" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="參考1#" field="ref1" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.ref1" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="參考2#" field="ref2" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.ref2" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="只限用於此單" field="ncv" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.ncv" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="出貨通知單號" field="apprise_id" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.apprise_id" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="是否免費" field="is_free" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.is_free" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="對應條碼" field="corresponding_code" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.corresponding_code" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="淨重" field="nwt" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.nwt" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="毛重" field="gross_wt" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.gross_wt" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="包數" field="package_num" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.package_num" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="箱號" field="box_no" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.box_no" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="顏色" field="color" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.color" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="規格" field="spec" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.spec" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="科目編號" field="subject_id" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.subject_id" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="PO/NO" field="contract_cid" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.contract_cid" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="走貨要求" field="Delivery_Require" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.Delivery_Require" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="倉庫" field="location_id" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.location_id" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+
+                    <vxe-form-item title="牌子類別" field="brand_category" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.brand_category" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="檢驗分類編號" field="customer_test_id" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.customer_test_id" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="客戶產品編號" field="customer_goods" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.customer_goods" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="客戶顏色編號" field="customer_color_id" span="8" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.customer_color_id" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="備注" field="remark" span="16" :item-render="{}" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.remark" class="input-customize"></vxe-input>
+                        </template>
+                    </vxe-form-item>
+
+                </vxe-form>
+            @*</div>*@
+    </template>
+    
+</vxe-modal>
 
 </div>
 @section PageSpecificJavascriptIncludes{

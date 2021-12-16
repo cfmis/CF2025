@@ -86,6 +86,9 @@
     <Reference Include="CF.Web">
       <HintPath>..\CF.Web\bin\Debug\CF.Web.dll</HintPath>
     </Reference>
+    <Reference Include="CF2025.Base.DAL">
+      <HintPath>..\CF2025.Base.DAL\bin\Debug\CF2025.Base.DAL.dll</HintPath>
+    </Reference>
     <Reference Include="CF2025.Sys.Contract, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\CF2025.Sys.Contract\bin\Debug\CF2025.Sys.Contract.dll</HintPath>
@@ -245,6 +248,8 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="Areas\Base\BaseAreaRegistration.cs" />
+    <Compile Include="Areas\Base\Controllers\DataComboxListController.cs" />
     <Compile Include="Areas\Sale\Controllers\InvoiceController.cs" />
     <Compile Include="Areas\Sale\Controllers\OrderController.cs" />
     <Compile Include="Areas\Sale\SaleAreaRegistration.cs" />
@@ -275,6 +280,7 @@
     <Content Include="Config\UploadConfig.xml" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\Js\common.js" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -293,6 +299,7 @@
     <Content Include="Areas\Sale\Views\Order\List.cshtml" />
     <Content Include="Areas\Sale\Views\Order\Search.cshtml" />
     <Content Include="Areas\Sale\Views\Invoice\Index.cshtml" />
+    <Content Include="Areas\Base\Views\web.config" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -347,6 +354,10 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Areas\Base\Models\" />
+    <Folder Include="Areas\Base\Views\DataComboxList\" />
+    <Folder Include="Areas\Base\Views\Shared\" />
+    <Folder Include="Areas\Base\Views\Unit\" />
     <Folder Include="Areas\Sale\Models\" />
     <Folder Include="Images\" />
     <Folder Include="Lib\" />

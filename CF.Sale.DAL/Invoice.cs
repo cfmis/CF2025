@@ -22,12 +22,6 @@ namespace CF.Sale.DAL
                 case "DocSourceTypeList"://單據來源
                     strSql += "Select id,name,name As english_name From sys_bill_origin Where function_id='SO01' AND language='3' Order By id";
                     break;
-                case "SalesmanList"://營業員&跟單員
-                    strSql += "Select id,name,english_name From cd_personnel Where within_code='" + within_code + "' And sales_group is not null and state='0' Order By id";
-                    break;
-                case "CurrList"://貨幣代號
-                    strSql += "Select id,name,english_name From cd_money Where within_code='" + within_code + "' Order By id";
-                    break;
                 case "OutStoreList"://發貨倉位
                     strSql += "Select id,name,english_name From cd_mo_type Where within_code='" + within_code + "' And mo_type='7' Order By id";
                     break;
@@ -51,9 +45,6 @@ namespace CF.Sale.DAL
                     break;
                 case "ShipPortList"://發貨港口&目的港口
                     strSql += "Select id,name,english_name From cd_port Where within_code='" + within_code + "' Order By id";
-                    break;
-                case "MoGroupList"://負責組別
-                    strSql += "Select id,name,english_name From cd_mo_type Where within_code='" + within_code + "' And mo_type='3' Order By id";
                     break;
                 default:
                     strSql += "";

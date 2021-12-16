@@ -4,22 +4,21 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using CF2025.Web.Admin.Common;
-using CF.Sale.DAL;
+using CF2025.Base.DAL;
 
-namespace CF2025.Web.Admin.Areas.Sale.Controllers
+namespace CF2025.Web.Admin.Areas.Base.Controllers
 {
-    public class InvoiceController : AdminControllerBase//: Controller//: Controller
+    public class DataComboxListController : AdminControllerBase//: Controller//: Controller
     {
-        // GET: Sale/Invoice
+        // GET: Base/DataComboxList
         public ActionResult Index()
         {
-            ViewBag.Title = "銷售發票";
             return View();
         }
 
         public JsonResult GetComboxList(string SourceType)
         {
-            var result = Invoice.GetComboxList(SourceType);
+            var result = DataComboxList.GetComboxList(SourceType);
             //var result = new { rows = list };
             return Json(result, JsonRequestBehavior.AllowGet);
         }
