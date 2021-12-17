@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DCCE56B7-D7B3-4298-964F-E08468E64E43}</ProjectGuid>
+    <ProjectGuid>{15D2FF9D-C4C4-467D-B4C3-E442D6B6E2E8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CF.Sale.DAL</RootNamespace>
-    <AssemblyName>CF.Sale.DAL</AssemblyName>
+    <RootNamespace>CF2025.Store.DAL</RootNamespace>
+    <AssemblyName>CF2025.Store.DAL</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,18 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CF.Core.Config">
-      <HintPath>..\CF.Core.Config\bin\Debug\CF.Core.Config.dll</HintPath>
-    </Reference>
-    <Reference Include="CF.Framework.Contract">
-      <HintPath>..\CF.Framework.Contract\bin\Debug\CF.Framework.Contract.dll</HintPath>
-    </Reference>
-    <Reference Include="CF.Sale.Contract">
-      <HintPath>..\CF.Sale.Contract\bin\Debug\CF.Sale.Contract.dll</HintPath>
-    </Reference>
-    <Reference Include="CF.SQLServer.DAL">
-      <HintPath>..\CF.SQLServer.DAL\bin\Debug\CF.SQLServer.DAL.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -52,7 +40,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Invoice.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

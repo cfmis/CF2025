@@ -1,4 +1,0 @@
-C:\Workspace\CF2025\CF.Sale.Contract\bin\Debug\CF.Sale.Contract.dll
-C:\Workspace\CF2025\CF.Sale.Contract\bin\Debug\CF.Sale.Contract.pdb
-C:\Workspace\CF2025\CF.Sale.Contract\obj\Debug\CF.Sale.Contract.dll
-C:\Workspace\CF2025\CF.Sale.Contract\obj\Debug\CF.Sale.Contract.pdb

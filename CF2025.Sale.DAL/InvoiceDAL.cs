@@ -14,10 +14,10 @@ namespace CF2025.Sale.DAL
     public static class InvoiceDAL
     {
         private static SQLHelper sh = new SQLHelper(CachedConfigContext.Current.DaoConfig.OA);
+        private static string within_code = "0000";
         public static List<ModelBaseList> GetComboxList(string SourceType)
         {
             string strSql = "";
-            string within_code = "0000";
             switch (SourceType)
             {
                 case "DocSourceTypeList"://單據來源
@@ -71,6 +71,19 @@ namespace CF2025.Sale.DAL
         public static so_invoice_mostly GetDataMostly(string mo_id)
         {
             so_invoice_mostly objInv = new so_invoice_mostly();
+            string strSql = "";
+            strSql += " Select a.it_customer,a.m_id,a.merchandiser " +
+                " From so_order_manage a " +
+                " Inner Join so_order_details b On a.within_code=b.within_code And a.id=b.id And a.ver=b.ver " +
+                " Where b.within_code='" + within_code + "' And b.mo_id='" + mo_id + "'";
+            DataTable dtMostly = sh.ExecuteSqlReturnDataTable(strSql);
+            if (dtMostly.Rows.Count > 0)
+            {
+                DataRow dr = dtMostly.Rows[0]; 
+                objInv.it_customer = dr["it_customer"].ToString();
+                objInv.m_id = dr["m_id"].ToString();
+                objInv.merchandiser = dr["merchandiser"].ToString();
+            }
             return objInv;
         }
     }

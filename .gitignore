@@ -15,6 +15,10 @@ CF2025.Sale.Contract/bin/
 CF2025.Sale.Contract/obj/
 CF2025.Sale.DAL/bin/
 CF2025.Sale.DAL/obj/
+CF2025.Store.Contract/bin/
+CF2025.Store.Contract/obj/
+CF2025.Store.DAL/bin/
+CF2025.Store.DAL/obj/
 CF.SQLServer.DAL/bin/
 CF.SQLServer.DAL/obj/
 CF.Framework.Web/bin/
