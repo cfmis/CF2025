@@ -1,0 +1,56 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="~/Content/bootstrap-4.0/css/fonts/font-awesome.css">
+    <link rel="stylesheet" href="~/Content/vxe-table/jsdelivr/style.css">
+    <style>
+        .div-left {
+            float: left;
+            width: 80%;
+            background-color: aqua;
+            /*border:dotted;*/
+        }
+
+        .div-right {
+            float: right;
+            width: 16%;
+            background-color: yellow;
+        }
+
+        .vxe-form-item-customize {
+            /*width:25%;*/
+            /*margin-top: -20px;*/
+            height: 20px;
+        }
+
+        .input-customize {
+            height: 20px;
+            font-size: 10px;
+            width: 25%;
+        }
+
+        .vxe-select > .vxe-input {
+            width: 100%;
+            height: 18px;
+        }
+
+        .vxe-input {
+            height: 20px;
+        }
+    </style>
+
+    @RenderSection("PageSpecificStyleSheetIncludes", required: false)
+    <script src="~/Content/vxe-table/js/vue.js"></script>
+    <script src="~/Content/vxe-table/jsdelivr/xe-utils.js"></script>
+    <script src="~/Content/vxe-table/jsdelivr/vxe-table.js"></script>
+    <script type="text/javascript" src="~/Scripts/axios.js"></script>
+</head>
+<body>
+    @RenderBody()
+    @RenderSection("PageSpecificJavascriptIncludes", required: false)
+</body>
+</html>
