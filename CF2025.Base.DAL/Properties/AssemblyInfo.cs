@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CF.Sale.DAL")]
+[assembly: AssemblyTitle("CF2025.Base.DAL")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("CF.Sale.DAL")]
+[assembly: AssemblyProduct("CF2025.Base.DAL")]
 [assembly: AssemblyCopyright("Copyright © Microsoft 2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("dcce56b7-d7b3-4298-964f-e08468e64e43")]
+[assembly: Guid("754ce242-b852-4015-8d5d-d1daf6153b4f")]
 
 // Version information for an assembly consists of the following four values:
 //

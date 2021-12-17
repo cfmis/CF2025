@@ -7,6 +7,18 @@ CF2025.Sys.Contract/bin/
 CF2025.Sys.Contract/obj/
 CF2025.Sys.DAL/bin/
 CF2025.Sys.DAL/obj/
+CF2025.Base.Contract/bin/
+CF2025.Base.Contract/obj/
+CF2025.Base.DAL/bin/
+CF2025.Base.DAL/obj/
+CF2025.Sale.Contract/bin/
+CF2025.Sale.Contract/obj/
+CF2025.Sale.DAL/bin/
+CF2025.Sale.DAL/obj/
+CF2025.Store.Contract/bin/
+CF2025.Store.Contract/obj/
+CF2025.Store.DAL/bin/
+CF2025.Store.DAL/obj/
 CF.SQLServer.DAL/bin/
 CF.SQLServer.DAL/obj/
 CF.Framework.Web/bin/
@@ -35,10 +47,7 @@ CF.Account.BLL/bin/
 CF.Account.BLL/obj/
 CF.Account.Contract/bin/
 CF.Account.Contract/obj/
-CF.Sale.Contract/bin/
-CF.Sale.Contract/obj/
-CF.Sale.DAL/bin/
-CF.Sale.DAL/obj/
+
 
 .vs/
 

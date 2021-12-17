@@ -7,26 +7,21 @@ using System.Data;
 using CF.Framework.Contract;
 using CF.SQLServer.DAL;
 using CF.Core.Config;
+using CF2025.Sale.Contract;
 
-namespace CF.Sale.DAL
+namespace CF2025.Sale.DAL
 {
-    public static class Invoice
+    public static class InvoiceDAL
     {
         private static SQLHelper sh = new SQLHelper(CachedConfigContext.Current.DaoConfig.OA);
+        private static string within_code = "0000";
         public static List<ModelBaseList> GetComboxList(string SourceType)
         {
             string strSql = "";
-            string within_code = "0000";
             switch (SourceType)
             {
                 case "DocSourceTypeList"://單據來源
                     strSql += "Select id,name,name As english_name From sys_bill_origin Where function_id='SO01' AND language='3' Order By id";
-                    break;
-                case "SalesmanList"://營業員&跟單員
-                    strSql += "Select id,name,english_name From cd_personnel Where within_code='" + within_code + "' And sales_group is not null and state='0' Order By id";
-                    break;
-                case "CurrList"://貨幣代號
-                    strSql += "Select id,name,english_name From cd_money Where within_code='" + within_code + "' Order By id";
                     break;
                 case "OutStoreList"://發貨倉位
                     strSql += "Select id,name,english_name From cd_mo_type Where within_code='" + within_code + "' And mo_type='7' Order By id";
@@ -52,9 +47,6 @@ namespace CF.Sale.DAL
                 case "ShipPortList"://發貨港口&目的港口
                     strSql += "Select id,name,english_name From cd_port Where within_code='" + within_code + "' Order By id";
                     break;
-                case "MoGroupList"://負責組別
-                    strSql += "Select id,name,english_name From cd_mo_type Where within_code='" + within_code + "' And mo_type='3' Order By id";
-                    break;
                 default:
                     strSql += "";
                     break;
@@ -75,6 +67,24 @@ namespace CF.Sale.DAL
                 ls.Add(obj);
             }
             return ls;
+        }
+        public static so_invoice_mostly GetDataMostly(string mo_id)
+        {
+            so_invoice_mostly objInv = new so_invoice_mostly();
+            string strSql = "";
+            strSql += " Select a.it_customer,a.m_id,a.merchandiser " +
+                " From so_order_manage a " +
+                " Inner Join so_order_details b On a.within_code=b.within_code And a.id=b.id And a.ver=b.ver " +
+                " Where b.within_code='" + within_code + "' And b.mo_id='" + mo_id + "'";
+            DataTable dtMostly = sh.ExecuteSqlReturnDataTable(strSql);
+            if (dtMostly.Rows.Count > 0)
+            {
+                DataRow dr = dtMostly.Rows[0]; 
+                objInv.it_customer = dr["it_customer"].ToString();
+                objInv.m_id = dr["m_id"].ToString();
+                objInv.merchandiser = dr["merchandiser"].ToString();
+            }
+            return objInv;
         }
     }
 }

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CF.Sale.Contract")]
+[assembly: AssemblyTitle("CF2025.Store.Contract")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("CF.Sale.Contract")]
+[assembly: AssemblyProduct("CF2025.Store.Contract")]
 [assembly: AssemblyCopyright("Copyright © Microsoft 2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("344b8969-ef75-412f-b91b-c8a102613696")]
+[assembly: Guid("fd7d49f7-79cc-45bf-9410-5fd47f29f486")]
 
 // Version information for an assembly consists of the following four values:
 //
