@@ -73,9 +73,7 @@ var Main = {
                     alert("ok");
                     //var vl = value;
                 },
-		showRowValue(value){
-			alert(value);
-		},
+
 		formatSex (value) {
           if (value === '1') {
             return '男'
@@ -113,17 +111,17 @@ var Main = {
 				seller_id:'',
                 m_id: '',
                 exchange_rate: '',
-                goods_sum: '',
-                other_fare: '',
-                disc_rate: '',
-                disc_amt: '',
-                disc_spare: '',
-                total_sum: '',
+                goods_sum: 0.00,
+                other_fare: 0.00,
+                disc_rate: 0.00,
+                disc_amt: 0.00,
+                disc_spare: 0.00,
+                total_sum: 0.00,
                 tax_ticket: '',
-                tax_sum: '',
-                amount: '',
-                other_fee: '',
-                total_package_num:'',
+                tax_sum: 0.00,
+                amount: 0.00,
+                other_fee: 0.00,
+                total_package_num:0,
                 total_weight: '',
                 remark2: '',
                 ship_remark: '',
@@ -144,7 +142,6 @@ var Main = {
                 tranship_port: '',
                 finally_buyer: '',
                 mo_group:'',
-
                 packinglistno: '',
                 box_no: '',
                 create_by: '',
@@ -175,38 +172,18 @@ var Main = {
                 }, 500);
                 
             },
-            getPlanHead(_ProductMo) {
+		getDataDetails(value){
+			alert(value);
+		},
+            getDataMostly(value) {
                 var _self = this;
                 //axios.get("GetGoodsDetails", { params: { goods_id: _id, } })//也可以將參數寫在這裡
-                axios.get("GetPlanHeadByMo", { params: { ProductMo: _ProductMo } }).then(
+                axios.get("GetDataMostly", { params: { mo_id: value } }).then(
                 (response) => {
-                    //this.formData.ProductMo = response.data.ProductMo,
-                    //    this.formData.Ver = response.data.Ver,
-                    //    this.formData.PlanDate = response.data.PlanDate,
-                    //    this.formData.CustomerID = response.data.CustomerID,
-                    //    this.formData.GoodsID = response.data.GoodsID,
-                    //    this.formData.OrderQty = response.data.OrderQty,
-                    //    this.formData.OrderUnit = response.data.OrderUnit,
-                    //    this.formData.MoRemark = response.data.MoRemark,
-                    //    this.formData.PlanRemark = response.data.PlanRemark,
-                    //    this.formData.ProductRemark = response.data.ProductRemark
-                    this.formData = {
-                        ProductMo: response.data.ProductMo,
-                        Ver: response.data.Ver,
-                        PlanDate: response.data.PlanDate,
-                        CustomerID: response.data.CustomerID,
-                        GoodsID: response.data.GoodsID,
-                        OrderQty: response.data.OrderQty,
-                        OrderUnit: response.data.OrderUnit,
-                        MoRemark: response.data.MoRemark,
-                        PlanRemark: response.data.PlanRemark,
-                        ProductRemark: response.data.ProductRemark,
-                        ArtImageUrl: response.data.ArtImageUrl,
-                        CreateUser: response.data.CreateUser,
-                        CreateTime: response.data.CreateTime,
-                        AmendUser: response.data.AmendUser,
-                        AmendTime: response.data.AmendTime,
-                    }
+                    this.formData.it_customer = response.data.it_customer;
+                    this.formData.m_id = response.data.m_id;
+                    this.formData.merchandiser = response.data.merchandiser;
+
                     //深度複製一個對象，用來判斷數據是否有修改
                     this.prevForm = JSON.parse(JSON.stringify(this.formData));
                     //var ImagePath = "/art/artwork/" + "AAAA/A888020.bmp";
@@ -257,11 +234,18 @@ var Main = {
 
             },
             showInsertEvent () {
-                this.editDetails = {
+               this.cleanDetailsTextBox();
+               this.selectRow = null;
+               this.showEdit = true;
+
+            },
+			cleanDetailsTextBox(){
+				this.editDetails = {
                     EditFlag: 0,
 					ID:this.formData.ID,
 					sequence_id:'',
                     mo_id: '',
+					shipment_suit:'',
                     goods_id: '',
                     table_head: '',
                     goods_name: '',
@@ -299,10 +283,7 @@ var Main = {
                     customer_color_id: '',
                     remark: '',
                 };
-               this.selectRow = null;
-               this.showEdit = true;
-
-            },
+			},
 			getComboxList(SourceType) {
                 var _self = this;///Base/BaseData///, { params: { ProductMo: this.editDetails.GoodsID } }
 				var url="GetComboxList";
@@ -363,49 +344,7 @@ var Main = {
                 } else {
                     this.editDetails.EditFlag = 1;
                     this.tableDetails.push(this.editDetails);
-                    //this.editDetails = {};
-                    this.editDetails = {
-                    EditFlag: 0,
-					ID:this.formData.ID,
-					sequence_id:'',
-                    mo_id: '',
-                    goods_id: '',
-                    table_head: '',
-                    goods_name: '',
-                    u_invoice_qty: 0,
-                    goods_unit: '',
-                    sec_qty: 0.00,
-                    sec_unit: 'KG',
-					invoice_price: 0.000,
-                    disc_rate: 0.00,
-                    disc_price: 0.000,
-                    total_sum: 0.00,
-                    disc_amt: 0.00,
-                    buy_id: '',
-                    order_id: '',
-                    issues_id: '',
-					ref1: '',
-                    ref2: '',
-                    ncv: '',
-                    apprise_id: '',
-                    is_free: '',
-                    corresponding_code: '',
-                    nwt: 0.00,
-                    gross_wt: 0.00,
-					package_num: '',
-                    box_no: '',
-                    color: '',
-                    spec: '',
-                    subject_id: '',
-                    contract_cid: '',
-                    Delivery_Require: '',
-                    location_id: 'Y10',
-					brand_category: '',
-                    customer_test_id: '',
-                    customer_goods: '',
-                    customer_color_id: '',
-                    remark: '',
-					};
+					this.cleanDetailsTextBox();
                 }
             },
             getGoodsByID(){

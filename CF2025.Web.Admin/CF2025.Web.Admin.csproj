@@ -76,9 +76,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\CF.Framework.Web\bin\Debug\CF.Framework.Web.dll</HintPath>
     </Reference>
-    <Reference Include="CF.Sale.DAL">
-      <HintPath>..\CF.Sale.DAL\bin\Debug\CF.Sale.DAL.dll</HintPath>
-    </Reference>
     <Reference Include="CF.SQLServer.DAL, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\CF.SQLServer.DAL\bin\Debug\CF.SQLServer.DAL.dll</HintPath>
@@ -88,6 +85,12 @@
     </Reference>
     <Reference Include="CF2025.Base.DAL">
       <HintPath>..\CF2025.Base.DAL\bin\Debug\CF2025.Base.DAL.dll</HintPath>
+    </Reference>
+    <Reference Include="CF2025.Sale.Contract">
+      <HintPath>..\CF2025.Sale.Contract\bin\Debug\CF2025.Sale.Contract.dll</HintPath>
+    </Reference>
+    <Reference Include="CF2025.Sale.DAL">
+      <HintPath>..\CF2025.Sale.DAL\bin\Debug\CF2025.Sale.DAL.dll</HintPath>
     </Reference>
     <Reference Include="CF2025.Sys.Contract, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

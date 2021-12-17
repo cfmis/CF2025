@@ -7,11 +7,11 @@ using System.Data;
 using CF.Framework.Contract;
 using CF.SQLServer.DAL;
 using CF.Core.Config;
-using CF.Sale.Contract;
+using CF2025.Sale.Contract;
 
-namespace CF.Sale.DAL
+namespace CF2025.Sale.DAL
 {
-    public static class Invoice
+    public static class InvoiceDAL
     {
         private static SQLHelper sh = new SQLHelper(CachedConfigContext.Current.DaoConfig.OA);
         public static List<ModelBaseList> GetComboxList(string SourceType)
