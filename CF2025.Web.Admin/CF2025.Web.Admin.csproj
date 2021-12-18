@@ -256,6 +256,8 @@
     <Compile Include="Areas\Sale\Controllers\InvoiceController.cs" />
     <Compile Include="Areas\Sale\Controllers\OrderController.cs" />
     <Compile Include="Areas\Sale\SaleAreaRegistration.cs" />
+    <Compile Include="Areas\Store\Controllers\TransferOutUnconfirmController.cs" />
+    <Compile Include="Areas\Store\StoreAreaRegistration.cs" />
     <Compile Include="Common\AdminCacheContext.cs" />
     <Compile Include="Common\AdminControllerBase.cs" />
     <Compile Include="Common\AdminCookieContext.cs" />
@@ -274,6 +276,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\Sale\js\Invoice.js" />
+    <Content Include="Areas\Store\js\TransferOutUnconfirm.js" />
     <Content Include="Config\AdminMenuConfig.xml" />
     <Content Include="Config\CacheConfig.xml" />
     <Content Include="Config\DaoConfig.xml" />
@@ -303,6 +306,10 @@
     <Content Include="Areas\Sale\Views\Order\Search.cshtml" />
     <Content Include="Areas\Sale\Views\Invoice\Index.cshtml" />
     <Content Include="Areas\Base\Views\web.config" />
+    <Content Include="Areas\Store\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\Store\Views\TransferOutUnconfirm\Index.cshtml" />
+    <Content Include="Areas\Store\Views\web.config" />
+    <Content Include="Areas\Store\Views\_ViewStart.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -362,6 +369,7 @@
     <Folder Include="Areas\Base\Views\Shared\" />
     <Folder Include="Areas\Base\Views\Unit\" />
     <Folder Include="Areas\Sale\Models\" />
+    <Folder Include="Areas\Store\Models\" />
     <Folder Include="Images\" />
     <Folder Include="Lib\" />
   </ItemGroup>

@@ -1,22 +1,22 @@
 ﻿using System.Web.Mvc;
 
-namespace CF2025.Web.Admin.Areas.Warehouse
+namespace CF2025.Web.Admin.Areas.Store
 {
-    public class WarehouseAreaRegistration : AreaRegistration 
+    public class StoreAreaRegistration : AreaRegistration 
     {
         public override string AreaName 
         {
             get 
             {
-                return "Warehouse";
+                return "Store";
             }
         }
 
         public override void RegisterArea(AreaRegistrationContext context) 
         {
             context.MapRoute(
-                "Warehouse_default",
-                "Warehouse/{controller}/{action}/{id}",
+                "Store_default",
+                "Store/{controller}/{action}/{id}",
                 new { action = "Index", id = UrlParameter.Optional }
             );
         }

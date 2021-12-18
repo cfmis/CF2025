@@ -1,0 +1,14 @@
+D:\Workspace\CF2025\CF.Sale.DAL\bin\Debug\CF.Sale.DAL.dll
+D:\Workspace\CF2025\CF.Sale.DAL\bin\Debug\CF.Sale.DAL.pdb
+D:\Workspace\CF2025\CF.Sale.DAL\bin\Debug\CF.Core.Config.dll
+D:\Workspace\CF2025\CF.Sale.DAL\bin\Debug\CF.Framework.Contract.dll
+D:\Workspace\CF2025\CF.Sale.DAL\bin\Debug\CF.SQLServer.DAL.dll
+D:\Workspace\CF2025\CF.Sale.DAL\bin\Debug\CF.Framework.Utility.dll
+D:\Workspace\CF2025\CF.Sale.DAL\bin\Debug\Newtonsoft.Json.dll
+D:\Workspace\CF2025\CF.Sale.DAL\bin\Debug\CF.Core.Config.pdb
+D:\Workspace\CF2025\CF.Sale.DAL\bin\Debug\CF.Framework.Contract.pdb
+D:\Workspace\CF2025\CF.Sale.DAL\bin\Debug\CF.SQLServer.DAL.pdb
+D:\Workspace\CF2025\CF.Sale.DAL\bin\Debug\CF.Framework.Utility.pdb
+D:\Workspace\CF2025\CF.Sale.DAL\obj\Debug\CF.Sale.DAL.csprojResolveAssemblyReference.cache
+D:\Workspace\CF2025\CF.Sale.DAL\obj\Debug\CF.Sale.DAL.dll
+D:\Workspace\CF2025\CF.Sale.DAL\obj\Debug\CF.Sale.DAL.pdb
