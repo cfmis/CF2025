@@ -34,7 +34,7 @@ namespace CF2025.Sale.Contract
         public string shipping_methods { get; set; }
         public string seller_id { get; set; }
         public string m_id { get; set; }
-        public string exchange_rate { get; set; }
+        public decimal exchange_rate { get; set; }
         public decimal goods_sum { get; set; }
         public decimal other_fare { get; set; }
         public decimal disc_rate { get; set; }
@@ -86,11 +86,12 @@ namespace CF2025.Sale.Contract
         public string goods_id { get; set; }
         public string table_head { get; set; }
         public string goods_name { get; set; }
-        public int u_invoice_qty { get; set; }
+        public decimal u_invoice_qty { get; set; }
         public string goods_unit { get; set; }
         public decimal sec_qty { get; set; }
         public string sec_unit { get; set; }
         public decimal invoice_price { get; set; }
+        public string p_unit { get; set; }
         public decimal disc_rate { get; set; }
         public decimal disc_price { get; set; }
         public decimal total_sum { get; set; }
@@ -101,6 +102,7 @@ namespace CF2025.Sale.Contract
         public string ref1 { get; set; }
         public string ref2 { get; set; }
         public string ncv { get; set; }
+        public string is_print { get; set; }
         public string apprise_id { get; set; }
         public string is_free { get; set; }
         public string corresponding_code { get; set; }
@@ -118,6 +120,12 @@ namespace CF2025.Sale.Contract
         public string customer_test_id { get; set; }
         public string customer_goods { get; set; }
         public string customer_color_id { get; set; }
+        public string big_class { get; set; }
         public string remark { get; set; }
+    }
+    public class viewOc
+    {
+        public so_invoice_mostly ocMostly = new so_invoice_mostly();
+        public so_invoice_details ocDetails = new so_invoice_details();
     }
 }

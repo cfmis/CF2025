@@ -92,6 +92,9 @@
     <Reference Include="CF2025.Sale.DAL">
       <HintPath>..\CF2025.Sale.DAL\bin\Debug\CF2025.Sale.DAL.dll</HintPath>
     </Reference>
+    <Reference Include="CF2025.Store.Contract">
+      <HintPath>..\CF2025.Store.Contract\bin\Debug\CF2025.Store.Contract.dll</HintPath>
+    </Reference>
     <Reference Include="CF2025.Sys.Contract, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\CF2025.Sys.Contract\bin\Debug\CF2025.Sys.Contract.dll</HintPath>

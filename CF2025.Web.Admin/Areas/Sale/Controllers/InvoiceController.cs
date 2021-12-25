@@ -5,7 +5,6 @@ using System.Web;
 using System.Web.Mvc;
 using CF2025.Web.Admin.Common;
 using CF2025.Sale.DAL;
-using CF2025.Sale.Contract;
 
 namespace CF2025.Web.Admin.Areas.Sale.Controllers
 {
@@ -28,8 +27,16 @@ namespace CF2025.Web.Admin.Areas.Sale.Controllers
         [HttpPost]
         public JsonResult GetDataMostly(string mo_id)
         {
-            //PlanDAL clsPlanDAL = new PlanDAL();
+            //PlanDAL clsPlanDAL = new PlanDAL();GetDataDetails
             var result = InvoiceDAL.GetDataMostly(mo_id);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult GetDataDetails(string mo_id)
+        {
+            //PlanDAL clsPlanDAL = new PlanDAL();
+            var result = InvoiceDAL.GetDataDetails(mo_id);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
     }
