@@ -15,14 +15,14 @@ namespace CF2025.Store.DAL
     public static class TransferOutUnconfirmDAL
     {
         private static SQLHelper sh = new SQLHelper(CachedConfigContext.Current.DaoConfig.OA);
-        private static string strRemoteDB = "DGERP2.cferp.dbo.";//SQLHelper.RemoteDB;
+        //private static string strRemoteDB = "DGERP2.cferp.dbo.";//SQLHelper.RemoteDB;
         public static List<TransferOutDetails> GetSearchDataList(TransferOutFind model)
         {           
-            string strSql = string.Format(
+            string strSql = 
              @"SELECT id,Convert(varchar(10),transfer_date,120) AS transfer_date,mo_id,goods_id,goods_name,color,unit,transfer_amount,
              al_transfer_amount,sec_unit,sec_qty,package_num,nwt,gross_wt,location_id,move_location_id,inventory_qty,lot_no,remark
-             FROM {0}v_rpt_transfer_out_list
-             WHERE within_code = '0000' ", strRemoteDB);
+             FROM v_rpt_transfer_out_list
+             WHERE within_code = '0000'";
             if (!string.IsNullOrEmpty(model.transfer_date))
             {
                 strSql += string.Format(" AND transfer_date >= '{0}'", model.transfer_date);
