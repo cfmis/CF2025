@@ -23,7 +23,7 @@
 </vxe-toolbar>
 <div>
     <vxe-form :data="formData" @@submit="submitSearch" size="mini"  title-align="right" title-width="100px" prevent-submit title-colon custom-layout>@**@
-            <vxe-form-item title="編號" field="ID" ::item-render="{}" span="6" class="vxe-form-item-customize">
+            <vxe-form-item title="編號" field="ID" :item-render="{}" span="6" class="vxe-form-item-customize">
                 <template #default="{ data }">
                     <vxe-input v-model="data.ID" class="input-customize" style="width:76%"></vxe-input>
                     <vxe-input v-model="data.Ver" class="input-customize" style="width:22%"></vxe-input>
