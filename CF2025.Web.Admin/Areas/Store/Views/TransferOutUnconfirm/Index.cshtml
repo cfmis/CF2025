@@ -1,0 +1,175 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<div id="app">
+    <vxe-toolbar perfect size="small" style="height:35px;margin-bottom:5px" >
+        <template #buttons style="height:35px;margin-bottom:10px">
+            <vxe-button icon="fa fa-check" content="確認" ></vxe-button>
+            <vxe-button type="reset" icon="fa fa-mail-reply-all" content="重置"></vxe-button>
+            <vxe-button icon="fa fa-save" content="查詢" @@click="searchData" ></vxe-button>           
+        </template>
+    </vxe-toolbar>
+
+    <div>
+        <fieldset>
+            <legend>查詢條件</legend>
+            <div style="margin-bottom:15px">
+                <vxe-form :data="formData" 
+                          ref="xForm"
+                          @*@@submit="searchData"*@
+                          @@reset="resetEvent"
+                          size="mini" 
+                          title-align="right" 
+                          title-width="100px"
+                          prevent-submit title-colon custom-layout>
+                    <!--行1-->
+                    <vxe-form-item title="頁數" field="mo_id" :item-render="{}" span="8" class="vxe-form-item-customize">  
+                         <template #default="{ data }">
+                             <vxe-input v-model="data.mo_id" 
+                                        @@change="upperCase(data.mo_id,'mo_id')" 
+                                        @@blur="setToEndValue(data.mo_id,'mo_id_end')" 
+                                        maxlength="9" class="input-customize" style="width:40%">
+                             </vxe-input> ~
+                             <vxe-input v-model="data.mo_id_end"
+                                        @@change="upperCase(data.mo_id_end,'mo_id_end')" 
+                                        maxlength="9" class="input-customize" style="width:40%">
+                             </vxe-input>
+                         </template>
+                     </vxe-form-item>
+                     <vxe-form-item title="貨品編碼" field="goods_id" :item-render="{}" span="12" class="vxe-form-item-customize">
+                         <template #default="{ data }">
+                             <vxe-input v-model="data.goods_id" 
+                                        @*@@change="upperCase(data.goods_id,'goods_id')"*@ 
+                                        @@blur="setToEndValue(data.goods_id,'goods_id_end')" 
+                                        maxlength="18" class="input-customize" style="width:40%">
+                             </vxe-input> ~
+                             <vxe-input v-model="data.goods_id_end" 
+                                        @@change="upperCase(data.goods_id_end,'goods_id_end')" 
+                                        maxlength="18" class="input-customize" style="width:40%">
+                             </vxe-input>
+                         </template>
+                     </vxe-form-item>
+                     <!--行2-->
+                     <vxe-form-item title="轉出日期" field="transfer_date" :item-render="{}" span="8" class="vxe-form-item-customize">
+                         <template #default="{ data }">
+                             <vxe-input type="date" v-model="data.transfer_date" 
+                                        @@change="setToEndValue(data.transfer_date,'transfer_date_end')" class="input-customize" style="width:40%"></vxe-input> ~
+                             <vxe-input type="date" v-model="data.transfer_date_end" class="input-customize" style="width:40%"></vxe-input>
+                         </template>                 
+                     </vxe-form-item>
+                     <vxe-form-item title="貨品名稱" field="goods_name" :item-render="{}" span="12" class="vxe-form-item-customize">
+                         <template #default="{ data }">
+                             <vxe-input v-model="data.goods_name" class="input-customize" style="width:82.3%"></vxe-input>                      
+                         </template>
+                     </vxe-form-item>
+                    <!--行3--> 
+                    <vxe-form-item title="轉出單號" field="id" :item-render="{}" span="8" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.id" 
+                                       @@change="upperCase(data.id,'id')" 
+                                       @@blur="setToEndValue(data.id,'id_end')" maxlength="12" class="input-customize" style="width:40%">
+                            </vxe-input> ~
+                            <vxe-input v-model="data.id_end" 
+                                       @@change="upperCase(data.id_end,'id_end')" maxlength="12" class="input-customize" style="width:40%">
+                            </vxe-input>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="轉入倉" field="location_id" :item-render="{}" span="4" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-select v-model="data.location_id" @@change="getCartonCodeList(data.location_id)" size="mini">
+                                <vxe-option v-for="item in LocationList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                            </vxe-select>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="貨架" field="shelf" :item-render="{}" span="6" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-select v-model="data.shelf" size="mini">
+                                <vxe-option v-for="item in CartonCodeList" :key="item.value" :value="item.value" :label="item.value"></vxe-option>
+                            </vxe-select>
+                        </template>
+                    </vxe-form-item>
+                    <vxe-form-item title="" :item-render="{}" span="6" class="vxe-form-item-customize">                                            
+                    </vxe-form-item>
+                    <!--行4-->
+                    <vxe-form-item title="客戶編號" field="id" :item-render="{}" span="8" class="vxe-form-item-customize">
+                        <template #default="{ data }">
+                            <vxe-input v-model="data.customer_id" 
+                                       @@change="upperCase(data.customer_id,'customer_id')" 
+                                       @@blur="setToEndValue(data.customer_id,'customer_id_end')" 
+                                       maxlength="8" class="input-customize" style="width:40%">
+                            </vxe-input> ~
+                            <vxe-input v-model="data.customer_id_end" 
+                                       @@change="upperCase(data.customer_id_end,'customer_id_end')" 
+                                       maxlength="8" class="input-customize" style="width:40%">
+                            </vxe-input>
+                        </template>
+                    </vxe-form-item>                    
+                </vxe-form>
+                
+            </div>  
+
+            @*< vxe-input
+            v-model=“mm”
+            type=“input”
+            :controls=“false”
+            maxlength="4"
+            placeholder=“请输入密码四位数”
+            style=“width: 150px; font-size: 14px”
+            >*@
+
+        </fieldset>  
+    </div>
+    
+     <div style="float: left;width:100%">
+        <vxe-table border
+                    show-overflow
+                    @*設置最大高度*@
+                    max-height="450"
+                    size="small" 
+                    resizable
+                    @*自適合高度*@
+                    highlight-hover-row
+                    highlight-current-row                   
+                    @*loading3顯示查詢動畫*@
+                    :loading="loading"
+                    @*:sync-resize="selectTab"*@
+                    @*選中時highlight*@
+                    :checkbox-config="{highlight: true, range: true}"
+                    :data="tableDetails"
+                    :keyboard-config="{isArrow: true}"
+                    :edit-config="{trigger: 'click', mode: 'cell', icon: 'fa fa-pencil', showStatus: true}"
+                    @*@@cell-click="cellClickEvent"*@
+                    >
+            <vxe-table-column type="seq" title="序號" width="60"></vxe-table-column>
+            <vxe-column type="checkbox" width="60"></vxe-column>
+            <vxe-column field="id" title="編號" width="120"></vxe-column>
+            <vxe-column field="transfer_date" title="轉出日期" width="90"></vxe-column>
+            <vxe-column field="mo_id" title="頁數" width="110"></vxe-column>
+            <vxe-column field="goods_id" title="貨品編碼" width="160"></vxe-column>
+            <vxe-column field="goods_name" title="貨品名稱" width="260"></vxe-column>
+            <vxe-column field="color" title="顏色" width="60"></vxe-column>
+            <vxe-column field="unit" title="單位" width="60"></vxe-column>
+            <vxe-column field="transfer_amount" title="轉倉數量" width="100"></vxe-column>
+            <vxe-column field="sec_unit" title="重量單位" width="80"></vxe-column>
+            <vxe-column field="sec_qty" title="重量" width="70"></vxe-column>
+            <vxe-column field="package_num" title="包數" width="70"></vxe-column>
+            <vxe-column field="nwt" title="淨重" width="70"></vxe-column>
+            <vxe-column field="gross_wt" title="毛重" width="70"></vxe-column>
+            <vxe-column field="location_id" title="倉庫" width="70"></vxe-column>
+            <vxe-column field="move_location_id" title="流動倉庫" width="80"></vxe-column>
+            <vxe-column field="inventory_qty" title="倉存數量" width="80"></vxe-column>
+            <vxe-column field="lot_no" title="批號" width="100"></vxe-column>
+            <vxe-column field="remark" title="備註" width="150"></vxe-column>
+        </vxe-table>
+        
+    </div>
+    
+
+</div>
+
+@section PageSpecificJavascriptIncludes{    
+    <script src="~/Areas/Store/js/TransferOutUnconfirm.js"></script>
+}
+
