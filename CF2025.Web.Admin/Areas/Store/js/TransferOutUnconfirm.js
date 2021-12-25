@@ -1,28 +1,19 @@
 ﻿var Main = {
     data() {
         return {            
-            selectRow: null,            
+            selectRow: null,      
             tableDetails:[],
-            loading3: false,
+            loading: false,
             formData: {}, 
-            sexList: [
-                { label: '', value: '' },
-                { label: '女', value: '0' },
-                { label: '男', value: '1' }
-            ],
-            DocSourceTypeList: [],
-            SalesmanList: [],
-            CurrList: [],
-            OutStoreList: [],
-            InvSourceTypeList: [],
-            PaymentTypeList: [],
-            PriceCondList: [],
-            ShipModeList: [],
-            AccountList: [],
-            ShipWayList: [],
-            ShipPortList: [],
-            MoGroupList: [],
-            tableData: [],
+            //sexList: [
+            //    { label: '', value: '' },
+            //    { label: '女', value: '0' },
+            //    { label: '男', value: '1' }
+            //],
+            CustomerList: [],
+            LocationList: [],
+            CartonCodeList: [{ label: '', value: ''}],
+            tableData: [],           
             
             //tableData: [
             //{ id: 10001, name: 'Test1', role: 'Develop', sex: 'Man', age: 28, address: 'test abc', sex: '1' },
@@ -38,21 +29,18 @@
             name: '',
             sex: 1,
             date: '',
+
+            //resetEvent: VxeFormEvents.Reset = () => {
+            //  VXETable.modal.message({ content: '重置事件', status: 'info' })
+            //}
+
+           
+
         }
     },
     created() {        
-        //this.getComboxList("DocSourceTypeList");
-        //this.getComboxList("SalesmanList");
-        //this.getComboxList("CurrList");
-        //this.getComboxList("OutStoreList");
-        //this.getComboxList("InvSourceTypeList");
-        //this.getComboxList("PaymentTypeList");
-        //this.getComboxList("PriceCondList");
-        //this.getComboxList("ShipModeList");
-        //this.getComboxList("AccountList");
-        //this.getComboxList("ShipWayList");
-        //this.getComboxList("ShipPortList");
-        //this.getComboxList("MoGroupList");
+        this.getComboxList("CustomerList");//客戶編號
+        this.getComboxList("LocationList");
     },
     methods: {
         resetEvent() {
@@ -67,36 +55,35 @@
         showRowValue(value) {
             alert(value);
         },
-        formatSex (value) {
-            if (value === '1') {
-                return '男'
-            }
-            if (value === '0') {
-                return '女'
-            }
-            return ''
-        },        
-        productMoBlurEvent() {
-            if (this.formData.ProductMo == "")
-                return;
-            if (this.edit_mode == 1)
-                this.getPlanFromOrder();
-        },
+        //formatSex (value) {
+        //    if (value === '1') {
+        //        return '男'
+        //    }
+        //    if (value === '0') {
+        //        return '女'
+        //    }
+        //    return ''
+        //},        
+        //productMoBlurEvent() {
+        //    if (this.formData.ProductMo == "")
+        //        return;
+        //    if (this.edit_mode == 1)
+        //        this.getPlanFromOrder();
+        //},
+        //查找未確認入倉資料
         searchData() {
-            this.loading3 = true;
-            setTimeout(() => {                
+            this.loading = true;
+            setTimeout(() => {
                 this.getDetails();
-                this.loading3 = false;
+                this.loading = false;
             }, 500);
-
         },        
-        getDetails() {//查詢
-            var _self = this;
+        getDetails() {//查詢                       
             var searchParams = {
                 mo_id: this.formData.mo_id,
                 mo_id_end: this.formData.mo_id_end,
                 goods_id: this.formData.goods_id,
-                goods_id_end: this.formData.goods_id_end,               
+                goods_id_end: this.formData.goods_id_end,
                 transfer_date: this.formData.transfer_date,
                 transfer_date_end: this.formData.transfer_date_end,
                 location_id: this.formData.location_id,
@@ -105,82 +92,8 @@
                 id_end: this.formData.id_end
             }
             axios.get("GetDataList", { params: searchParams }).then(
-            (response) => {
-                this.tableDetails = response.data;
-            },
-            (response) => {
-                alert(response.status);
-            }
-        ).catch(function (response) {
-                alert(response);
-            });
-        },
-
-        //searchData() {//查詢
-        //    this.isLoading = true;
-        //    //this.tableTempList = [];
-        //    var searchParams = {
-        //        OcID: this.searchFormData.OcID,
-        //        CustomerID: this.searchFormData.CustomerID,
-        //        OrderDate: this.searchFormData.OrderDate,
-        //        ReceivedDate: this.searchFormData.ReceivedDate,
-        //        ForeignFirm: this.searchFormData.ForeignFirm,
-        //        Area: this.searchFormData.Area,
-        //        SallerID: this.searchFormData.SallerID,
-        //        Season: this.searchFormData.Season,
-        //        ContractID: this.searchFormData.ContractID,
-        //        BrandID: this.searchFormData.BrandID,
-        //        ProductMo: this.searchFormData.ProductMo,
-        //        ProductID: this.searchFormData.ProductID
-        //    }
-        //    axios.get("GetOcHeadReturnList", { params: searchParams }).then(
-        //        (response) => {
-        //            this.tableTempList = [];
-        //            for (var i = 0; i < response.data.length; i++) {
-        //                this.tableTempList.push(response.data[i]);
-        //            }
-        //            //_self.goodsList.push({ goods_id:"",goods_cname:"" });
-        //            //this.fillData();
-        //            this.tableDataSearch = this.tableTempList;
-        //            this.isLoading = false;
-        //        },
-        //        (response) => {
-        //            alert(response.status);
-        //        }
-        //    ).catch(function (response) {
-        //        this.isLoading = false;
-        //        alert(response);
-        //    });
-        //},
-
-        getComboxList(SourceType) {
-            var _self = this;///Base/BaseData///, { params: { ProductMo: this.editPlanDetails.GoodsID } }
-            axios.get("GetComboxList?SourceType=" + SourceType).then(
                 (response) => {
-                    if (SourceType == "DocSourceTypeList")
-                        this.DocSourceTypeList = response.data;
-                    else if (SourceType == "SalesmanList")
-                        this.SalesmanList = response.data;
-                    else if (SourceType == "CurrList")
-                        this.CurrList = response.data;
-                    else if (SourceType == "OutStoreList")
-                        this.OutStoreList = response.data;
-                    else if (SourceType == "InvSourceTypeList")
-                        this.InvSourceTypeList = response.data;
-                    else if (SourceType == "PaymentTypeList")
-                        this.PaymentTypeList = response.data;
-                    else if (SourceType == "PriceCondList")
-                        this.PriceCondList = response.data;
-                    else if (SourceType == "ShipModeList")
-                        this.ShipModeList = response.data;
-                    else if (SourceType == "AccountList")
-                        this.AccountList = response.data;
-                    else if (SourceType == "ShipWayList")
-                        this.ShipWayList = response.data;
-                    else if (SourceType == "ShipPortList")
-                        this.ShipPortList = response.data;
-                    else if (SourceType == "MoGroupList")
-                        this.MoGroupList = response.data;
+                    this.tableDetails = response.data;
                 },
                 (response) => {
                     alert(response.status);
@@ -189,38 +102,39 @@
                 alert(response);
             });
         },
-        updateEvent() {
-            //this.showEdit = false
-            //this.$XModal.message({ content: '保存成功', status: 'success' })
-            //Object.assign(this.selectRow, this.tablePlanDetails)
-            //return;
-            if (this.selectRow) {
-                this.showEdit = false
-                //this.$XModal.message({ content: '保存成功', status: 'success' })
-                for (let i in this.editPlanDetails) {
-                    if (this.editPlanDetails[i] != this.prevEditPlanDetails[i]) {
-                        this.editPlanDetails.EditFlag = 1;
-                        break;
-                    }
+
+        //初始化下拉列表框
+        getComboxList(SourceType) {
+            var _self = this;///Base/BaseData///, { params: { ProductMo: this.editPlanDetails.GoodsID } }
+            axios.get("GetComboxList?SourceType=" + SourceType).then(
+                (response) => {
+                    if (SourceType == "CustomerList")
+                        this.CustomerList = response.data;
+                    else if (SourceType == "LocationList")
+                        this.LocationList = response.data;                    
+                },
+                (response) => {
+                    alert(response.status);
                 }
-                Object.assign(this.selectRow, this.editPlanDetails)
-            } else {
-                this.editPlanDetails.EditFlag = 1;
-                this.tablePlanDetails.push(this.editPlanDetails);
-                //this.editPlanDetails = {};
-                this.editPlanDetails = {
-                    EditFlag: 0,
-                    ProductMo: this.formData.ProductMo,
-                    Ver: this.formData.Ver,
-                    GoodsID: '',
-                    GoodsCname: '',
-                    RequestQty: '',
-                    RequestDate: '',
-                    WipID: '',
-                    NextWipID: ''
-                };
-            }
+            ).catch(function (response) {
+                alert(response);
+            });
         },
+        //取貨架資料
+        getCartonCodeList(location_id) {            
+            axios.get("GetCartonCodeList?LocationId=" + location_id).then(
+                (response) => {                   
+                    this.$set(this.formData, "shelf", "");
+                    this.CartonCodeList = response.data;
+                },
+                (response) => {
+                    alert(response.status);
+                }
+            ).catch(function (response) {
+                alert(response);
+            });
+        },
+       
         getGoodsByID() {
             if (this.editPlanDetails.GoodsID != "") {
                 var _self = this;
@@ -236,77 +150,61 @@
             });
             }
         },
-        editRowEvent (row) {
-            this.editPlanDetails = {
-                EditFlag: 0,
-                GoodsID: row.GoodsID,
-                GoodsCname: row.GoodsCname,
-                RequestQty: row.RequestQty,
-                RequestDate: row.RequestDate,
-                WipID: row.WipID,
-                NextWipID: row.NextWipID
-            }
-            //深度複製一個對象，用來判斷數據是否有修改
-            this.prevEditPlanDetails = JSON.parse(JSON.stringify(this.editPlanDetails));
-            this.selectRow = row
-            this.showEdit = true
-        },
-        saveEvent() {
-            this.validData();
-            var _self = this;
-            var PlanHead = _self.formData;
-            var PlanDetails = _self.tablePlanDetails;
-            axios.post("SavePlan", { PlanHead, PlanDetails }).then(
-            (response) => {
-                this.SavePlan = {
-                    ProductMo: "",
-            };
-                alert("更新成功!");
-            },
-            (response) => {
-                alert(response.status);
-            }
-        ).catch(function (response) {
-            alert(response);
-        });
-        },
-
-        validData() {
-            for (let i in this.formData) {
-                if (this.formData[i] != this.prevForm[i]) {
-                    this.formData.EditFlag = 1;
-                    break;
-                }
-            }
-        },
-        deleteEvent() {
-            let selectRecords = this.$refs.xTable.getCheckboxRecords()
-            if (selectRecords.length) {
-                this.$refs.xTable.removeCheckboxRow()
-            } else {
-                alert('请至少选择一条数据！')
-                //this.$xDetails.message({ content: 'warning 提示框', status: 'warning' })
-            }
-        },
-    },
-    watch: {
-        //// watch监听 判断是否修改  
-        //formData: {
-        //    handler (val, oldVal) {
-        //        for (let i in this.formData) {
-        //            if (val[i] != this.prevForm[i]) {
-        //                this.editFormChanged = true;
-        //                break;
-        //            } else {
-        //                this.editFormChanged = false;
-        //            }
+        //validData() {
+        //檢查數據是否有過更改
+        //    for (let i in this.formData) {
+        //        if (this.formData[i] != this.prevForm[i]) {
+        //            this.formData.EditFlag = 1;
+        //            break;
         //        }
-        //        console.log(this.editFormChanged);
+        //    }
+        //},
+        //轉大寫
+        upperCase(val, fieldName) {
+            if (val) {
+                var strUpper = val.toUpperCase();
+                this.$set(this.formData, fieldName, strUpper);
+            }
+        },        
+        setToEndValue(val, fieldName) {
+            if (val) {
+                this.$set(this.formData, fieldName, val);
+            }
+        }        
+        
+    },
+    watch:{
+        // watch监听 判断是否修改  
+        formData() {           
+            this.formData.goods_id = this.formData.goods_id.toUpperCase()
+        },
+        //formData: {           
+        //    handler (val, oldVal) {
+        //        //for (let i in this.formData) {
+        //        //    if (val[i] != this.prevForm[i]) {
+        //        //        this.editFormChanged = true;
+        //        //        break;
+        //        //    } else {
+        //        //        this.editFormChanged = false;
+        //        //    }
+        //        //}
+        //        //console.log(this.editFormChanged);
+        //        this.formData.goods_id = this.formData.goods_id.toUpperCase()
         //    },
         //    deep: true
         //}
+    },
+    //computed: {
+    //    cpGoods_id: {
+    //        get: function () {
+    //            return this.formData.goods_id;
+    //        },
+    //        set: function (val) {
+    //            this.formData.goods_id = val.toUpperCase();//转大小写的方法
+    //        }
+    //    }
+    //}
 
-    }
 };
 
 var app = new Vue(Main).$mount('#app');

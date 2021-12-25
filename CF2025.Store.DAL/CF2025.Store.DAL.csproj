@@ -30,6 +30,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CF.Core.Config">
+      <HintPath>..\CF.Core.Config\bin\Debug\CF.Core.Config.dll</HintPath>
+    </Reference>
+    <Reference Include="CF.Framework.Contract">
+      <HintPath>..\CF.Framework.Contract\bin\Debug\CF.Framework.Contract.dll</HintPath>
+    </Reference>
+    <Reference Include="CF.SQLServer.DAL">
+      <HintPath>..\CF.SQLServer.DAL\bin\Debug\CF.SQLServer.DAL.dll</HintPath>
+    </Reference>
+    <Reference Include="CF2025.Base.DAL">
+      <HintPath>..\CF2025.Base.DAL\bin\Debug\CF2025.Base.DAL.dll</HintPath>
+    </Reference>
+    <Reference Include="CF2025.Store.Contract">
+      <HintPath>..\CF2025.Store.Contract\bin\Debug\CF2025.Store.Contract.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -41,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TransferOutUnconfirmDAL.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
