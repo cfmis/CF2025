@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 using CF.Framework.Contract;
+using CF2025.Base.Contract;
 using CF.SQLServer.DAL;
 using CF.Core.Config;
 
@@ -14,14 +15,17 @@ namespace CF2025.Base.DAL
     public static class DataComboxList
     {
         private static SQLHelper sh = new SQLHelper(CachedConfigContext.Current.DaoConfig.OA);
+        private static string within_code="0000";
         public static List<ModelBaseList> GetComboxList(string SourceType)
         {
             string strSql = "";
-            string within_code = "0000";
             switch (SourceType)
             {
-                case "QtyUnitList"://單位
+                case "QtyUnitList"://數量單位
                     strSql += "Select id,name,english_name From cd_units Where kind='05' Order By id";
+                    break;
+                case "WegUnitList"://重量單位
+                    strSql += "Select id,name,english_name From cd_units Where kind='03' Order By id";
                     break;
                 case "SalesmanList"://營業員&跟單員
                     strSql += "Select id,id+'--'+name As name,english_name From cd_personnel Where within_code='" + within_code + "' And sales_group is not null and state='0' Order By id";
@@ -45,12 +49,12 @@ namespace CF2025.Base.DAL
                     strSql += "";
                     break;
             }
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             ModelBaseList obj1 = new ModelBaseList();
             obj1.value = "";
             obj1.label = "";
             List<ModelBaseList> lst = new List<ModelBaseList>();
             lst.Add(obj1);
-            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             for (int i = 0; i < dt.Rows.Count; i++)
             {
                 DataRow dr = dt.Rows[i];
@@ -62,6 +66,30 @@ namespace CF2025.Base.DAL
             return lst;
         }
 
+        public static List<QtyUnitRate> GetQtyUnitRateList()
+        {
+            string strSql = "";
+            strSql += "Select a.id,a.basic_unit,a.unit_code,a.rate" +
+                " From it_coding a " +
+                " Where a.within_code='" + within_code + "' And a.id='*' " +
+                " Order By a.id";
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            QtyUnitRate obj1 = new QtyUnitRate();
+            obj1.value = "";
+            obj1.label = "";
+            List<QtyUnitRate> lst = new List<QtyUnitRate>();
+            lst.Add(obj1);
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                DataRow dr = dt.Rows[i];
+                QtyUnitRate obj = new QtyUnitRate();
+                obj.value = dr["unit_code"].ToString();
+                obj.label = dr["unit_code"].ToString().Trim();
+                obj.rate = dr["rate"].ToString() == "" ? 0 : Convert.ToDecimal(dr["rate"].ToString());
+                lst.Add(obj);
+            }
+            return lst;
+        }
         /// <summary>
         /// 倉位取倉位資料
         /// </summary>
@@ -69,7 +97,6 @@ namespace CF2025.Base.DAL
         /// <returns></returns>
         public static List<ModelBaseList> GetCartonCodeList(string location_id)
         {
-            string within_code = "0000";
             string strSql = string.Format(
                 @"SELECT S.* 
                   FROM (SELECT id, name FROM cd_carton_code WHERE within_code='{0}' and location_id='{1}' AND id<>'ZZZ') S

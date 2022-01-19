@@ -7,13 +7,13 @@
 
 
 <div id="app">
-<vxe-toolbar perfect size="medium" style="height:35px;" >
+<vxe-toolbar perfect size="medium" style="height:35px;background-color:gainsboro;margin-top:-6px" >
     <template #buttons>
         <vxe-button type="text" icon="fa fa-plus" status="primary" content="新增" @@click="newDoc()"></vxe-button>
-        <vxe-button type="text" icon="fa fa-trash-o" content="删除"></vxe-button>
         <vxe-button type="text" icon="fa fa-save" content="儲存" @@click="saveEvent()"></vxe-button>
-        <vxe-button icon="fa fa-plus" @@click="addNewItem()" size="mini">項目新增</vxe-button>
-        <vxe-button icon="fa fa-trash-o" @@click="deleteEvent()" size="mini">項目刪除</vxe-button>
+        <vxe-button type="text" icon="fa fa-pencil" @@click="addNewItem()" size="mini">項目新增</vxe-button>
+        <vxe-button type="text" icon="fa fa-remove" @@click="deleteTableItemEvent()" size="mini">項目刪除</vxe-button>
+        <vxe-button type="text" icon="fa fa-trash-o" content="删除"></vxe-button>
         @*<vxe-input v-model="searchProductMo" class="my-search" placeholder="輸入制單編號" style="height:30px;margin:105px,0px;">
             <template #suffix>
                 <i class="fa fa-search" @@click="searchByProductMo(searchProductMo)"></i>
@@ -22,10 +22,11 @@
     </template>
 </vxe-toolbar>
 <div>
-    <vxe-form :data="formData" @@submit="submitSearch" size="mini"  title-align="right" title-width="100px" prevent-submit title-colon custom-layout>@**@
+    <!--表頭記錄-->
+    <vxe-form :data="formData" size="mini"  title-align="right" title-width="100px" prevent-submit title-colon custom-layout>@**@
             <vxe-form-item title="編號" field="ID" :item-render="{}" span="6" class="vxe-form-item-customize">
                 <template #default="{ data }">
-                    <vxe-input v-model="data.ID" class="input-customize" style="width:76%"></vxe-input>
+                    <vxe-input v-model="data.ID" class="input-customize" style="width:76%" @@blur="getDataByID(data.ID)"></vxe-input>
                     <vxe-input v-model="data.Ver" class="input-customize" style="width:22%"></vxe-input>
                 </template>
             </vxe-form-item>
@@ -48,7 +49,7 @@
             </vxe-form-item>
             <vxe-form-item title="客戶編號" field="it_customer" :item-render="{}" span="6" class="vxe-form-item-customize">
                 <template #default="{ data }">
-                    <vxe-input v-model="data.it_customer" class="input-customize" maxlength="8" style="width:76%"></vxe-input>
+                    <vxe-input v-model="data.it_customer" class="input-customize" maxlength="8" style="width:72%"></vxe-input>
                     <vxe-button icon="fa fa-search" class="input-customize" style="height:20px;width:18%;"></vxe-button>
                 </template>
             </vxe-form-item>
@@ -120,7 +121,7 @@
             </vxe-form-item>
             <vxe-form-item title="Via" field="shipping_methods" :item-render="{}" span="6" class="vxe-form-item-customize">
                 <template #default="{ data }">
-                    <vxe-input v-model="data.shipping_methods" @@blur="productMoBlurEvent()" class="input-customize"></vxe-input>
+                    <vxe-input v-model="data.shipping_methods" class="input-customize"></vxe-input>
                 </template>
             </vxe-form-item>
         <vxe-form-item title="銷售員編號" field="seller_id" :item-render="{}" span="6" class="vxe-form-item-customize">
@@ -154,7 +155,7 @@
             </vxe-form-item>
             <vxe-form-item title="折扣(%)" field="disc_rate" :item-render="{}" span="6" class="vxe-form-item-customize">
                 <template #default="{ data }">
-                    <vxe-input v-model="data.disc_rate" class="input-customize"></vxe-input>
+                    <vxe-input v-model="data.disc_rate" class="input-customize" @@blur="sumInvAmt()"></vxe-input>
                 </template>
             </vxe-form-item>
             <vxe-form-item title="折扣額" field="disc_amt" :item-render="{}" span="6" class="vxe-form-item-customize">
@@ -357,12 +358,13 @@
             </vxe-form-item>
     </vxe-form>
 </div>
+    <!--明細表記錄-->
 <div style="margin-top:20px">
     <vxe-table border
                show-overflow
                height="350"
                size="mini"
-               :row-config="{height: 20}"
+               :row-config="{height: 20,isCurrent: true, isHover: true}"
                highlight-current-row
                ref="xTable"
                :loading="loading3"
@@ -370,74 +372,81 @@
                :checkbox-config="{highlight: true, range: true}"
                :data="tableDetails"
                :keyboard-config="{isArrow: true, isEnter: true,Backspace:true}"
-               :edit-config="{trigger: 'click', mode: 'row', icon: 'fa fa-pencil1', showStatus: true}">
+               :edit-config="{trigger: 'click', mode: 'row', icon: 'fa fa-pencil1', showStatus: true}"
+               @@cell-click="tableDetailsCellClickEvent"
+               @@current-change="currentChangeEvent"
+               >
         <vxe-column type="seq" title="序號" width="60"></vxe-column>
         <vxe-column field="shipment_suit" title="套件出貨" width="80" :edit-render="{}">
             <template #edit="{ row }">
                 <vxe-checkbox v-model="row.shipment_suit" size="mini" style="height:20px"></vxe-checkbox>
             </template>
         </vxe-column>
-        <vxe-column field="mo_id" title="頁數" width="100" :edit-render="{}">
+        <vxe-column field="mo_id" title="頁數" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.mo_id" style="height:20px" @@blur="getDataFromOC(row.mo_id)"></vxe-input>
+                <vxe-input v-model="row.mo_id" style="height:20px" @@input="tablemo_idInputEvent(row)" @@blur="getDataFromOC(row)" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="goods_id" title="貨品編碼" width="180" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.goods_id" style="height:20px"></vxe-input>
+                <vxe-input v-model="row.goods_id" style="height:20px" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="goods_name" title="貨品名稱" width="260" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.goods_name" style="height:20px"></vxe-input>
+                <vxe-input v-model="row.goods_name" style="height:20px" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
 
         <vxe-column field="color" title="顏色" width="120" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.color" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.color" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="customer_goods" title="客戶產品編號" width="180" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.customer_goods" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.customer_goods" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="customer_color_id" title="客戶顏色編號" width="180" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.customer_color_id" style="height:20px"></vxe-input>
+                <vxe-input v-model="row.customer_color_id" style="height:20px" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="u_invoice_qty" title="發貨數量" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.u_invoice_qty" style="height:20px"></vxe-input>
+                <vxe-input v-model="row.u_invoice_qty" style="height:20px" @@blur="sumGoodsAmt(row)" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
 
-        <vxe-column field="goods_unit" title="單位" width="60" :edit-render="{}">
+        <vxe-column field="goods_unit" title="單位" width="80" :edit-render="{autofocus: '.vxe-input--inner'}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.goods_unit" style="height:20px;"></vxe-input>
+                <vxe-select v-model="row.goods_unit" size="mini" @@change="sumGoodsAmt(row)">
+                    <vxe-option v-for="item in QtyUnitList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                </vxe-select>
             </template>
         </vxe-column>
         <vxe-column field="sec_qty" title="重量" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.sec_qty" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.sec_qty" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="sec_unit" title="重量單位" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.sec_unit" style="height:20px"></vxe-input>
+                <vxe-input v-model="row.sec_unit" style="height:20px" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="invoice_price" title="銷售單價" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.invoice_price" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.invoice_price" style="height:20px;" @@blur="sumGoodsAmt(row)"></vxe-input>
             </template>
         </vxe-column>
 
         <vxe-column field="p_unit" title="單價單位" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.p_unit" style="height:20px;"></vxe-input>
+                <vxe-select v-model="row.p_unit" size="mini" @@change="sumGoodsAmt(row)">
+                    <vxe-option v-for="item in QtyUnitList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                </vxe-select>
             </template>
         </vxe-column>
         <vxe-column field="total_sum" title="總金額" width="100" :edit-render="{}">
@@ -447,69 +456,69 @@
         </vxe-column>
         <vxe-column field="package_num" title="包數" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.package_num" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.package_num" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="box_no" title="箱號" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.box_no" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.box_no" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
 
         <vxe-column field="spec" title="規格" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.spec" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.spec" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="table_head" title="客戶款號" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.table_head" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.table_head" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="is_print" title="打印" width="60" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.is_print" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.is_print" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="subject_id" title="科目編號" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.subject_id" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.subject_id" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
 
         <vxe-column field="issues_date" title="出貨日期" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.issues_date" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.issues_date" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="issues_id" title="出貨單號" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.issues_id" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.issues_id" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="contract_cid" title="PO/NO" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.contract_cid" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.contract_cid" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="order_id" title="OC No" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.order_id" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.order_id" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="disc_rate" title="折扣(%)" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.disc_rate" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.disc_rate" style="height:20px;" @@blur="sumGoodsAmt(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="buy_id" title="報價單編號" width="100" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.buy_id" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.buy_id" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="disc_price" title="折後單價" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.disc_price" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.disc_price" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="disc_amt" title="折扣額" width="80" :edit-render="{}">
@@ -517,96 +526,81 @@
                 <vxe-input v-model="row.disc_amt" style="height:20px;"></vxe-input>
             </template>
         </vxe-column>
-        <vxe-column field="disc_rate" title="折扣(%)" width="80" :edit-render="{}">
-            <template #edit="{ row }">
-                <vxe-input v-model="row.disc_rate" style="height:20px;"></vxe-input>
-            </template>
-        </vxe-column>
         <vxe-column field="ncv" title="此價錢只限用於此單" width="140" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.ncv" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.ncv" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="nwt" title="淨重" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.nwt" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.nwt" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="gross_wt" title="毛重" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.gross_wt" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.gross_wt" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="remark" title="備注" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.remark" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.remark" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="ref1" title="參考1#" width="100" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.ref1" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.ref1" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="ref2" title="參考2#" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.ref2" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.ref2" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="corresponding_code" title="對應條碼" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.corresponding_code" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.corresponding_code" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
 
 
        <vxe-column field="org_inv_no" title="原始發票號" width="100" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.org_inv_no" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.org_inv_no" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="location_id" title="倉庫" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.location_id" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.location_id" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="apprise_id" title="出貨通知單號" width="120" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.apprise_id" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.apprise_id" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="big_class" title="大類" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.big_class" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.big_class" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="is_free" title="是否免費" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.is_free" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.is_free" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="Delivery_Require" title="走貨要求" width="100" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.Delivery_Require" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.Delivery_Require" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="customer_test_id" title="檢驗分類編號" width="120" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.customer_test_id" style="height:20px;"></vxe-input>
+                <vxe-input v-model="row.customer_test_id" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column field="brand_category" title="牌子類別" width="80" :edit-render="{}">
             <template #edit="{ row }">
-                <vxe-input v-model="row.brand_category" style="height:20px;"></vxe-input>
-            </template>
-        </vxe-column>
-        <vxe-column field="sex" title="Sex" width="80" :edit-render="{}">
-            @*<template #default="{ row }">
-                <span>{{ formatSex(row.sex) }}</span>
-            </template>*@
-            <template #edit="{ row }">
-                <vxe-select v-model="row.sex" size="mini">
-                    <vxe-option v-for="item in SalesmanList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
-                </vxe-select>
+                <vxe-input v-model="row.brand_category" style="height:20px;" @@change="setCurrentRowUpdateState(row)"></vxe-input>
             </template>
         </vxe-column>
         <vxe-column title="修改" width="60" :resizable="false" show-overflow>
@@ -616,6 +610,68 @@
         </vxe-column>
     </vxe-table>
 </div>
+    <!--附加費列表-->
+<div style="margin-top:20px">
+    <vxe-table border
+               show-overflow
+               height="150"
+               size="mini"
+               :row-config="{height: 20}"
+               highlight-current-row
+               ref="xTable"
+               :loading="loading3"
+               :sync-resize="selectTab"
+               :checkbox-config="{highlight: true, range: true}"
+               :data="tableFareDetails"
+               :keyboard-config="{isArrow: true, isEnter: true,Backspace:true}"
+               @@cell-click="tableFareDetailsCellClickEvent"
+               :edit-config="{trigger: 'click', mode: 'row', icon: 'fa fa-pencil1', showStatus: true}">
+        <vxe-column type="seq" title="序號" width="60"></vxe-column>
+        
+        <vxe-column field="fare_id" title="附加費用編號" width="100" :edit-render="{}">
+            <template #edit="{ row }">
+                <vxe-input v-model="row.fare_id" style="height:20px" @@change="setFareCurrentRowUpdateState(row)"></vxe-input>
+            </template>
+        </vxe-column>
+        <vxe-column field="name" title="附加費用名稱" width="100" :edit-render="{}">
+            <template #edit="{ row }">
+                <vxe-input v-model="row.name" style="height:20px" @@change="setFareCurrentRowUpdateState(row)"></vxe-input>
+            </template>
+        </vxe-column>
+        <vxe-column field="qty" title="數量" width="80" :edit-render="{}">
+            <template #edit="{ row }">
+                <vxe-input v-model="row.qty" style="height:20px" @@change="setFareCurrentRowUpdateState(row)"></vxe-input>
+            </template>
+        </vxe-column>
+        <vxe-column field="price" title="價格" width="80" :edit-render="{}">
+            <template #edit="{ row }">
+                <vxe-input v-model="row.price" style="height:20px" @@change="setFareCurrentRowUpdateState(row)"></vxe-input>
+            </template>
+        </vxe-column>
+        <vxe-column field="fare_sum" title="費用金額" width="80" :edit-render="{}">
+            <template #edit="{ row }">
+                <vxe-input v-model="row.fare_sum" style="height:20px" @@change="setFareCurrentRowUpdateState(row)"></vxe-input>
+            </template>
+        </vxe-column>
+        <vxe-column field="mo_id" title="頁數" width="100" :edit-render="{}">
+            <template #edit="{ row }">
+                <vxe-input v-model="row.mo_id" style="height:20px"></vxe-input>
+            </template>
+        </vxe-column>
+        <vxe-column field="is_fee" title="是否免費" width="80" :edit-render="{}">
+            <template #edit="{ row }">
+                <vxe-checkbox v-model="row.is_fee" size="mini" style="height:20px"></vxe-checkbox>
+            </template>
+        </vxe-column>
+        <vxe-column field="remark" title="備註" width="160" :edit-render="{}">
+            <template #edit="{ row }">
+                <vxe-input v-model="row.remark" style="height:20px"></vxe-input>
+            </template>
+        </vxe-column>
+    </vxe-table>
+</div>
+
+
 <vxe-modal ref="xModal" v-model="showEdit" title="编辑&保存" width="900" height="600" resize destroy-on-close>
     
         <template #default>
@@ -836,6 +892,6 @@
 
 </div>
 @section PageSpecificJavascriptIncludes{
-    <script src="~/Areas/Sale/js/Invoice.js"></script>
+    <script src="~/Areas/Sale/js/Invoice.js?v=@Guid.NewGuid().ToString()"></script>
      @*<link rel="stylesheet" href="~/Content/main_inv.css">*@ 
 }

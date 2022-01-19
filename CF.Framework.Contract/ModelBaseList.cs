@@ -11,4 +11,10 @@ namespace CF.Framework.Contract
         public string value { get; set; }
         public string label { get; set; }
     }
+    public class UpdateStatusModel
+    {
+        public string Status { get; set; }
+        public string Msg { get; set; }
+        public string ReturnValue { get; set; }
+    }
 }

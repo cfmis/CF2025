@@ -127,5 +127,22 @@ namespace CF2025.Sale.Contract
     {
         public so_invoice_mostly ocMostly = new so_invoice_mostly();
         public so_invoice_details ocDetails = new so_invoice_details();
+        public so_other_fare ocOtherFare = new so_other_fare();
+    }
+    public class so_other_fare
+    {
+        public int EditFlag { get; set; }
+        public string sequence_id { get; set; }
+        public string fare_id { get; set; }
+        public string name { get; set; }
+        public decimal tf_percent { get; set; }
+        public decimal sum_kind { get; set; }
+        public decimal qty { get; set; }
+        public decimal price { get; set; }
+        public decimal fare_sum { get; set; }
+        public string mo_id { get; set; }
+        public string mould_no { get; set; }
+        public string remark { get; set; }
+        public string is_free { get; set; }
     }
 }
