@@ -13,6 +13,102 @@ namespace CF.Framework.Utility
     /// </summary>  
     public class ConvertHelper
     {
+
+        /// <summary>
+        /// List泛型转换DataTable.
+        /// </summary>
+        /// 
+
+        public DataTable ListToDataTable<T>(List<T> items)
+        {
+            var tb = new DataTable(typeof(T).Name);
+
+            PropertyInfo[] props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+            foreach (PropertyInfo prop in props)
+            {
+                Type t = GetCoreType(prop.PropertyType);
+                tb.Columns.Add(prop.Name, t);
+            }
+
+            foreach (T item in items)
+            {
+                var values = new object[props.Length];
+
+                for (int i = 0; i < props.Length; i++)
+                {
+                    values[i] = props[i].GetValue(item, null);
+                }
+
+                tb.Rows.Add(values);
+            }
+
+            return tb;
+        }
+
+        /// <summary>
+        /// model转换DataTable
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="items"></param>
+        /// <returns></returns>
+        public DataTable ModelToDataTable<T>(T items)
+        {
+            var tb = new DataTable(typeof(T).Name);
+
+            PropertyInfo[] props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+            foreach (PropertyInfo prop in props)
+            {
+                Type t = GetCoreType(prop.PropertyType);
+                tb.Columns.Add(prop.Name, t);
+            }
+
+
+            var values = new object[props.Length];
+
+            for (int i = 0; i < props.Length; i++)
+            {
+                values[i] = props[i].GetValue(items, null);
+            }
+
+            tb.Rows.Add(values);
+
+
+            return tb;
+        }
+
+        /// <summary>
+        /// Determine of specified type is nullable
+        /// </summary>
+        public static bool IsNullable(Type t)
+        {
+            return !t.IsValueType || (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>));
+        }
+
+        /// <summary>
+        /// Return underlying type if type is Nullable otherwise return the type
+        /// </summary>
+        public static Type GetCoreType(Type t)
+        {
+            if (t != null && IsNullable(t))
+            {
+                if (!t.IsValueType)
+                {
+                    return t;
+                }
+                else
+                {
+                    return Nullable.GetUnderlyingType(t);
+                }
+            }
+            else
+            {
+                return t;
+            }
+        }
+
+
         /// <summary>  
         /// 单表查询结果转换成泛型集合  
         /// </summary>  
@@ -116,5 +212,165 @@ namespace CF.Framework.Utility
              return t;
          }
 
+        public static string DataTableJsonReturnExcel(DataTable dt)
+        {
+            StringBuilder json = new StringBuilder();
+            StringBuilder jsonBuilder = new StringBuilder();
+            json.Append("[");
+
+
+
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                jsonBuilder.Append("{");
+                for (int j = 0; j < dt.Columns.Count; j++)
+                {
+                    jsonBuilder.Append("\"");
+                    jsonBuilder.Append(dt.Columns[j].ColumnName);
+                    jsonBuilder.Append("\":\"");
+                    string aa = WipeRiskString(dt.Rows[i][j].ToString().Trim());
+                    jsonBuilder.Append(WipeRiskString(dt.Rows[i][j].ToString().Trim()));
+                    jsonBuilder.Append("\",");
+                }
+                if (dt.Columns.Count > 0)
+                {
+                    jsonBuilder.Remove(jsonBuilder.Length - 1, 1);
+                }
+                jsonBuilder.Append("},");
+            }
+            if (dt.Rows.Count > 0)
+            {
+                jsonBuilder.Remove(jsonBuilder.Length - 1, 1);
+            }
+
+            json.Append(jsonBuilder.ToString());
+            json.Append("]");
+
+            return json.ToString();
+        }
+
+        #region dataTable转换成Json格式  
+        /// <summary>       
+        /// dataTable转换成Json格式       
+        /// </summary>       
+        /// <param name="dt"></param>       
+        /// <returns></returns>       
+        public static string DataTableJsonReturnTextBox(DataTable dt)
+        {
+            StringBuilder jsonBuilder = new StringBuilder();
+            jsonBuilder.Append("{\"");
+            jsonBuilder.Append(dt.TableName.ToString());
+            jsonBuilder.Append("\":[");
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                jsonBuilder.Append("{");
+                for (int j = 0; j < dt.Columns.Count; j++)
+                {
+                    jsonBuilder.Append("\"");
+                    jsonBuilder.Append(dt.Columns[j].ColumnName);
+                    jsonBuilder.Append("\":\"");
+                    jsonBuilder.Append(dt.Rows[i][j].ToString());
+                    jsonBuilder.Append("\",");
+                }
+                jsonBuilder.Remove(jsonBuilder.Length - 1, 1);
+                jsonBuilder.Append("},");
+            }
+            jsonBuilder.Remove(jsonBuilder.Length - 1, 1);
+            jsonBuilder.Append("]");
+            jsonBuilder.Append("}");
+            return jsonBuilder.ToString();
+        }
+
+
+        public static string DataTableJsonReturnList(DataTable dt)
+        {
+            StringBuilder jsonBuilder = new StringBuilder();
+            jsonBuilder.Append("[");
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                jsonBuilder.Append("{");
+                for (int j = 0; j < dt.Columns.Count; j++)
+                {
+                    jsonBuilder.Append("\"");
+                    jsonBuilder.Append(dt.Columns[j].ColumnName);
+                    jsonBuilder.Append("\":\"");
+                    jsonBuilder.Append(dt.Rows[i][j].ToString());
+                    jsonBuilder.Append("\",");
+                }
+                jsonBuilder.Remove(jsonBuilder.Length - 1, 1);
+                jsonBuilder.Append("},");
+            }
+            jsonBuilder.Remove(jsonBuilder.Length - 1, 1);
+            jsonBuilder.Append("]");
+            //jsonBuilder.Append("}");
+            return jsonBuilder.ToString();
+        }
+
+        //JASON格式，返回給EasyUI Table使用
+        public static string DataTableJsonReturnTable(DataTable dt)
+        {
+            StringBuilder json = new StringBuilder();
+            StringBuilder jsonBuilder = new StringBuilder();
+            json.Append("{\"total\":");
+            json.Append(dt.Rows.Count);
+            json.Append(",\"rows\":[");
+
+
+
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                jsonBuilder.Append("{");
+                for (int j = 0; j < dt.Columns.Count; j++)
+                {
+                    jsonBuilder.Append("\"");
+                    jsonBuilder.Append(dt.Columns[j].ColumnName);
+                    jsonBuilder.Append("\":\"");
+                    string aa = WipeRiskString(dt.Rows[i][j].ToString().Trim());
+                    jsonBuilder.Append(WipeRiskString(dt.Rows[i][j].ToString().Trim()));
+                    jsonBuilder.Append("\",");
+                }
+                if (dt.Columns.Count > 0)
+                {
+                    jsonBuilder.Remove(jsonBuilder.Length - 1, 1);
+                }
+                jsonBuilder.Append("},");
+            }
+            if (dt.Rows.Count > 0)
+            {
+                jsonBuilder.Remove(jsonBuilder.Length - 1, 1);
+            }
+
+            json.Append(jsonBuilder.ToString());
+            json.Append("]}");
+
+            return json.ToString();
+        }
+
+        #endregion
+
+
+
+        //去處非法的字符
+        public static string WipeRiskString(string fstr)
+        {
+            string tstr = fstr;
+            tstr = tstr.Replace("\r\n", "");
+            tstr = tstr.Replace("\r", "");
+            tstr = tstr.Replace("\n", "");
+            tstr = tstr.Replace("\\", "");//SBL012647
+            tstr = tstr.Replace("\u0002", "");//GBV043482
+            tstr = tstr.Replace("\t", "");
+            tstr = tstr.Replace("%", "");
+            tstr = tstr.Replace("!", "");
+            tstr = tstr.Replace("\"", "");
+            tstr = tstr.Replace("”", "");
+            tstr = tstr.Replace("“", "");
+            //tstr = tstr.Replace(".", "");
+            //tstr = tstr.Replace("~", "");
+            tstr = tstr.Replace("{", "");
+            tstr = tstr.Replace("}", "");
+            tstr = tstr.Replace("?", "");
+            return tstr;
+        }
     }
 }
