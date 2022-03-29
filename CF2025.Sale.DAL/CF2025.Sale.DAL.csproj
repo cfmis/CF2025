@@ -39,6 +39,9 @@
     <Reference Include="CF.SQLServer.DAL">
       <HintPath>..\CF.SQLServer.DAL\bin\Debug\CF.SQLServer.DAL.dll</HintPath>
     </Reference>
+    <Reference Include="CF2025.Base.Contract">
+      <HintPath>..\CF2025.Base.Contract\bin\Debug\CF2025.Base.Contract.dll</HintPath>
+    </Reference>
     <Reference Include="CF2025.Sale.Contract">
       <HintPath>..\CF2025.Sale.Contract\bin\Debug\CF2025.Sale.Contract.dll</HintPath>
     </Reference>

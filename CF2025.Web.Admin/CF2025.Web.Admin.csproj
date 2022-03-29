@@ -83,6 +83,9 @@
     <Reference Include="CF.Web">
       <HintPath>..\CF.Web\bin\Debug\CF.Web.dll</HintPath>
     </Reference>
+    <Reference Include="CF2025.Base.Contract">
+      <HintPath>..\CF2025.Base.Contract\bin\Debug\CF2025.Base.Contract.dll</HintPath>
+    </Reference>
     <Reference Include="CF2025.Base.DAL">
       <HintPath>..\CF2025.Base.DAL\bin\Debug\CF2025.Base.DAL.dll</HintPath>
     </Reference>
@@ -258,10 +261,12 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Areas\Base\BaseAreaRegistration.cs" />
+    <Compile Include="Areas\Base\Controllers\PublicQueryController.cs" />
     <Compile Include="Areas\Base\Controllers\DataComboxListController.cs" />
     <Compile Include="Areas\Sale\Controllers\InvoiceController.cs" />
     <Compile Include="Areas\Sale\Controllers\OrderController.cs" />
     <Compile Include="Areas\Sale\SaleAreaRegistration.cs" />
+    <Compile Include="Areas\Store\Controllers\TransferInController.cs" />
     <Compile Include="Areas\Store\Controllers\TransferOutUnconfirmController.cs" />
     <Compile Include="Areas\Store\StoreAreaRegistration.cs" />
     <Compile Include="Common\AdminCacheContext.cs" />
@@ -281,7 +286,9 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Areas\Base\js\publicQuery.js" />
     <Content Include="Areas\Sale\js\Invoice.js" />
+    <Content Include="Areas\Store\js\TransferIn.js" />
     <Content Include="Areas\Store\js\TransferOutUnconfirm.js" />
     <Content Include="Config\AdminMenuConfig.xml" />
     <Content Include="Config\CacheConfig.xml" />
@@ -317,6 +324,11 @@
     <Content Include="Areas\Store\Views\TransferOutUnconfirm\Index.cshtml" />
     <Content Include="Areas\Store\Views\web.config" />
     <Content Include="Areas\Store\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\Store\Views\TransferIn\Index.cshtml" />
+    <Content Include="Areas\Base\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\Base\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\Base\Views\PublicQuery\Index.cshtml" />
+    <Content Include="Areas\Store\Views\TransferIn\QueryPartialView.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -373,7 +385,6 @@
     <Folder Include="App_Data\" />
     <Folder Include="Areas\Base\Models\" />
     <Folder Include="Areas\Base\Views\DataComboxList\" />
-    <Folder Include="Areas\Base\Views\Shared\" />
     <Folder Include="Areas\Base\Views\Unit\" />
     <Folder Include="Areas\Sale\Models\" />
     <Folder Include="Areas\Store\Models\" />

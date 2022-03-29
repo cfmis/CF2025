@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CF.Framework.Contract
-{
+{ 
     public class ModelBaseList
     {
         public string value { get; set; }

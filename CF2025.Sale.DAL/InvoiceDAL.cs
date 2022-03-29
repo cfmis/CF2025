@@ -8,6 +8,7 @@ using CF.Framework.Contract;
 using CF.SQLServer.DAL;
 using CF.Core.Config;
 using CF2025.Sale.Contract;
+using CF2025.Base.Contract.Model;
 
 namespace CF2025.Sale.DAL
 {

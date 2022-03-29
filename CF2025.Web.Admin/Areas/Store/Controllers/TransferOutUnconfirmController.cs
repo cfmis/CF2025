@@ -10,26 +10,13 @@ using CF2025.Store.Contract;
 
 namespace CF2025.Web.Admin.Areas.Store.Controllers
 {
-    public class TransferOutUnconfirmController : AdminControllerBase // Controller
-    {
-        // GET: Store/TransferOutUnconfirm
+    public class TransferOutUnconfirmController : AdminControllerBase
+    {       
         public ActionResult Index()
         {
-            return View();
+            return View();            
         }
-
-        public JsonResult GetComboxList(string SourceType)
-        {
-            var result = DataComboxList.GetComboxList(SourceType);            
-            return Json(result, JsonRequestBehavior.AllowGet);
-        }
-
-        public JsonResult GetCartonCodeList(string LocationId)
-        {
-            var result = DataComboxList.GetCartonCodeList(LocationId);
-            return Json(result, JsonRequestBehavior.AllowGet);
-        }
-
+        
         public ActionResult GetDataList(TransferOutFind model)        
         {
             var list = TransferOutUnconfirmDAL.GetSearchDataList(model);

@@ -7,6 +7,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Runtime.InteropServices;
 using System.Configuration;
+using System.Reflection;
 //using CF.Core.Config;
 
 namespace CF.SQLServer.DAL
@@ -194,10 +195,7 @@ namespace CF.SQLServer.DAL
                 sda.Dispose();
                 connection.Close();
                 return dataSet;
-            }
-
-
-            
+            }            
         }
 
         /// <summary>
@@ -223,7 +221,6 @@ namespace CF.SQLServer.DAL
                 sda.Dispose();
                 return dtData;
             }
-
         }
 
         public string ExecuteSqlUpdate(string strSql)
@@ -250,5 +247,74 @@ namespace CF.SQLServer.DAL
 
             return result;
         }
+
+        /// <summary>
+        /// 轉換為GEO中對應的語言
+        /// </summary>
+        /// <param name="language"></param>
+        /// <returns></returns>
+        public string ConvertLanguage(string language)
+        {
+            string LanguageID = "";
+            if (string.IsNullOrEmpty(language))
+            {
+                language = "0";//WEB中登入的語言,0:繁體中文
+            }                   
+            switch (language)
+            {
+                //GEO中語言:3.繁體中文,2.英文,1.簡體中文
+                case "0"://繁體中文
+                    LanguageID = "3";//GEO中3:為繁體中文
+                    break;
+                case "2"://英文
+                    LanguageID = "2";
+                    break;
+                default:
+                    LanguageID = "3";
+                    break;
+            }
+            return LanguageID;
+        }
+
+        /// <summary>
+        /// DataTable轉換為Json字符串格式
+        /// </summary>
+        /// <param name="table"></param>
+        /// <returns></returns>
+        public string DataTableToJson(DataTable table)
+        {
+            var jsonString = new StringBuilder();
+            if (table.Rows.Count > 0)
+            {
+                jsonString.Append("[");
+                for (int i = 0; i < table.Rows.Count; i++)
+                {
+                    jsonString.Append("{");
+                    for (int j = 0; j < table.Columns.Count; j++)
+                    {
+                        if (j < table.Columns.Count - 1)
+                        {
+                            jsonString.Append("\"" + table.Columns[j].ColumnName.ToString()+ "\":" + "\"" + table.Rows[i][j].ToString() + "\",");
+                        }
+                        else if (j == table.Columns.Count - 1)
+                        {
+                            jsonString.Append("\"" + table.Columns[j].ColumnName.ToString() + "\":" + "\"" + table.Rows[i][j].ToString() + "\"");
+                        }
+                    }
+                    if (i == table.Rows.Count - 1)
+                    {
+                        jsonString.Append("}");
+                    }
+                    else
+                    {
+                        jsonString.Append("},");
+                    }
+                }
+                jsonString.Append("]");
+            }
+            return jsonString.ToString();
+        }
+
+
     }
 }
