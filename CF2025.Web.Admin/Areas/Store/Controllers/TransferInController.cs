@@ -81,12 +81,6 @@ namespace CF2025.Web.Admin.Areas.Store.Controllers
             else
                 return Json("Error");
         }
-
-        public ActionResult QueryPartialView()
-        {
-            //TableAEntity tae = new TableAEntity();
-            //return PartialView(tae.GetTableAs());
-            return PartialView();
-        }
+       
     }
 }

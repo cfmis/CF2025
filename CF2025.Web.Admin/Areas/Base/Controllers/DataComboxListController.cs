@@ -9,7 +9,7 @@ using CF2025.Base.Contract.Model;
 
 namespace CF2025.Web.Admin.Areas.Base.Controllers
 {
-    public class DataComboxListController : AdminControllerBase //: Controller//
+    public class DataComboxListController : AdminControllerBase 
     {
         // GET: Base/DataComboxList
         string language_id = AdminUserContext.Current.LoginInfo.LanguageID;
@@ -20,13 +20,13 @@ namespace CF2025.Web.Admin.Areas.Base.Controllers
 
         public JsonResult GetComboxList(string SourceType)
         {           
-            var result = DataComboxDAL.GetComboxList(SourceType,language_id);           
+            var result = DataComboxList.GetComboxList(SourceType,language_id);           
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult GetCartonCodeList(string LocationId)
         {            
-            var result = DataComboxDAL.GetCartonCodeList(LocationId);
+            var result = DataComboxList.GetCartonCodeList(LocationId);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 

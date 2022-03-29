@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CF2025.Base.Contract.Model
+﻿namespace CF2025.Base.Contract.Model
 {
     public class BaseModel
     {
     }
+    
     public class ModelQueryList
     {
         public string value { get; set; }

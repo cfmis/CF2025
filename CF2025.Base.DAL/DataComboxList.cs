@@ -12,7 +12,7 @@ using CF.Core.Config;
 namespace CF2025.Base.DAL
 {
    
-    public static class DataComboxDAL
+    public static class DataComboxList
     {
         private static SQLHelper sh = new SQLHelper(CachedConfigContext.Current.DaoConfig.OA);
        
