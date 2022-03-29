@@ -68,7 +68,7 @@ namespace CF2025.Base.DAL
                 obj.value = dr["id"].ToString();
                 obj.label = dr["name"].ToString().Trim();
                 lst.Add(obj);
-            }
+            } 
             return lst;
         }
 
