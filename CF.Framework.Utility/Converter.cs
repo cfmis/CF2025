@@ -380,5 +380,36 @@ namespace CF.Framework.Utility
             return result;
         }
         #endregion
+
+        ///判斷日期字段是否為null并轉換成日期字符
+        ///
+        public static string ConvertFieldToCnDataString(string date)
+        {
+            string strDate = "";
+            try
+            {
+                strDate = date.ToString().Trim() == "" ? "" : ToCnDataString(Convert.ToDateTime(date));
+            }
+            catch
+            {
+                strDate = "";
+            }
+            return strDate;
+        }
+        ///判斷日期字段是否為null并轉換成日期字符長格式
+        ///
+        public static string ConvertFieldToCnDateTimeString(string date)
+        {
+            string strDateTime = "";
+            try
+            {
+                strDateTime = date.ToString().Trim() == "" ? "" : ToCnDateTimeString(Convert.ToDateTime(date));
+            }
+            catch
+            {
+                strDateTime = "";
+            }
+            return strDateTime;
+        }
     }
 }

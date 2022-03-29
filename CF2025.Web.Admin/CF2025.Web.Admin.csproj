@@ -83,9 +83,6 @@
     <Reference Include="CF.Web">
       <HintPath>..\CF.Web\bin\Debug\CF.Web.dll</HintPath>
     </Reference>
-    <Reference Include="CF2025.Base.Contract">
-      <HintPath>..\CF2025.Base.Contract\bin\Debug\CF2025.Base.Contract.dll</HintPath>
-    </Reference>
     <Reference Include="CF2025.Base.DAL">
       <HintPath>..\CF2025.Base.DAL\bin\Debug\CF2025.Base.DAL.dll</HintPath>
     </Reference>
@@ -324,11 +321,6 @@
     <Content Include="Areas\Store\Views\TransferOutUnconfirm\Index.cshtml" />
     <Content Include="Areas\Store\Views\web.config" />
     <Content Include="Areas\Store\Views\_ViewStart.cshtml" />
-    <Content Include="Areas\Store\Views\TransferIn\Index.cshtml" />
-    <Content Include="Areas\Base\Views\_ViewStart.cshtml" />
-    <Content Include="Areas\Base\Views\Shared\_Layout.cshtml" />
-    <Content Include="Areas\Base\Views\PublicQuery\Index.cshtml" />
-    <Content Include="Areas\Store\Views\TransferIn\QueryPartialView.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />

@@ -36,11 +36,12 @@
     <Reference Include="CF.Framework.Contract">
       <HintPath>..\CF.Framework.Contract\bin\Debug\CF.Framework.Contract.dll</HintPath>
     </Reference>
+    <Reference Include="CF.Framework.Utility, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\CF.Framework.Utility\bin\Debug\CF.Framework.Utility.dll</HintPath>
+    </Reference>
     <Reference Include="CF.SQLServer.DAL">
       <HintPath>..\CF.SQLServer.DAL\bin\Debug\CF.SQLServer.DAL.dll</HintPath>
-    </Reference>
-    <Reference Include="CF2025.Base.Contract">
-      <HintPath>..\CF2025.Base.Contract\bin\Debug\CF2025.Base.Contract.dll</HintPath>
     </Reference>
     <Reference Include="CF2025.Sale.Contract">
       <HintPath>..\CF2025.Sale.Contract\bin\Debug\CF2025.Sale.Contract.dll</HintPath>
@@ -55,6 +56,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InvoiceBase.cs" />
     <Compile Include="InvoiceDAL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

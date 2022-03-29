@@ -35,7 +35,5 @@ namespace CF2025.Web.Admin.Areas.Base.Controllers
             var result = DateTime.Now.Date.ToString("yyyy-MM-dd"); 
             return Json(result, JsonRequestBehavior.AllowGet);
         }
-
-                        
     }
 }
