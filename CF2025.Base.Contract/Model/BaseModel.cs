@@ -9,13 +9,6 @@ namespace CF2025.Base.Contract.Model
     public class BaseModel
     {
     }
-
-    //public class ModelBaseList1
-    //{
-    //    public string value { get; set; }
-    //    public string label { get; set; }
-    //}
-
     public class ModelQueryList
     {
         public string value { get; set; }
