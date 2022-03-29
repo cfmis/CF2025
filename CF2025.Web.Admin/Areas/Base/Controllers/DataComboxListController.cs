@@ -24,7 +24,7 @@ namespace CF2025.Web.Admin.Areas.Base.Controllers
         }
         public JsonResult GetQtyUnitRateList(string SourceType)
         {
-            var result = DataComboxList.GetQtyUnitRateList();
+            var result = DataComboxList.GetQtyUnitRateList("");
             //var result = new { rows = list };
             return Json(result, JsonRequestBehavior.AllowGet);
         }

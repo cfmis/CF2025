@@ -53,6 +53,7 @@
     <Compile Include="Caching.cs" />
     <Compile Include="Collection.cs" />
     <Compile Include="Converter.cs" />
+    <Compile Include="ConvertHelper.cs" />
     <Compile Include="ConvertJson.cs" />
     <Compile Include="Cookie.cs" />
     <Compile Include="DataTableToJson.cs" />
@@ -67,6 +68,7 @@
     <Compile Include="ImageUtil.cs" />
     <Compile Include="JsUtil.cs" />
     <Compile Include="MailHelper.cs" />
+    <Compile Include="ModelConvertHelper.cs" />
     <Compile Include="NetHelper.cs" />
     <Compile Include="ObjectHelper.cs" />
     <Compile Include="PermutationAndCombination.cs" />

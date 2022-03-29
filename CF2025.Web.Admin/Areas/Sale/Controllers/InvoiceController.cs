@@ -17,7 +17,11 @@ namespace CF2025.Web.Admin.Areas.Sale.Controllers
             ViewBag.Title = "銷售發票";
             return View();
         }
-
+        public ActionResult Create()
+        {
+            ViewBag.Title = "銷售發票";
+            return View();
+        }
         public JsonResult GetComboxList(string SourceType)
         {
             var result = InvoiceDAL.GetComboxList(SourceType);
@@ -48,18 +52,109 @@ namespace CF2025.Web.Admin.Areas.Sale.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
-        public JsonResult GetDataByID(string ID)
+        public JsonResult DelInvoice(so_invoice_mostly InvMostly, string sequence_id, List<so_other_fare> InvOtherFare)
         {
-            //PlanDAL clsPlanDAL = new PlanDAL();
-            var result = InvoiceDAL.GetDataByID(ID);
+            ////PlanDAL clsPlanDAL = new PlanDAL();
+            var result = InvoiceDAL.DelInvoice(InvMostly, sequence_id, InvOtherFare);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
-        public JsonResult GetFareDataByID(string ID)
+        public JsonResult GetInvoiceByID(string ID)
         {
             //PlanDAL clsPlanDAL = new PlanDAL();
-            var result = InvoiceDAL.GetFareDataByID(ID);
+            var result = InvoiceDAL.GetInvoiceByID(ID);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+        //[HttpPost]
+        //public JsonResult GetFareDataByID(string ID)
+        //{
+        //    //PlanDAL clsPlanDAL = new PlanDAL();
+        //    var result = InvoiceDAL.GetFareDataByID(ID);
+        //    return Json(result, JsonRequestBehavior.AllowGet);
+        //}
+        public JsonResult ValidGoodsData(string ID,string mo_id,string goods_id,string u_invoice_qty,string goods_unit,string sec_qty,string location_id)
+        {
+            //PlanDAL clsPlanDAL = new PlanDAL();
+            var result = InvoiceDAL.ValidGoodsData(ID, mo_id, goods_id, u_invoice_qty, goods_unit, sec_qty, location_id);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult CheckGoodsQty(string ID, string mo_id, string goods_id, string u_invoice_qty, string goods_unit, string sec_qty, string location_id)
+        {
+            //PlanDAL clsPlanDAL = new PlanDAL();
+            var result = InvoiceDAL.CheckGoodsQty(ID, mo_id, goods_id, u_invoice_qty, goods_unit, sec_qty, location_id);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult GetGoodsWegFromStore(string mo_id, string goods_id, string location_id, string u_invoice_qty, string goods_unit)
+        {
+            //PlanDAL clsPlanDAL = new PlanDAL();
+            var result = InvoiceDAL.GetGoodsWegFromStore(mo_id, goods_id, location_id, u_invoice_qty, goods_unit);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
+        public JsonResult ApproveInvoice(so_invoice_mostly InvMostly, List<so_invoice_details> InvDetails, List<so_other_fare> InvOtherFare)
+        {
+            //PlanDAL clsPlanDAL = new PlanDAL();
+            var result = InvoiceDAL.ApproveInvoice(InvMostly, InvDetails, InvOtherFare);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
+        public JsonResult NewVersion(so_invoice_mostly InvMostly, List<so_invoice_details> InvDetails, List<so_other_fare> InvOtherFare)
+        {
+            //PlanDAL clsPlanDAL = new PlanDAL();
+            var result = InvoiceDAL.NewVersion(InvMostly, InvDetails, InvOtherFare);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        //發貨確認
+        [HttpPost]
+        public JsonResult ConfirmSent(List<so_invoice_details> InvDetails,string issues_state)
+        {
+            //PlanDAL clsPlanDAL = new PlanDAL();
+            var result = InvoiceDAL.ConfirmSent(InvDetails, issues_state);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        //取消發貨
+        [HttpPost]
+        public JsonResult CancelSent(List<so_invoice_details> InvDetails)
+        {
+            //PlanDAL clsPlanDAL = new PlanDAL();
+            var result = InvoiceDAL.CancelSent(InvDetails);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        //注銷
+        [HttpPost]
+        public JsonResult CancelDoc(string ID)
+        {
+            //PlanDAL clsPlanDAL = new PlanDAL();
+            var result = InvoiceDAL.CancelDoc(ID);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        //[HttpPost]
+        //public JsonResult CreateService1()
+        //{
+
+        //    //PlanDAL clsPlanDAL = new PlanDAL();
+        //    var result = "";
+        //    return Json(result, JsonRequestBehavior.AllowGet);
+        //}
+        //[HttpPost]
+        //public JsonResult CreateService()//<T>() where T : new()
+        //{
+
+        //    //PlanDAL clsPlanDAL = new PlanDAL();
+        //    var result = InvoiceDAL.CreateService<InvoiceModel>();
+        //    return Json(result, JsonRequestBehavior.AllowGet);
+        //}
+
+        //public JsonResult DataTableReturnList()//<T>() where T : new()
+        //{
+
+        //    //PlanDAL clsPlanDAL = new PlanDAL();
+        //    var result = InvoiceDAL.DataTableReturnList();
+        //    return Json(result, JsonRequestBehavior.AllowGet);
+        //}
     }
 }

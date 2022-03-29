@@ -45,6 +45,12 @@ namespace CF2025.Base.DAL
                 case "CustomerList"://客戶編號
                     strSql += "SELECT id,id+'--' + name AS name FROM it_customer WHERE within_code='" + within_code + "' AND customer_group='1' AND state<>'2' ORDER BY id";
                     break;
+                case "TackFareList"://附加費用
+                    strSql += "Select id,name,english_name From cd_tack_fare Where within_code='" + within_code + "' Order By id";
+                    break;
+                case "issues_state_list"://發貨狀態
+                    strSql += "SELECT id,id+'--' + name AS name FROM cd_mo_type WHERE within_code='" + within_code + "' AND mo_type='A' ORDER BY id";
+                    break;
                 default:
                     strSql += "";
                     break;
@@ -66,13 +72,15 @@ namespace CF2025.Base.DAL
             return lst;
         }
 
-        public static List<QtyUnitRate> GetQtyUnitRateList()
+        public static List<QtyUnitRate> GetQtyUnitRateList(string unit_code)
         {
             string strSql = "";
             strSql += "Select a.id,a.basic_unit,a.unit_code,a.rate" +
                 " From it_coding a " +
-                " Where a.within_code='" + within_code + "' And a.id='*' " +
-                " Order By a.id";
+                " Where a.within_code='" + within_code + "' And a.id='*' ";
+            if (unit_code != "")
+                strSql += " And a.unit_code='" + unit_code + "'";
+            strSql += " Order By a.id";
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             QtyUnitRate obj1 = new QtyUnitRate();
             obj1.value = "";
