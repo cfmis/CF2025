@@ -94,6 +94,7 @@
         }
     },
     created() {
+		debugger;
         this.getComboxList("DeptList");//部門編碼   
         this.getComboxList("StateList");//狀態 
         this.getComboxList("LocationList");//倉庫,貨架,由選擇的倉庫帶出       
@@ -150,26 +151,32 @@
 
         },       
         //初始化下拉列表框
-        getComboxList(SourceType) {
-            axios.get("/Base/DataComboxList/GetComboxList?SourceType=" + SourceType).then(
+        async getComboxList(SourceType) {
+            await axios.get("/Base/DataComboxList/GetComboxList?SourceType=" + SourceType).then(
                 (response) => {
-                    if (SourceType == "DeptList") {
-                        this.deptList = response.data;
-                    }
+                    // if (SourceType == "DeptList") {
+                        // this.deptList = response.data;
+                    // }
+					debugger;
                     switch (SourceType) {
                         case "DeptList":
+						debugger;
                             this.deptList = response.data;
                             break;
                         case "StateList":                         
+						debugger;
                             this.stateList = response.data;
                             break;
                         case "QtyUnitList":
+						debugger;
                             this.qtyUnitList = response.data;
                             break;
                         case "WtUnitList":
+						debugger;
                             this.wtUnitList = response.data;
                             break;
                         case "LocationList":
+						debugger;
                             this.locationList = response.data;
                             break;
                         default:

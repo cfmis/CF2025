@@ -594,6 +594,8 @@ var Main = {
             });
         },
 		async getInvoiceByID(ID){
+			if(this.formData.ID=='')
+				return;
 			this.initMostlyValue();
 			this.initDetailsValue();
 			this.initFareDetailsValue();
@@ -741,6 +743,8 @@ var Main = {
 			});
         },
        validData() {
+			if(this.formData.ID=='')
+				return false;
 			let valid_flag=true;
 			let edit_flag=false;
             for (let i in this.formData) {
@@ -898,6 +902,8 @@ var Main = {
             }
 		},
 		approveEvent() {
+			if(this.formData.ID=='')
+				return;
             /* if (!this.validData())
 			{
 				return false;
@@ -925,6 +931,8 @@ var Main = {
         },
 		//新版本
 		newVersion() {
+			if(this.formData.ID=='')
+				return;
             /* if (!this.validData())
 			{
 				return false;
@@ -964,6 +972,8 @@ var Main = {
 		},
 		//發貨確認
 		confirmSent() {
+			if(this.formData.ID=='')
+				return;
             /* if (!this.validData())
 			{
 				return false;
@@ -996,6 +1006,8 @@ var Main = {
         },
 		//取消發貨
 		cancelSent() {
+			if(this.formData.ID=='')
+				return;
             /* if (!this.validData())
 			{
 				return false;
@@ -1026,7 +1038,8 @@ var Main = {
         },
 		//注銷
 		async cancelDoc() {
-
+			if(this.formData.ID=='')
+				return;
             let ID = this.formData.ID;
             await axios.post("CancelDoc", { ID }).then(
             (response) => {
@@ -1082,28 +1095,6 @@ var Main = {
 			
 		},
 		
-		dataTableReturnList(){
-			// location.href="Create?TB_iframe=true&height=600&width=600";
-			let ID='';
-			axios.post("DataTableReturnList").then(
-            (response) => {
-				debugger;
-				if(response.data.Status=="0")
-				{
-					
-				}
-				else
-					this.$XModal.alert(response.data.Msg);
-            },
-            (response) => {
-                alert(response.status);
-            }
-			).catch(function (response) {
-				alert(response);
-			});
-			
-			
-		}
     },
 	watch: {
             //// watch监听 判断是否修改  
