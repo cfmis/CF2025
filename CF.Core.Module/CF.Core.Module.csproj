@@ -39,11 +39,12 @@
     <Reference Include="CF.Framework.Utility">
       <HintPath>..\CF.Framework.Utility\bin\Debug\CF.Framework.Utility.dll</HintPath>
     </Reference>
-    <Reference Include="DevTrends.MvcDonutCaching">
-      <HintPath>..\Lib\DevTrends.MvcDonutCaching.dll</HintPath>
+    <Reference Include="DevTrends.MvcDonutCaching, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\DevTrends.MvcDonutCaching.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\Lib\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\CF.Framework.Utility\bin\Debug\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
