@@ -83,8 +83,7 @@
     <Reference Include="CF.Web">
       <HintPath>..\CF.Web\bin\Debug\CF.Web.dll</HintPath>
     </Reference>
-    <Reference Include="CF2025.Base.Contract, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="CF2025.Base.Contract">
       <HintPath>..\CF2025.Base.Contract\bin\Debug\CF2025.Base.Contract.dll</HintPath>
     </Reference>
     <Reference Include="CF2025.Base.DAL">

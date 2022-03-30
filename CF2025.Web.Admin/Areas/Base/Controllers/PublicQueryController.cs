@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using CF2025.Web.Admin.Common;
-using CF2025.Base.Contract.Model;
+using CF2025.Base.Contract;
 using CF2025.Base.DAL;
 
 namespace CF2025.Web.Admin.Areas.Base.Controllers

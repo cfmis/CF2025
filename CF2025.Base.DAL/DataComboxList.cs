@@ -16,9 +16,10 @@ namespace CF2025.Base.DAL
     {
         private static SQLHelper sh = new SQLHelper(CachedConfigContext.Current.DaoConfig.OA);
         private static string within_code="0000";
-        public static List<ModelBaseList> GetComboxList(string SourceType)
+        public static List<ModelBaseList> GetComboxList(string SourceType, string language_id)
         {
             string strSql = "";
+            string LanguageID = sh.ConvertLanguage(language_id);
             switch (SourceType)
             {
                 case "QtyUnitList"://數量單位

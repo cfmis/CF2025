@@ -1,4 +1,4 @@
-﻿namespace CF2025.Base.Contract.Model
+﻿namespace CF2025.Base.Contract
 {
     public class BaseModel
     {

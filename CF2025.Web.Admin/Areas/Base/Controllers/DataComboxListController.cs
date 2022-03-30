@@ -5,7 +5,6 @@ using System.Web;
 using System.Web.Mvc;
 using CF2025.Web.Admin.Common;
 using CF2025.Base.DAL;
-using CF2025.Base.Contract.Model;
 
 namespace CF2025.Web.Admin.Areas.Base.Controllers
 {
@@ -24,6 +23,11 @@ namespace CF2025.Web.Admin.Areas.Base.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
+        public JsonResult GetQtyUnitRateList(string SourceType)
+        {
+            var result = DataComboxList.GetQtyUnitRateList("");
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
         public JsonResult GetCartonCodeList(string LocationId)
         {            
             var result = DataComboxList.GetCartonCodeList(LocationId);

@@ -1,6 +1,6 @@
 ﻿using CF.Core.Config;
 using CF.SQLServer.DAL;
-using CF2025.Base.Contract.Model;
+using CF2025.Base.Contract;
 using System;
 using System.Collections.Generic;
 using System.Data;
