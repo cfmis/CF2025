@@ -80,7 +80,7 @@
                   { required: true, message: '倉庫必须填写' }
                 ]
             },
-            commonFindData:[{fieldName:'id',operator:'=',fieldValue:'DDIH082202005',logic:'AND'}],
+            //commonFindData:[{fieldName:'id',operator:'=',fieldValue:'DDIH082202005',logic:'AND'}],
             operatorList:[
              { label: '等于', value: '=' },
              { label: '開頭', value: 'LIKE' },
@@ -93,15 +93,14 @@
             windowHeight: document.documentElement.clientHeight, //实时屏幕高度
         }
     },
-    created() {
-		debugger;
+    created() {       
         this.getComboxList("DeptList");//部門編碼   
         this.getComboxList("StateList");//狀態 
         this.getComboxList("LocationList");//倉庫,貨架,由選擇的倉庫帶出       
         this.getComboxList("QtyUnitList");//數量單位
-        this.getComboxList("WtUnitList");//重量單位
+        this.getComboxList("WegUnitList");//重量單位
         this.flagChild = $("#isChild").val();
-        this.userId = $("#user_id").val();         
+        this.userId = $("#user_id").val();
         this.tempHeadData = this.headData;
         this.tempGridData = this.gridData;
         this.initData();
@@ -151,34 +150,25 @@
 
         },       
         //初始化下拉列表框
-        async getComboxList(SourceType) {
-            await axios.get("/Base/DataComboxList/GetComboxList?SourceType=" + SourceType).then(
+        getComboxList(SourceType) {
+            axios.get("/Base/DataComboxList/GetComboxList?SourceType=" + SourceType).then(
                 (response) => {
-                    // if (SourceType == "DeptList") {
-                        // this.deptList = response.data;
-                    // }
-					debugger;
                     switch (SourceType) {
                         case "DeptList":
-						debugger;
                             this.deptList = response.data;
                             break;
                         case "StateList":                         
-						debugger;
                             this.stateList = response.data;
                             break;
-                        case "QtyUnitList":
-						debugger;
-                            this.qtyUnitList = response.data;
-                            break;
-                        case "WtUnitList":
-						debugger;
-                            this.wtUnitList = response.data;
-                            break;
                         case "LocationList":
-						debugger;
                             this.locationList = response.data;
                             break;
+                        case "QtyUnitList":
+                            this.qtyUnitList = response.data;
+                            break;
+                        case "WegUnitList":
+                            this.wtUnitList = response.data;
+                            break;                       
                         default:
                             break
                     }

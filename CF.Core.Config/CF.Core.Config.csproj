@@ -33,8 +33,8 @@
     <Reference Include="CF.Framework.Utility">
       <HintPath>..\CF.Framework.Utility\bin\Debug\CF.Framework.Utility.dll</HintPath>
     </Reference>
-    <Reference Include="CF.SQLServerDAL">
-      <HintPath>..\CF.SQLServerDAL\bin\Debug\CF.SQLServerDAL.dll</HintPath>
+    <Reference Include="CF.SQLServer.DAL">
+      <HintPath>..\CF.SQLServer.DAL\bin\Debug\CF.SQLServer.DAL.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

@@ -26,7 +26,7 @@ namespace CF2025.Base.DAL
                     strSql += "Select id,name,english_name From cd_units Where kind='05' Order By id";
                     break;
                 case "WegUnitList"://重量單位
-                    strSql += "Select id,name,english_name From cd_units Where kind='03' Order By id";
+                    strSql += "Select id,name,english_name From cd_units Where kind='03' Order By id";                    
                     break;
                 case "SalesmanList"://營業員&跟單員
                     strSql += "Select id,id+'--'+name As name,english_name From cd_personnel Where within_code='" + within_code + "' And sales_group is not null and state='0' Order By id";
@@ -52,10 +52,17 @@ namespace CF2025.Base.DAL
                 case "issues_state_list"://發貨狀態
                     strSql += "SELECT id,id+'--' + name AS name FROM cd_mo_type WHERE within_code='" + within_code + "' AND mo_type='A' ORDER BY id";
                     break;
+                case "DeptList"://部門編碼
+                    strSql += "SELECT id,id+'--' + name AS name FROM cd_department WHERE within_code='" + within_code + "' AND LEN(id)<=4 AND state<>'2' ORDER BY id";
+                    break;
+                case "StateList"://狀態 
+                    strSql += string.Format(@"SELECT id, matter as name FROM sy_bill_state WHERE language_id = '{0}'", LanguageID); ;
+                    break;
                 default:
                     strSql += "";
                     break;
             }
+           
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             ModelBaseList obj1 = new ModelBaseList();
             obj1.value = "";

@@ -25,10 +25,10 @@
             this.loading = true;            
             setTimeout(() => {
                 this.getDetails();
-                this.loading = false;
+                //this.loading = false;
             }, 3000);
         },        
-        getDetails() {//查詢                       
+        getDetails() {//查詢
             var searchParams = {
                 mo_id: this.formData.mo_id,
                 mo_id_end: this.formData.mo_id_end,
@@ -44,10 +44,11 @@
             axios.get("GetDataList", { params: searchParams }).then(
                 (response) => {
                     this.tableData = response.data;
+                    this.loading = false;
                 },
                 (response) => {
                     alert(response.status);
-                }
+                }                
             ).catch(function (response) {
                 alert(response);
             });
