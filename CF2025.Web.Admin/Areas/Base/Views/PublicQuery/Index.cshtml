@@ -1,0 +1,167 @@
+﻿
+@{
+    ViewBag.Title = "Public Query";
+}
+
+@section PageSpecificStyleSheetIncludes{
+    <style>
+        .my-search.vxe-input {
+            height: 20px;
+            width: 300px;
+        }
+        .my-search.vxe-input .vxe-input--suffix {
+            width: 40px;
+            height: 18px;
+            top: 1px;
+            text-align: center;
+            border-left: 1px solid #dcdfe6;
+            background-color: #f5f7fa;
+            cursor: pointer;
+        }
+        .my-search.vxe-input .vxe-input--inner {
+            padding-right: 72px;
+            border: 1px solid #dcdfe6;
+        }
+        .my_fieldset{
+            /*padding-bottom属性设置元素的下内边距（底部空白）
+            *不可設置元素高度,否則元素不會隨內容的多少自動撐開
+            *2022.03.22
+            */
+            padding-bottom:5px;
+            border-width: 1px;
+            border-color: #FCFCFC;
+            /*height:220px;*/
+        }
+        .my-black {
+          color: #000000;
+        }   
+    </style>
+}
+<div id="app"> 
+    @*查詢*@   
+    <input class="" type="hidden" name="window_id" value="@ViewBag.window_id" id="window_id" />
+    <input class="" type="hidden" name="user_id" value="@ViewBag.user_id" id="user_id" />
+   
+    <fieldset class="my_fieldset">
+        <legend>查詢條件</legend>
+        <vxe-toolbar perfect size="small" style="height:35px;margin-bottom:5px">
+            <template #buttons style="height:35px;margin-bottom:10px">
+                <vxe-button icon="fa fa-plus" @@click="insertRowEvent()">項目增加</vxe-button>
+                <vxe-button icon="fa fa-remove" @@click="delRowEvent()" style="margin-left: -2px">項目刪除</vxe-button>
+                <vxe-button icon="fa fa-save my-black" @@click="saveEvent()" style="margin-left: -2px">保存</vxe-button>
+                <vxe-button status="primary" icon="fa fa-search" @@click="searchEvent()" style="margin-left: 50px">查詢</vxe-button>
+                <vxe-button status="success" icon="fa fa-check" @@click="okEvent()" style="margin-left: 50px">確認</vxe-button>
+            </template>
+        </vxe-toolbar>
+        <vxe-table border
+                    stripe
+                    show-overflow
+                    :data="tableCondition"
+                    ref="tableConditionRef"
+                    height="180"                   
+                    @*max-height="180"*@
+                    highlight-hover-row
+                    highlight-current-row
+                    :header-cell-style="headerCellStyle"
+                    :keyboard-config="{isArrow: true}"
+                    :column-config="{resizable: true}"
+                    :edit-config="{trigger: 'click', mode: 'row'}"
+                    :edit-rules="validRules"
+                    :row-config="{height: 25}"
+                    @@cell-click="cellClickEvent" >
+            <vxe-column type="seq" width="50"></vxe-column>
+            <vxe-column field="field_name" title="欄位名稱" width="150" :edit-render="{}"  style="height:25px">
+                <template #default="{ row }">
+                    <span>{{ formatFieldName(row.field_name) }}</span>
+                </template>
+                <template #edit="{ row }">
+                    <vxe-select v-model="row.field_name"type="text" :options="fieldNameList" transfer @@change="fieldNameChangeEvent({ row })"></vxe-select>
+                </template>
+            </vxe-column>
+
+            <vxe-column field="operators" title="操作符" width="120" :edit-render="{}">
+                @*格式化值*@
+                <template #default="{ row }">
+                    <span>{{ formatOperator(row.operators) }}</span>
+                </template>
+                @*填充下拉列表框*@
+                <template #edit="{ row }">
+                    <vxe-select v-model="row.operators" type="text" :options="operatorList" transfer></vxe-select>
+                </template>
+            </vxe-column>
+
+            <vxe-column field="field_value" title="欄位值" width="150" :edit-render="{}">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.field_value" type="text" placeholder="请输入欄位值"></vxe-input>
+                </template>
+            </vxe-column>
+            <vxe-column field="logic" title="邏輯符" width="100" :edit-render="{}">
+                @*格式化值*@
+                <template #default="{ row }">
+                    <span>{{ formatLogic(row.logic) }}</span>
+                </template>
+                @*填充下拉列表框*@
+                <template #edit="{ row }">
+                    <vxe-select v-model="row.logic" type="text" :options="logicList" transfer></vxe-select>
+                </template>
+            </vxe-column>
+            
+            <vxe-column field="id" title="主鍵" width="70" :edit-render="{}" v-if="false">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.id" type="text"></vxe-input>
+                </template>
+            </vxe-column>
+            <vxe-column field="table_name" title="表名" :edit-render="{}" v-if="false">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.table_name" type="text"></vxe-input>
+                </template>
+            </vxe-column>
+            <vxe-column field="field_type" title="數據類型" width="100" :edit-render="{}" v-if="false">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.field_type" type="text"></vxe-input>
+                </template>
+            </vxe-column>
+            <vxe-column field="sequence_id" title="序號" width="70" :edit-render="{}" v-if="false">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.sequence_id" type="text"></vxe-input>
+                </template>
+            </vxe-column>
+            <vxe-column field="row_status" title="更新狀態" width="70" :edit-render="{}" v-if="false">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.row_status" type="text"></vxe-input>
+                </template>
+            </vxe-column>
+        </vxe-table>
+    </fieldset> 
+
+    <vxe-table border
+            show-overflow
+            stripe
+            ref="tableResultRef"
+            size="small"            
+            height="290"
+            @*max-height="290"*@
+            highlight-hover-row
+            highlight-current-row
+            :header-cell-style="headerCellStyle"
+            :keyboard-config="{isArrow: true}"
+            :column-config="{resizable: true}"
+            :data="tableResult"
+            :row-config="{height: 25}"
+            @@cell-click="cellClickResultEvent"
+            @@cell-dblclick="cellDBLClickEvent">
+        <vxe-column type="seq" title="#" fixed="left" width="50"></vxe-column>
+        <template v-for="(item,i) in fieldNameList">
+            <!--i=0第一列為空格所以要隱藏-->
+            <vxe-column width="130" :key="item.value" v-if="i !='0'" :field="item.value" :title="item.label"></vxe-column>
+            @*<vxe-column width="120" :key="item.value" v-else :field="item.value" :title="item.label"></vxe-column>*@          
+        </template>
+    </vxe-table>
+
+</div>
+
+
+@section PageSpecificJavascriptIncludes{
+    <script>Vue.config.productionTip= false</script>
+    <script src="~/Areas/Base/js/publicQuery.js?v=@Guid.NewGuid().ToString()"></script>
+}

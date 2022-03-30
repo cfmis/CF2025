@@ -1,0 +1,75 @@
+﻿
+@{
+    ViewBag.Title = "Public Query";
+}
+
+<div id="app">
+    @*查詢*@
+    <input class="" type="hidden" name="window_id" value="@ViewBag.window_id" id="window_id" />
+    <input class="" type="hidden" name="user_id" value="@ViewBag.user_id" id="user_id" />
+    <fieldset class="my_fieldset">
+        <legend>查詢條件</legend>
+        <vxe-toolbar perfect size="small" style="height:35px;margin-bottom:5px">
+            <template #buttons style="height:35px;margin-bottom:10px">
+                <vxe-button type="text" icon="fa fa-plus" @@click="insertEvent()">新增</vxe-button>
+                <vxe-button type="text" icon="fa fa-plus" @@click="insertRowEvent()">項目增加</vxe-button>
+                <vxe-button type="text" icon="fa fa-remove" @@click="delRowEvent()" style="margin-left: -2px">項目刪除</vxe-button>
+                <vxe-button type="text" icon="fa fa-save" @@click="saveEvent()" style="margin-left: -2px">保存</vxe-button>
+                <vxe-button type="text" icon="fa fa-search" @@click="searchEvent()" style="margin-left: 50px">查詢</vxe-button>
+            </template>
+        </vxe-toolbar>
+        <vxe-table border
+                   show-overflow
+                   :data="tableCondition"
+                   :column-config="{resizable: true}"
+                   :edit-config="{trigger: 'click', mode: 'row'}"
+                   :row-config="{height: 25}">           
+            <vxe-column type="seq" width="30"></vxe-column>
+            <vxe-column field="fieldName" title="欄位名稱" :edit-render="{}">
+                <template #edit="{ row }">
+                    <vxe-select v-model="row.fieldName" type="text" :options="fieldNameList" transfer></vxe-select>
+                </template>
+            </vxe-column>
+
+            <vxe-column field="operator" title="操作符" :edit-render="{}">
+                @*格式化值*@*
+                <template #default="{ row }">
+                    <span>{{ formatOperator(row.operator) }}</span>
+                </template>
+                @*填充下拉列表框*@*
+                <template #edit="{ row }">
+                    <vxe-select v-model="row.operator" type="text" :options="operatorList" transfer></vxe-select>
+                </template>
+            </vxe-column>
+
+            <vxe-column field="fieldValue" title="欄位值" :edit-render="{}">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.fieldValue" type="text" @*type="number"*@ placeholder="请输欄位值"></vxe-input>
+                </template>
+            </vxe-column>
+            <vxe-column field="logic" title="邏輯符" :edit-render="{}">
+                @*格式化值*@*
+                <template #default="{ row }">
+                    <span>{{ formatLogic(row.logic) }}</span>
+                </template>
+                @*填充下拉列表框*@*
+                <template #edit="{ row }">
+                    <vxe-select v-model="row.logic" type="text" :options="logicList" transfer></vxe-select>
+                </template>
+            </vxe-column>
+        </vxe-table>
+    </fieldset>
+
+    <vxe-table border
+               show-overflow
+               :column-config="{resizable: true}"
+               :data="tableResult">
+        <vxe-column type="seq" title="#" fixed="left" width="30"></vxe-column>
+        <vxe-column field="id" title="轉入單編號" width="120"></vxe-column>
+    </vxe-table>
+
+
+</div>
+@section PageSpecificJavascriptIncludes{
+<script src="~/Areas/Base/js/publicQuery.js?v=@Guid.NewGuid().ToString()"></script>
+}

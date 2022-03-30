@@ -7,6 +7,10 @@
     <title>@ViewBag.Title</title>
     <link rel="stylesheet" href="~/Content/bootstrap-4.0/css/fonts/font-awesome.css">
     <link rel="stylesheet" href="~/Content/vxe-table/jsdelivr/style.css">
+
+    <link rel="stylesheet" type="text/css" href="~/Lib/jquery-easyui-1.5/themes/default/easyui.css" />
+    <link rel="stylesheet" type="text/css" href="~/Lib/jquery-easyui-1.5/themes/icon.css" />
+
     <style>
         .div-left {
             float: left;
@@ -44,6 +48,9 @@
     </style>
 
     @RenderSection("PageSpecificStyleSheetIncludes", required: false)
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="~/Lib/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+
     <script src="~/Content/vxe-table/js/vue.js"></script>
     <script src="~/Content/vxe-table/jsdelivr/xe-utils.js"></script>
     <script src="~/Content/vxe-table/jsdelivr/vxe-table.js"></script>
