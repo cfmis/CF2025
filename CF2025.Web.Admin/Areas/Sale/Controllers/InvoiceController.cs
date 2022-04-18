@@ -224,5 +224,6 @@ namespace CF2025.Web.Admin.Areas.Sale.Controllers
         //    var result = InvoiceDAL.DataTableReturnList();
         //    return Json(result, JsonRequestBehavior.AllowGet);
         //}
+
     }
 }
