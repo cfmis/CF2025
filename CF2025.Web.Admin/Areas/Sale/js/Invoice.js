@@ -2,13 +2,16 @@
 var Main = {
 	
     data() {
-    return {
+        return {
+            searchID:"",
 			selectTab: 'tab1',
             edit_mode: 0,
             showEdit: false,
             selectRow: null,
+            curReportRow:null,
             tableDetails: [],
-			tableFareDetails:[],
+            tableFareDetails:[],
+            tableReport:[],
             editDetails: {},
 			editFareDetails:{},
             preveditDetails:{},
@@ -17,6 +20,7 @@ var Main = {
 			selectedRowIndex:-1,
 			selectedFareRowIndex:-1,
 			showSent:false,
+            showPrint:false,
 			issues_state:'',
 			newDocFlag:0,
             // formData:{
@@ -1091,10 +1095,56 @@ var Main = {
 			// ).catch(function (response) {
 				// alert(response);
 			// });
-			
-			
 		},
-		
+        //顯示通用查詢頁面
+        showFindWindos(){
+		    comm.openWindos('Invoice');
+		},
+        findByID() {
+            if(this.searchID ===""){
+                return;
+            }
+            this.formData.ID = this.searchID;
+            setTimeout(() => {
+                this.getInvoiceByID(this.formData.ID);
+            }, 500);
+        },
+        //列印
+        printEvent(){
+            if(this.formData.ID){
+                var id="w_sales_invoice";
+                axios.post("GetSelectReport?ID="+ id +"&it_customer=" + this.formData.it_customer + "&m_id=" + this.formData.m_id).then(
+                    (response) => {
+                        this.showPrint = true;
+                        this.curReportRow = null;
+                        if(response.data){
+                            this.tableReport = response.data;
+                        }else{
+                            this.tableReport=[];				
+                        }
+                    }
+			    ).catch(function (response) {
+			        alert(response);			       
+			    });               
+                
+            }else{
+                this.$XModal.alert("請首先查詢出發票數據!");
+                return;
+            }
+        },       
+        tablePrintCellClickEvent(row){
+            this.curReportRow = row.data[row.$rowIndex];
+        },
+        printReport(){
+            if(this.curReportRow){
+                console.log(this.curReportRow.reportid);
+                var url= "Print?ID=" + this.formData.ID + "&Ver=" + this.formData.Ver+"&report_id=" + this.curReportRow.reportid;
+                comm.showMessageDialog(url,'列印',1024,768,true);
+            }else{
+                this.$XModal.alert({ content: '請首先指定列印的報表類型!',mask: false });
+            }
+        }
+
     },
 	watch: {
             //// watch监听 判断是否修改  

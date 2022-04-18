@@ -251,7 +251,7 @@ namespace CF2025.Store.DAL
         private static bool CheckHeadID(string id)
         {
             bool result = true;
-            string strSql = "Select id FROM st_transfer_mostly with(nolock) Where '" + id + "'" + " AND within_code='0000'";
+            string strSql = "Select id FROM st_transfer_mostly with(nolock) Where id= '" + id + "'" + " AND within_code='0000'";
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             if (dt.Rows.Count > 0)
                 result = true;

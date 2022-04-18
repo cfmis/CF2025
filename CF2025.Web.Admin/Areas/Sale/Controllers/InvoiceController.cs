@@ -6,6 +6,8 @@ using System.Web.Mvc;
 using CF2025.Web.Admin.Common;
 using CF2025.Sale.DAL;
 using CF2025.Sale.Contract;
+using FastReport.Web;
+using System.Web.UI.WebControls;
 
 namespace CF2025.Web.Admin.Areas.Sale.Controllers
 {
@@ -129,6 +131,72 @@ namespace CF2025.Web.Admin.Areas.Sale.Controllers
         {
             //PlanDAL clsPlanDAL = new PlanDAL();
             var result = InvoiceDAL.CancelDoc(ID);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        //打印
+        WebReport rpt = new WebReport();
+        public ActionResult Print(string ID,string Ver,string report_id)
+        {
+            report_id = report_id.Replace(".rpt", ".frx");
+            if (report_id == "so_invoice_remark_commercial.frx")
+            {
+                //打印條款(出口發票), 出口與本地條款一致
+                report_id = "so_invoice_remark.frx";
+            }            
+            string report_path = $"{Request.MapPath(Request.ApplicationPath)}Reports\\" + report_id;           
+            switch (report_id)
+            {
+                case "so_invoice.frx":
+                    //本地戶口發票
+                    var list1 = InvoiceDAL.GetReportDataByID(ID, Ver,"");
+                    rpt.Report.RegisterData(list1, "InvData");//注冊數據
+                    break;
+                case "so_invoice_cash.frx":
+                    //現沽發票
+                    var list2 = InvoiceDAL.GetReportDataByID(ID, Ver,"DC");
+                    rpt.Report.RegisterData(list2, "InvData");
+                    break;
+                case "so_invoice_ship_remark.frx":
+                    //打印裝運嘜頭
+                    var list3 = InvoiceDAL.GetShipRemark(ID, Ver);
+                    rpt.Report.RegisterData(list3, "InvData");
+                    break;
+                case "so_invoice_remark.frx":             //打印條款(本地及現沽發票)
+                //case "so_invoice_remark_commercial.frx":  //打印條款(出口發票)                    
+                    rpt.Report.RegisterData("", "InvData");
+                    break;
+                case "so_invoice_commercial.frx":
+                    //出口發票格式1
+                    var list4 = InvoiceDAL.GetReportCommercial(ID, Ver);
+                    rpt.Report.RegisterData(list4, "InvData");
+                    break;
+                case "so_invoice_commercial_2.frx":
+                    //出口發票格式2
+                    var list5 = InvoiceDAL.GetReportCommercial(ID, Ver);
+                    rpt.Report.RegisterData(list5, "InvData");
+                    break;                
+                case "so_invoice_remark2.frx":
+                    //打印備註                     
+                    rpt.Report.RegisterData("", "InvData");
+                    break;
+            }          
+            rpt.Report.Load(report_path);//調用報表模板
+            rpt.Width = 1024;// Unit.Percentage(100);
+            rpt.Height = 800;// Unit.Percentage(100);
+            rpt.ToolbarStyle = ToolbarStyle.Small; //將原先的圖標變小
+            rpt.ToolbarIconsStyle = ToolbarIconsStyle.Blue;
+            rpt.ToolbarBackgroundStyle = ToolbarBackgroundStyle.Light;
+            //rpt.PreviewMode = true;//预览模式
+            //rpt.PrintInPdf = true;//在PDF打印
+            ViewBag.WebReport = rpt;
+            return View("/Areas/Base/Views/Print/Print.cshtml");
+        }
+
+        [HttpPost]
+        public JsonResult GetSelectReport(string ID,string it_customer, string m_id)
+        {           
+            var result = InvoiceDAL.GetSelectReport(ID,it_customer, m_id);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 

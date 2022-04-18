@@ -109,6 +109,18 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\CF2025.Sys.DAL\bin\Debug\CF2025.Sys.DAL.dll</HintPath>
     </Reference>
+    <Reference Include="FastReport, Version=2019.1.15.0, Culture=neutral, PublicKeyToken=db7e5ce63278458c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\FastReport.dll</HintPath>
+    </Reference>
+    <Reference Include="FastReport.Bars, Version=2019.1.15.0, Culture=neutral, PublicKeyToken=db7e5ce63278458c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\FastReport.Bars.dll</HintPath>
+    </Reference>
+    <Reference Include="FastReport.Web, Version=2019.1.15.0, Culture=neutral, PublicKeyToken=db7e5ce63278458c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\FastReport.Web.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AI.Agent.Intercept, Version=1.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ApplicationInsights.Agent.Intercept.1.2.1\lib\net45\Microsoft.AI.Agent.Intercept.dll</HintPath>
       <Private>True</Private>
@@ -261,6 +273,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Areas\Base\BaseAreaRegistration.cs" />
+    <Compile Include="Areas\Base\Controllers\PrintController.cs" />
     <Compile Include="Areas\Base\Controllers\PublicQueryController.cs" />
     <Compile Include="Areas\Base\Controllers\DataComboxListController.cs" />
     <Compile Include="Areas\Sale\Controllers\InvoiceController.cs" />
@@ -326,6 +339,10 @@
     <Content Include="Areas\Store\Views\_ViewStart.cshtml" />
     <Content Include="Areas\Store\Views\TransferIn\Index.cshtml" />
     <Content Include="Areas\Store\Views\TransferIn\QueryPartialView.cshtml" />
+    <Content Include="Areas\Base\Views\PublicQuery\Index.cshtml" />
+    <Content Include="Areas\Base\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\Base\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\Base\Views\Print\Print.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -387,6 +404,7 @@
     <Folder Include="Areas\Store\Models\" />
     <Folder Include="Images\" />
     <Folder Include="Lib\" />
+    <Folder Include="Reports\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

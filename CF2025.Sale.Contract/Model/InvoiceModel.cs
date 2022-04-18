@@ -176,4 +176,94 @@ namespace CF2025.Sale.Contract
         public string remark { get; set; }
         public string is_free { get; set; }
     }
+
+    public class so_invoice_report
+    {
+        public string within_code { get; set; }
+        public string id { get; set; }
+        public int ver { get; set; }
+        public string sequence { get; set; }
+        public string oi_date { get; set; }
+        public string it_customer { get; set; }
+        public string customer_name { get; set; }
+        public string address { get; set; }
+        public string phone { get; set; }
+        public string fax { get; set; }
+        public string sellerman { get; set; }
+        public string payment { get; set; }
+        public string shop_no { get; set; }
+        public string ship_date { get; set; }
+        public string currency { get; set; }
+        public string currency_sign { get; set; }
+        public string customer_bill_no { get; set; }
+        public string contract_cid { get; set; }
+        public string mo_id { get; set; }
+        public string goods_id { get; set; }
+        public string goods_id_a { get; set; }
+        public string goods_name { get; set; }
+        public string goods_name_a { get; set; }
+        public string order_id { get; set; }
+        public decimal u_invoice_qty { get; set; }
+        public string goods_unit { get; set; }
+        public decimal invoice_price { get; set; }
+        public string p_unit { get; set; }
+        public decimal total_sum { get; set; }
+        public string sort { get; set; }
+        public string types { get; set; }
+        public string types_desc { get; set; }
+        public decimal total_amount { get; set; }
+        public string table_head { get; set; }
+        public string customer_goods { get; set; }
+        public string customer_color_id { get; set; }
+        public string linkman { get; set; }
+        public decimal total_package_num { get; set; }
+        public string is_free { get; set; }
+        public string state { get; set; }
+        public string package_unit { get; set; }
+        public string total_weight { get; set; }
+        public string transport_style { get; set; }       
+        public string bill_address { get; set; }
+        public string remark { get; set; }
+        public string remark2 { get; set; }
+        public string invoice_remark { get; set; }
+
+        //出口發票用到的字段
+        public string cust_info { get; set; }
+        public string ship_remark { get; set; }
+        public string ship_remark2 { get; set; }
+        public string ship_remark3 { get; set; }
+        public string goods { get; set; }
+        public string size { get; set; }
+        public string unit_code { get; set; }
+        public string m_id { get; set; }
+        public string amount_english { get; set; }
+        public string po_no { get; set; }
+        public string loading_name { get; set; }
+        public string ap_name { get; set; }
+        public string email { get; set; }
+        public string l_phone { get; set; }
+        public string shipping_methods { get; set; }
+        public string per { get; set; }
+        public string finally_buyer { get; set; }
+        public string finally_buyer_name { get; set; }
+        public string pc_id { get; set; }
+        public string is_print { get; set; }
+        public string invoice_date { get; set; }
+        public string flag { get; set; }
+        public string order_id_desc { get; set; }
+        public string contract_cid_desc { get; set; }
+
+    }
+
+    public class so_invoice_ship_remark
+    {
+        public string within_code { get; set; }
+        public string id { get; set; }
+        public int ver { get; set; }
+        public string ship_remark { get; set; }
+        public string ship_remark2 { get; set; }
+        public string ship_remark3 { get; set; }
+    }
+
+
 }

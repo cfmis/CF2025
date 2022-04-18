@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Author="Allen Leung" ReportInfo.Created="06/15/2021 17:18:22" ReportInfo.Modified="04/15/2022 11:38:52" ReportInfo.CreatorVersion="2019.1.15.0" PrintSettings.PrintOnSheetWidth="297" PrintSettings.PrintOnSheetHeight="210">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {    
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <BusinessObjectDataSource Name="InvData" ReferenceName="InvData" DataType="System.Int32" Enabled="true"/>
+  </Dictionary>
+  <ReportPage Name="Page1" PaperWidth="297" PaperHeight="210" RawPaperSize="9" TopMargin="15" Guides="0,0,0,0,0,0" Watermark.Font="SimSun, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="1047.06">
+      <TextObject Name="Text17" Left="-9450" Top="-9450" Width="134.1" Height="13.9" Text="發票號碼 Invoice No." Font="SimSun, 9pt"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="4" Width="1047.06" Height="697.4" EvenStylePriority="UseAll" CanBreak="true">
+      <TextObject Name="Text1" Top="12.45" Width="228.4" Height="17.9" Text="Terms &amp; Condition/條款" Font="SimSun, 12pt, style=Underline"/>
+      <TextObject Name="Text29" Left="27.35" Top="37.25" Width="1014.8" Height="12.9" Text="ANY COMPLAINT IN REGARD TO THIS INVOICE MUST BE MADE WITHIN THREE(3) DAYS. WE WILL NOT ACCEPT ANY LIABILITIES THEREAFTER." Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text30" Top="37.25" Width="26.5" Height="12.9" Text="1)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text31" Left="27.35" Top="53.15" Width="1014.8" Height="12.9" Text="THE MAXIMUM LIABILITY OF OUR COMPANY IN RESPECT OF ANY LOSS OR CLAIM SHALL IN NO CASE EXCEED THE AMOUNT OF THE INVOICE RESPECTIVE TO RELATED ITEMS." Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text32" Top="52.7" Width="26.5" Height="12.9" Text="2)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text33" Left="27.35" Top="67.05" Width="1014.8" Height="12.9" Text="OUR COMPANY HAS SOLE AND ABSOLUTE DISCRETION TO MANUFACTURE AND DELIVER TO YOU AN ADDITIONAL AMOUNT (IN ANY EVENT SHOULD NOT EXCEED 3%) OF THE TOTAL QUANTITY OF YOUR" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text34" Top="67.05" Width="26.5" Height="12.9" Text="3)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text35" Left="27.35" Top="80.95" Width="1014.8" Height="12.9" Text="ORDER AND YOU AGREES TO ACCEPT AND PAY THE ADDITIONAL QUANTITY." Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text36" Left="27.35" Top="95.85" Width="1014.8" Height="12.9" Text="OUR COMPANY IS DEEMED TO BE FULLY COMPLIED OF YOUR ORDER IF THE TOTAL QUANTITY MANUFACTURED AND DELIVERED TO YOU IS NOT LESS THAN OR EQUAL TO 97% OF YOUR ORDER AND YOU &#13;&#10;" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text37" Top="95.95" Width="26.5" Height="12.9" Text="4)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text38" Left="27.35" Top="109.75" Width="1014.8" Height="12.9" Text="AGREE TO PAY THE EXACT QUANTITY THAT HAVE DELIVERED TO YOU." Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text39" Left="27.35" Top="123.85" Width="1014.8" Height="12.9" Text="ALL OUR PRODUCTS MADE OF STEEL MUST NOT BE BLEACH WASHED. &#13;&#10;" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text40" Top="123.85" Width="26.5" Height="12.9" Text="5)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text41" Left="27.35" Top="137.75" Width="1014.8" Height="12.9" Text="DYED-TO-MATCH ITEMS CAN ONLY BE USED ON FABRIC OF SAME COLOUR. NO GUARANTEE OF STAINING IF FABRIC OF CONTRAST COLOUR BEING USED.&#13;&#10;" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text42" Top="137.75" Width="26.5" Height="12.9" Text="6)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text43" Left="27.35" Top="152.45" Width="1014.8" Height="12.9" Text="DUE TO THE HIGH ACIDITY AND ALKALINITY CONTENT ON MOST FABRICS PARTICULARLY LEATHER,CORDUROY, PINWALE, NYLON,WOOLEN AND SULFUR DYED FABRICS. ALL METAL PRODUCTS TO BE " Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text44" Top="152.2" Width="26.5" Height="12.9" Text="7)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text45" Left="27.35" Top="165.35" Width="1014.8" Height="12.9" Text="ATTACHED ONTO THESE FABRICS REQUIRE SPECIAL TREATMENT AS AN EXTRA PROTECTIVE MEASURE AGAINST METAL OXIDATION,COLOUR ALTERATION AND STAINING OF FABRICS.PLEASE SPECIFY " Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text46" Left="27.35" Top="178.25" Width="1014.8" Height="12.9" Text="ON YOUR PURCHASE ORDER SHOULD THESE FABRICS ARE BEING USED, ELSE, NO RESPONSIBILITY NOR LIABILITY WILL BE ACCEPTED IF ABOVE DEFECTS OCCUR." Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text47" Left="27.35" Top="191" Width="1014.8" Height="12.9" Text="DUE TO THE POSSIBILITY OF ACID CONTENT ON FABRICS, CHEMICAL ACTION MIGHT TAKE PLACE WHEN IT COMES INTO CLOSE CONTACT WITH OUR METAL TRIMS &amp; ACCESSORIES WHICH CAUSING" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text48" Top="191" Width="26.5" Height="12.9" Text="8)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text49" Left="27.35" Top="204.05" Width="1014.8" Height="12.9" Text="DAMAGES &amp; ALTERATION OF COLOURS, POSSIBLY BOTH ON TRIMS AND FABRICES. WE WILL NOT BE HELD RESPONSIBILITY TO ALL DAMAGES, LIABILITIES WHATSOEVER THUS SO CAUSED." Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text50" Left="27.35" Top="218.35" Width="1014.8" Height="12.9" Text="NO GUARANTEE ON CHANGE OF COLOUR WITH CHEMICAL &amp; PHYSICAL TREATMENT AFTER THE THIRD PART LABTEST BY USING ACID WASH,SULPHURIC ACID WASH,SAND/STONE WASH,ENZYME WASH ETC." Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text51" Top="218.35" Width="26.5" Height="12.9" Text="9)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text52" Left="27.35" Top="233.8" Width="1014.8" Height="12.9" Text="NO GUARANTEE ON CHANGE OF COLOURS DURING GARMENT PACKAGING, PROCESS PRESSING, DRY IRONING, STEAM IRONING, POLYBAG PACKAGING ETC.&#13;&#10;" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text53" Top="233.8" Width="26.5" Height="12.9" Text="10)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text54" Left="27.35" Top="248.7" Width="1014.8" Height="12.9" Text="COLOUR FADING AND DETERIORATION DUE TO OXIDATION WILL OCCUR ON ELECTROPLATING FINISH.&#13;&#10;" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text55" Top="248.7" Width="26.5" Height="12.9" Text="11)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text56" Left="27.35" Top="263.15" Width="1014.8" Height="12.9" Text="THE RAW MATERIAL’STAINLESS STEEL AND ALUMINUM ARE SUBJECT TO VARIANCE AND DEVIATION FROM MATERIAL LOT. ALSO, THESE CANNOT PASS METAL DETECTOR.&#13;&#10;" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text57" Top="263.15" Width="26.5" Height="12.9" Text="12)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text58" Left="27.35" Top="277.55" Width="1014.8" Height="12.9" Text="QUALITY CONTROL IS EXERCISED AT ALL TIMES TO MAINTAIN FINISH CONSISTENCY. HOWEVER, FINISHES MAY VARY FROM LOT TO LOT DEPENDING ON THE QUANTITY PRODUCED." Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text59" Top="277.6" Width="26.5" Height="12.9" Text="13)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text60" Left="27.35" Top="291.5" Width="1014.8" Height="12.9" Text="YOU SHALL NOT USE OUR COMPANY'S NAMES,LOGOS,TRADE MARKS,TRADE DRESS,DESIGNS OR OTHER INTELLECTUAL PROPERTY RIGHTS,OR ANY NAMES,LOGOS,TRADE MARKS,TRADE DRESS,DESIGNS" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text61" Top="291.5" Width="26.5" Height="12.9" Text="14)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text62" Left="27.35" Top="305.35" Width="1014.8" Height="12.9" Text="OR OTHER INTELLECTUAL PROPERTY RIGHTS WHICH ARE SIMILAR TO THOSE OF OUR COMPANY FOR ANY PURPOSE WHATSOEVER, INCLUDING BUT NOT LIMITED TO ANY ADVERTISING,NOR PERMIT ANY" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text63" Left="27.35" Top="318.25" Width="1014.8" Height="12.9" Text="THIRD PARTY TO DO SO WITHOUT THE EXPRESS PRIOR WRITTEN APPROVAL OF OUR COMPANY.COMPANY HAS THE RIGHT TO TAKE ACTION AGAINST YOU FOR COMMITTING ACTS THAT INFRINGE OUR" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text64" Left="27.35" Top="329.15" Width="1014.8" Height="12.9" Text="COMPANY'S INTELLECTUAL PROPERTY RIGHTS." Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text65" Left="27.35" Top="342.75" Width="1014.8" Height="12.9" Text="YOU SHALL USE YOUR BEST ENDEAVORS TO ASSIST OUR COMPANY TO HANDLE ANY COMPLAINT,SUSPICION OR CLAIM THAT YOUR ACTIONS,OR ACTIONS OF THIRD PARTIES,INCLUDING METHODS OF &#13;&#10;" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text66" Top="342.75" Width="26.5" Height="12.9" Text="15)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text67" Left="27.35" Top="353.95" Width="1014.8" Height="12.9" Text="MANUFACTURE INFRINGE OUR COMPANY'S INTELLECTUAL PROPERTY RIGHTS." Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text68" Left="27.35" Top="395.1" Width="1014.8" Height="12.9" Text="如有錯漏，請於三天之內通知本公司查核，逾期恕不負責。" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text69" Top="395.1" Width="26.5" Height="12.9" Text="1)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text70" Left="27.35" Top="410" Width="1014.8" Height="12.9" Text="本公司所負責任最大不會超過有關貨品發票之面值。" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text71" Top="410" Width="26.5" Height="12.9" Text="2)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text72" Left="27.35" Top="424.9" Width="1014.8" Height="12.9" Text="本公司有權決定額外生產及交付不超過貴客戶訂單之3%而貴客戶同意接受及支付該額外數量。" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text73" Top="424.9" Width="26.5" Height="12.9" Text="3)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text74" Left="27.35" Top="440.35" Width="1014.8" Height="12.9" Text="本公司視作完全履行貴客戶之訂單如生產及交付的數量不少於或相等於訂單之97%而貴客戶同意支付已實際交付的數量。" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text75" Top="440.35" Width="26.5" Height="12.9" Text="4)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text76" Left="27.35" Top="455.25" Width="1014.8" Height="12.9" Text="鐵質鈕扣請勿漂洗。" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text77" Top="455.25" Width="26.5" Height="12.9" Text="5)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text78" Left="27.35" Top="470.15" Width="1014.8" Height="12.9" Text="凡染色尼龍膠面急鈕及配料等只可用於顏色相關之布料上不能用於顏色不相同之布料中。" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text79" Top="470.15" Width="26.5" Height="12.9" Text="6)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text80" Left="27.35" Top="485.5" Width="1014.8" Height="12.9" Text="酸及鹼性度高之布料所配用之金屬產品必需經特別處理，例如皮革類/燈心絨/尼龍類/羊毛料/硫化染色處理的布料，但亦包括其他可存在酸及鹼性度高之任何布料，若貴公司於落單時" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text81" Top="485.5" Width="26.5" Height="12.9" Text="7)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text82" Left="27.35" Top="500.95" Width="1014.8" Height="12.9" Text="並沒有註明或作任何通知，而有關產品(布或金屬產品本身)於日後打上布後出現任何變色或氧化之情況，本司概不負責。" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text84" Left="27.35" Top="533.3" Width="1014.8" Height="12.9" Text="當提交第三方測試時, 如受到化學性和物理性處理, 如酸洗，硫酸洗，沙/石洗，酵素洗等, 均不可確保顏色變化狀況。" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text85" Top="517.95" Width="26.5" Height="12.9" Text="8)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text86" Left="27.35" Top="517.95" Width="1014.8" Height="12.9" Text="成衣布料中，可能含有酸性成分，會令至成衣上之金屬配料產生化學作用，因而變色。貴客戶如處理不當，導至一切損失，均由貴客戶自行負責。 " Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text87" Top="533.3" Width="26.5" Height="12.9" Text="9)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text88" Left="27.35" Top="549.65" Width="1014.8" Height="12.9" Text="當受到包裝處理過程的影響，如積壓，干燙，蒸汽燙，塑膠袋化學物質釋放等，均不可確保顏色變化狀況。" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text89" Top="549.65" Width="26.5" Height="12.9" Text="10)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text90" Left="27.35" Top="566.2" Width="1014.8" Height="12.9" Text="電鍍顏色均屬於易受到氧化而褪色和變色的。" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text91" Top="565.65" Width="26.5" Height="12.9" Text="11)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text92" Left="27.35" Top="581.1" Width="1014.8" Height="12.9" Text="有關不銹鋼/鋁等原材料製成的產品均屬於原色系列。而且不銹鋼/鋁等原材料均無法通過金屬探測器。" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text93" Top="581.1" Width="26.5" Height="12.9" Text="12)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text94" Left="27.35" Top="597" Width="1014.8" Height="12.9" Text="品質監控盡量保持每一批次的產品色澤及光亮度品質一致性。但不同批次生產，效果一定會出現微異之差。" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text95" Top="597.45" Width="26.5" Height="12.9" Text="13)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text96" Left="27.35" Top="612.9" Width="1014.8" Height="12.9" Text="未經本公司事先書面批准，貴客戶不得為任何目的使用本公司的名稱、標識、商標、商業外觀、設計或其他知識產權，或任何類似於本公司的名稱、標識、商標、商業外觀、設計或其他" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text97" Top="613.35" Width="26.5" Height="12.9" Text="14)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text98" Left="27.35" Top="628.35" Width="1014.8" Height="12.9" Text="知識產權，包括但不限於任何廣告，也不得允許任何第三方作出該等行為。本公司有權就貴客戶侵犯本公司知識產權的行為採取行動。" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text99" Left="27.35" Top="645.25" Width="1014.8" Height="12.9" Text="貴客戶必須以其最大努力，協助本公司處理任何就貴客戶或第三方侵犯本公司知識產權的行為(包括生產方法)所引起的投訴、懷疑或申索 。" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text100" Top="645.25" Width="26.5" Height="12.9" Text="15)" Font="SimSun, 8.5pt"/>
+      <TextObject Name="Text2" Left="878.85" Top="659.95" Width="122.85" Height="18.9" Text="E.&amp;O.E." HorzAlign="Right" Font="SimSun, 8.5pt"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="705.4" Width="1047.06" Border.Lines="Left, Right" CanGrow="true" DataSource="InvData" KeepTogether="true" KeepDetail="true"/>
+    <PageFooterBand Name="PageFooter1" Top="709.4" Width="1047.06" Height="9.45" FirstRowStartsNewPage="true"/>
+  </ReportPage>
+</Report>

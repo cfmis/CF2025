@@ -12,6 +12,7 @@
         public string field_type { get; set; }
         public string from_table { get; set; }
         public string table_relation { get; set; }
+        public string order_by { get; set; }
     }
 
     public class ModelQuerySavedList

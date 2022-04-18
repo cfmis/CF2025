@@ -43,7 +43,7 @@
             <vxe-button type="text" icon="fa fa-remove" v-if="headData.state=='1' && !(isEditHead)" @@click="approveEvent('0')" style="margin-left: -2px">反批準</vxe-button>
             <vxe-button type="text" icon="fa fa-print" v-if="!(isEditHead)" @@click="printEvent">列印</vxe-button>
             <input v-model="searchID" maxlenth="13" style="outline-style:none;margin-left: 20px" v-if="flagChild=='' && !(isEditHead)" @@keyup.enter="findByID()" placeholder="搜索">
-            <vxe-button type="text" icon="fa fa-search" v-if="flagChild=='' && !(isEditHead)" @@click="showFindWindos" style="margin-left: -2px">查找</vxe-button>
+            <vxe-button type="text" icon="fa fa-search" v-if="flagChild=='' && !(isEditHead)" @@click="showFindWindos()" style="margin-left: -2px">查找</vxe-button>
         </template>
     </vxe-toolbar>
     <div class="my-div-header" @*style="margin-bottom:20px; border: 1px solid #dcdfe6;"*@>
@@ -321,8 +321,7 @@
 </div>
 
 
-@section PageSpecificJavascriptIncludes{    
-    <script src="~/Content/js/common.js?v=@Guid.NewGuid().ToString()"></script>
+@section PageSpecificJavascriptIncludes{
     <script src="~/Areas/Store/js/TransferIn.js?v=@Guid.NewGuid().ToString()"></script>
 }
 

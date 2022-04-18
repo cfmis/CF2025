@@ -23,11 +23,7 @@
                 { label: '不等于', value: '<>' },
             ],
             logicList: [ { label: '且', value: 'AND' }, { label: '或者', value: 'OR' },{ label: '', value: '' } ],
-            fieldNameList: [
-                { value: 'id',label: '編號', table_name: 'st_transfer_mostly', field_type: 'C' },
-                { value: 'transfer_date',label: '日期',  table_name: 'st_transfer_mostly', field_type: 'D' },
-                { value: 'mo_id',label: '頁數',  table_name: 'st_transfer_detail', field_type: 'C' }
-            ],
+            fieldNameList: [],
             validRules: {
                 field_name: [{ required: true, message: '請選擇欄位名稱' }],
                 operators: [{ required: true, message: '請選擇操作符' }]                       
@@ -206,7 +202,7 @@
             }
             var tableArr = []; 
             var strValue="",strFieldValue="";  
-           
+            //組合字段值關系運算符表達式
             for(var i=0;i<$table.tableData.length;i++){
                 if(i < $table.tableData.length-1){
                     if($table.tableData[i].field_name==="" || $table.tableData[i].operators==="" || $table.tableData[i].logic===""){
@@ -281,6 +277,7 @@
             var strSelect=""
             var joinArr=[];
             var fromArr=[];
+            var orderbyArr=[];
             for(var i=1;i<this.fieldNameList.length;i++){
                 //i=0是空格,所以循環從1開始.
                 if(i===1){
@@ -300,6 +297,12 @@
                         joinArr.push(this.fieldNameList[i].table_relation)
                     }
                 }
+                //構建Order by數組
+                if(this.fieldNameList[i].table_relation !==""){
+                    if(orderbyArr.indexOf(this.fieldNameList[i].order_by) === -1) {
+                        orderbyArr.push(this.fieldNameList[i].order_by)
+                    }
+                }
             }
             var strJoin ="";
             if(joinArr[0].length>0){
@@ -315,9 +318,17 @@
                 this.$XModal.alert({ content: '注意:后臺查詢構造語字段【from_table】內容不正確!', mask: false });
                 return;
             }
+            //構建排序
+            var strOrderby="";
+            if(orderbyArr[0].length>0){
+                strOrderby = orderbyArr[0];            
+            }
             //構建完整的sql語句
-            //在strTable(table_from)中寫有inner join left join,strJoin(table_relation)就不用寫
-            var strSql="SELECT " + strSelect +" FROM "+ strTable +" WHERE "+ strJoin +" AND "+ strValue;            
+            //在strTable(table_from)中寫有inner join left join,strJoin(table_relation)就不用寫           
+            var strSql="SELECT " + strSelect +" FROM "+ strTable +" WHERE "+ strJoin +" AND "+ strValue 
+            if(strOrderby !==""){
+                strSql +=" Order by "+ strOrderby;
+            }
             axios.get("/Base/PublicQuery/Query?sqlText=" + strSql).then(
                 (response) => {
                     if(response.data){

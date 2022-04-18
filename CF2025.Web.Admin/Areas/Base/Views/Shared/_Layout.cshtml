@@ -9,6 +9,10 @@
     <!-- 使用 cdn 引用方式需要注意是否锁定版本，默认指向最新版本 -->
     <link rel="stylesheet" href="~/Content/bootstrap-4.0/css/fonts/font-awesome.css">
     <link rel="stylesheet" href="~/Content/vxe-table/jsdelivr/style.css">
+
+    <!--2022.04.02 add-->
+    <link rel="stylesheet" type="text/css" href="~/Lib/jquery-easyui-1.5/themes/default/easyui.css" />
+
     <style>
         .div-left {
             float: left;
@@ -46,6 +50,11 @@
     </style>
 
     @RenderSection("PageSpecificStyleSheetIncludes", required: false)   
+    <!--begin 公共查詢需引入以下版本(1.10.2)的Jquery-->
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="~/Lib/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+    <!--end-->
+
     <script src="~/Content/vxe-table/js/vue.js"></script>
     <script src="~/Content/vxe-table/jsdelivr/xe-utils.js"></script>
     <script src="~/Content/vxe-table/jsdelivr/vxe-table.js"></script>

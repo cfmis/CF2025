@@ -79,8 +79,7 @@
                 location_id: [
                   { required: true, message: '倉庫必须填写' }
                 ]
-            },
-            //commonFindData:[{fieldName:'id',operator:'=',fieldValue:'DDIH082202005',logic:'AND'}],
+            },            
             operatorList:[
              { label: '等于', value: '=' },
              { label: '開頭', value: 'LIKE' },
@@ -89,8 +88,8 @@
              { label: '大于', value: '<' }],
             logicList:[{label:'且',value:'AND'},{label:'或者',value:'OR'}],
             fieldNameList:[{label:'編號',value:'id'},{label:'日期',value:'transfer_date'}],
-            windowWidth: document.documentElement.clientWidth, //实时屏幕宽度
-            windowHeight: document.documentElement.clientHeight, //实时屏幕高度
+            //windowWidth: document.documentElement.clientWidth, //实时屏幕宽度
+            //windowHeight: document.documentElement.clientHeight, //实时屏幕高度
         }
     },
     created() {       
@@ -139,14 +138,13 @@
                 this.loading = false;
             }, 500);            
         },
-        showFindWindos(){                      
-            var id='TransferIn';
-            var url = "/Base/PublicQuery?window_id=" + id;
-            comm.showMessageDialog(url, "查詢", 1024, 600, true); 
-        }, 
+        showFindWindos(){
+            comm.openWindos('TransferIn');
+        },
         printEvent(){
-            var parentWindowHeight=$(parent.window).height();
-            this.tableHeight=$(parent.window).height()-205;
+            //test
+            //var parentWindowHeight=$(parent.window).height();
+            //this.tableHeight=$(parent.window).height()-205;
 
         },       
         //初始化下拉列表框

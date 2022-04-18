@@ -1,8 +1,12 @@
 var comm= {
-   showMessageDialog:function(url, title, width, height, shadow){
+    openWindos(id){
+        var url = "/Base/PublicQuery?window_id=" + id;
+        this.showMessageDialog(url, "查詢", 1024, 600, true); 
+    }, 
+    showMessageDialog:function(url, title, width, height, shadow){        
         var content = '<iframe src="' + url + '" width="100%" height="99%" frameborder="0" scrolling="no"></iframe>';       
         //content += '<a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" style="width:80px" onclick="javascript:$(' + '\'#msgwindow\'' + ').dialog(' + '\'close\'' + ')">' + '关闭' + '</a>';
-        var boarddiv = '<div id="msgwindow" title="' + title + '"></div>'//style="overflow:hidden;"可以去掉滚动条
+        var boarddiv = '<div id="msgwindow" title="' + title + '"></div>'//style="overflow:hidden;"可以去掉滚动条       
         $(document.body).append(boarddiv);
         var win = $('#msgwindow').dialog({
             content: content,
@@ -17,7 +21,6 @@ var comm= {
         });
         win.dialog('open');
    },
-
    closeWindow:function(){
         $('#msgwindow').dialog('close');
    },

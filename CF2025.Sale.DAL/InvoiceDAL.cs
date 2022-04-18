@@ -10,6 +10,7 @@ using CF.SQLServer.DAL;
 using CF.Core.Config;
 using CF2025.Base.DAL;
 using CF2025.Sale.Contract;
+using CF2025.Base.Contract;
 
 namespace CF2025.Sale.DAL
 {
@@ -1306,6 +1307,159 @@ namespace CF2025.Sale.DAL
                 mdj.Msg = result;
             }
             return mdj;
+        }
+
+        public static List<so_invoice_report> GetReportDataByID(string ID,string Ver,string dc_flag)
+        {
+            string strSql = string.Format(
+            @"SELECT within_code,id,ver,sequence_id,CONVERT(varchar(10),oi_date,111) AS oi_date,it_customer,customer_name,address,
+	        phone,fax,sellerman,payment,shop_no,CONVERT(varchar(10),ship_date,111) AS ship_date,currency,customer_bill_no,contract_cid,mo_id,goods_id,
+            goods_id + CASE WHEN ISNULL(customer_goods,'')='' THEN '' ELSE CHAR(13)+CHAR(10)+customer_goods END AS goods_id_a ,goods_name,
+            ISNULL(goods_name,'') + CASE WHEN ISNULL(customer_color_id,'')='' THEN '' ELSE CHAR(13)+CHAR(10)+LTRIM(RTRIM(customer_color_id)) END +
+            CASE WHEN ISNULL(invoice_remark,'')='' THEN '' ELSE CHAR(13)+CHAR(10)+ LTRIM(RTRIM(invoice_remark)) END +
+            CASE WHEN ISNULL(remark,'')='' THEN '' ELSE CHAR(13)+CHAR(10)+LTRIM(RTRIM(remark)) END AS goods_name_a,
+            order_id,u_invoice_qty,goods_unit,invoice_price,p_unit,total_sum,sort,sys_dictionary.types, 
+            CASE currency WHEN 'HKD' THEN '$' WHEN 'USD' THEN '$' WHEN 'RMB' THEN '¥' ELSE '' END AS currency_sign, 
+            CASE sys_dictionary.types 
+                WHEN '1' THEN '(Original/正本)' 
+	            WHEN '2' THEN '(Copy1/副本1)'
+	            WHEN '3' THEN '(Copy2/副本2)'
+	            WHEN '4' THEN '(Copy3/副本3)'
+	        END AS types_desc,
+	        SUM(total_sum) OVER(Partition By within_code,id,ver,sys_dictionary.types) AS total_amount,
+	        Cast(isnull(table_head,'') AS nvarchar(80)) AS table_head,Isnull(customer_goods,'') AS customer_goods, 
+	        Isnull(customer_color_id,'') AS customer_color_id,linkman,total_package_num,Isnull(is_free,'0') as is_free,state,package_unit,total_weight,transport_style,
+	        Isnull(bill_address,'') AS bill_address,Cast(Isnull(remark,'') AS nvarchar(80)) AS remark,remark2,invoice_remark
+            FROM v_rpt_so_invoice,
+                    ( Select (Case col_code 
+                            When 't_id' Then '1' 
+			                When 't_order_date' Then '2' 
+			                When 't_order_qty' Then '3' 
+			                When 't_remark' Then '4' 
+			                End) As 'types' 
+                    From sys_dictionary 
+                    where  language_id = '1' And col_code In('t_id','t_order_date','t_order_qty','t_remark')
+                    ) sys_dictionary 
+            WHERE within_code='{0}' and id='{1}' and  Cast(ver As nvarchar(10))='{2}' Order BY sys_dictionary.types,sequence_id", within_code, ID, Ver);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql); 
+            if(dc_flag=="DC")
+            {
+                //現沽報表為一式三份
+                DataRow[] rowArray = dt.Select(string.Format(" types = '{0}'","4"));
+                foreach (DataRow row in rowArray)
+                {
+                    dt.Rows.Remove(row);
+                }
+                dt.AcceptChanges();
+            }          
+            List<so_invoice_report> list = CommonDAL.DataTableToList<so_invoice_report>(dt);
+            return list;
+        }
+
+        public static List<so_invoice_report> GetReportCommercial(string ID, string Ver)
+        {
+            string strSql = string.Format(
+            @"SELECT a.within_code,a.id,a.ver,CONVERT(varchar(10),a.oi_date,111) AS oi_date,a.ship_remark,a.ship_remark2,a.ship_remark3,a.goods,a.size,a.sequence_id,a.order_id,
+	        a.contract_cid,a.u_invoice_qty,a.unit_code,a.invoice_price,a.p_unit,Case WHEN ISNULL(a.is_free,'')<>'1' THEN a.total_sum ELSE 0 END AS total_sum,
+            a.m_id,sys_dictionary.types,SUM(a.total_sum) over(partition by a.within_code,a.id,a.ver,sys_dictionary.types) as total_amount,
+	        dbo.Fn_number_to_english(SUM(a.total_sum) over(partition by a.within_code,a.id,a.ver,sys_dictionary.types)) as 'amount_english',
+	        a.loading_name,a.ap_name,a.po_no,a.email,CONVERT(varchar(10),a.ship_date,111) AS ship_date,a.customer_name,a.shipping_methods,a.per,a.sort,a.linkman,a.l_phone,a.finally_buyer,a.finally_buyer_name,
+	        a.address,a.bill_address,a.mo_id,a.customer_goods,a.customer_color_id,a.invoice_remark,a.pc_id,a.is_print,ISNULL(a.is_free,'0') as is_free,state,
+	        a.remark,a.table_head,a.remark2,CONVERT(varchar(10),a.invoice_date,111) AS invoice_date,a.flag ,
+            CASE sys_dictionary.types 
+                WHEN '1' THEN '(Original/正本)' 
+	            WHEN '2' THEN '(Copy1/副本1)'
+	            WHEN '3' THEN '(Copy2/副本2)'
+	            WHEN '4' THEN '(Copy3/副本3)'
+	        END AS types_desc,
+	        CASE WHEN ISNULL(a.customer_goods,'')<>'' THEN 'Cust.Item:'+LTRIM(RTRIM(a.customer_goods)) ELSE '' END + 
+	        CASE WHEN ISNULL(a.size,'')<>'' THEN ' Size:'+LTRIM(RTRIM(a.size)) ELSE '' END + 
+	        CASE WHEN ISNULL(a.customer_color_id,'')<>'' THEN ' Cust.Color:'+LTRIM(RTRIM(a.customer_color_id)) ELSE '' END as cust_info,
+            'O.C.:'+a.order_id AS order_id_desc,'P.O.:'+ISNULL(a.contract_cid,'') AS contract_cid_desc           
+            FROM v_rpt_so_invoice_commercial a,
+	            (Select (Case col_code When 't_id' Then '1' When 't_order_date' Then '2' When 't_order_qty' Then '3' When 't_remark' Then '4' End) As 'types'
+	            From sys_dictionary 
+	            Where language_id = '1' And col_code In('t_id','t_order_date','t_order_qty','t_remark')) sys_dictionary
+            WHERE within_code='{0}' and id='{1}' and  Cast(ver As nvarchar(10))='{2}' Order BY sys_dictionary.types,a.sequence_id ", within_code, ID, Ver);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            //處理報表中重復不顯示問題
+            if (dt.Rows.Count > 0)
+            {
+                string strTypes = dt.Rows[0]["types"].ToString();
+                string strOrder_id = dt.Rows[0]["order_id"].ToString();
+                string strContract_cid = dt.Rows[0]["contract_cid"].ToString();
+                for (int i = 1; i < dt.Rows.Count; i++)
+                {
+                    if(dt.Rows[i]["types"].ToString() == strTypes)//同組
+                    {
+                        if(dt.Rows[i]["order_id"].ToString() == strOrder_id)
+                        {
+                            //以上條記錄存在相同
+                            dt.Rows[i]["order_id_desc"] = "";
+                        }
+                        if (dt.Rows[i]["contract_cid"].ToString() == strContract_cid)
+                        {
+                            //以上條記錄存在相同
+                            dt.Rows[i]["contract_cid_desc"] = "";
+                        }
+                    }else
+                    {
+                        //不同組,重置臨時變量
+                        strTypes = dt.Rows[i]["types"].ToString();
+                        strOrder_id = dt.Rows[i]["order_id"].ToString();
+                        strContract_cid = dt.Rows[i]["contract_cid"].ToString();
+                    }
+                }
+            }
+            List<so_invoice_report> list = CommonDAL.DataTableToList<so_invoice_report>(dt);
+            return list;
+        }
+
+        public static List<SelectReport> GetSelectReport(string ID,string it_customer,string m_id)
+        {
+            string reports = "";
+            string strId = it_customer.Substring(0, 2);
+            if (!"DO,DU".Contains(strId) && m_id == "USD")
+            {
+                //美金強制轉出口發票
+                strId = "DU";
+            }
+            switch (strId)
+            {
+                case "DL":
+                case "DR":
+                    reports = "'0001','0005','0007'";//0001本地戶口發票;0005打印裝運嘜頭;0007打印條款(本地及現沽發票)
+                    break;
+                case "DO":
+                case "DU":
+                    reports = "'0003','0004','0005','0008'";//0003出口發票格式1;0004出口發票格式2;0005打印裝運嘜頭;0008打印條款(出口發票)
+                    break;
+                case "DC":
+                    reports = "'0002','0005','0007'";//0002現沽單發票;0005打印裝運嘜頭;0007打印條款(本地及現沽發票)
+                    break;
+                default:
+                    reports = "'0001'";
+                    break;
+            }
+            List<SelectReport> lst = new List<SelectReport>();
+            string strSql = string.Format(
+                @"Select reportid,reportname,default_print FROM sys_reportsetup 
+                Where within_code='{0}' AND window_id='{1}' AND sequence_id IN({2}) AND state<>'2' 
+                Order By sequence_id", within_code, ID, reports);
+            strSql += "  ";
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            lst = ConvertHelper.DataTableToList<SelectReport>(dt);
+            return lst;
+        }
+
+        public static List<so_invoice_ship_remark> GetShipRemark(string Id, string Ver)
+        {
+            string strSql = string.Format(
+                @"SELECT within_code,id,ver,ship_remark,ship_remark2,ship_remark3 FROM so_invoice_mostly 
+                WHERE within_code ='{0}' and id = '{1}' and Cast(ver As nvarchar(10))='{2}'",within_code, Id, Ver);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            List<so_invoice_ship_remark> list = CommonDAL.DataTableToList<so_invoice_ship_remark>(dt);
+            return list;
         }
     }
 }

@@ -7,9 +7,11 @@
     <title>@ViewBag.Title</title>
     <link rel="stylesheet" href="~/Content/bootstrap-4.0/css/fonts/font-awesome.css">
     <link rel="stylesheet" href="~/Content/vxe-table/jsdelivr/style.css">
-
+    
+    <!--begin 公共查詢引入Jquery樣式-->
     <link rel="stylesheet" type="text/css" href="~/Lib/jquery-easyui-1.5/themes/default/easyui.css" />
-    <link rel="stylesheet" type="text/css" href="~/Lib/jquery-easyui-1.5/themes/icon.css" />
+    <!--end-->
+    @*<link rel="stylesheet" type="text/css" href="~/Lib/jquery-easyui-1.5/themes/icon.css" />*@
 
     <style>
         .div-left {
@@ -48,13 +50,16 @@
     </style>
 
     @RenderSection("PageSpecificStyleSheetIncludes", required: false)
+    <!--begin 公共查詢引入Jquery-->
     <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
     <script type="text/javascript" src="~/Lib/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+    <!--end-->
 
     <script src="~/Content/vxe-table/js/vue.js"></script>
     <script src="~/Content/vxe-table/jsdelivr/xe-utils.js"></script>
     <script src="~/Content/vxe-table/jsdelivr/vxe-table.js"></script>
     <script type="text/javascript" src="~/Scripts/axios.js"></script>
+    <script src="~/Content/Js/common.js"></script>
 </head>
 <body>
     @RenderBody()
