@@ -7,6 +7,7 @@
       <Column Name="ship_remark" DataType="System.String" PropName="oi_date"/>
       <Column Name="ship_remark2" DataType="System.String" PropName="it_customer"/>
       <Column Name="ship_remark3" DataType="System.String" PropName="mo_id"/>
+      
     </BusinessObjectDataSource>
   </Dictionary>
   <ReportPage Name="Page1" RawPaperSize="9" Guides="0,0,0,0,0,0" Watermark.Font="SimSun, 60pt">

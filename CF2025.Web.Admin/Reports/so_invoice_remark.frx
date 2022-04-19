@@ -27,6 +27,7 @@ namespace FastReport
   <ReportPage Name="Page1" PaperWidth="297" PaperHeight="210" RawPaperSize="9" TopMargin="15" Guides="0,0,0,0,0,0" Watermark.Font="SimSun, 60pt">
     <ReportTitleBand Name="ReportTitle1" Width="1047.06">
       <TextObject Name="Text17" Left="-9450" Top="-9450" Width="134.1" Height="13.9" Text="發票號碼 Invoice No." Font="SimSun, 9pt"/>
+      
     </ReportTitleBand>
     <PageHeaderBand Name="PageHeader1" Top="4" Width="1047.06" Height="697.4" EvenStylePriority="UseAll" CanBreak="true">
       <TextObject Name="Text1" Top="12.45" Width="228.4" Height="17.9" Text="Terms &amp; Condition/條款" Font="SimSun, 12pt, style=Underline"/>
