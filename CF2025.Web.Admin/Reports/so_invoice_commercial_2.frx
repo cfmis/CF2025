@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" DoublePass="true" ReportInfo.Created="06/15/2021 17:18:22" ReportInfo.Modified="04/15/2022 11:37:00" ReportInfo.CreatorVersion="2019.1.15.0">
+<Report ScriptLanguage="CSharp" DoublePass="true" ReportInfo.Created="06/15/2021 17:18:22" ReportInfo.Modified="04/18/2022 17:51:32" ReportInfo.CreatorVersion="2019.1.15.0">
   <ScriptText>using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -107,7 +107,7 @@ namespace FastReport
       <Column Name="types_desc" DataType="System.String"/>
       <Column Name="cust_info" DataType="System.String"/>
     </BusinessObjectDataSource>
-    <Total Name="TotalSum" Expression="[InvData.total_sum]" Evaluator="Data1" PrintOn="GroupFooter2"/>
+    <Total Name="TotalSum" Expression="[InvData.total_sum]" Evaluator="Data1" PrintOn="DataFooter1"/>
   </Dictionary>
   <ReportPage Name="Page1" RawPaperSize="9" TopMargin="5" BottomMargin="5" Guides="0,0,0,0,0,0" Watermark.Font="SimSun, 60pt" ResetPageNumber="true">
     <ReportTitleBand Name="ReportTitle1" Width="718.2"/>
@@ -210,7 +210,7 @@ namespace FastReport
       <TextObject Name="txtState" Left="103.95" Top="135.75" Width="86.5" Height="18.9" Visible="false" Text="[InvData.state]" VertAlign="Bottom" WordWrap="false" Font="SimSun, 8pt"/>
       <TextObject Name="txtApprove" Left="623.7" Top="35.45" Width="56.7" Height="18.9" Visible="false" Text="未批準" VertAlign="Bottom" WordWrap="false" Font="SimSun, 10pt"/>
     </PageHeaderBand>
-    <GroupHeaderBand Name="GroupHeader2" Top="538.98" Width="718.2" Border.Lines="Left, Right" StartNewPage="true" Condition="[InvData.types]" ResetPageNumber="true">
+    <GroupHeaderBand Name="GroupHeader2" Top="538.98" Width="718.2" Border.Lines="Left, Right" StartNewPage="true" Condition="[InvData.types]" SortOrder="None" ResetPageNumber="true">
       <DataBand Name="Data1" Top="542.98" Width="718.2" Height="41.58" Border.Lines="Left, Right" CanGrow="true" DataSource="InvData" KeepTogether="true" KeepDetail="true">
         <TableObject Name="Table4" Width="718.2" Height="41.58">
           <TableColumn Name="Column37" Width="415.8"/>
