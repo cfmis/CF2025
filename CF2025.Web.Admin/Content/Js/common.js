@@ -35,6 +35,7 @@ var comm= {
             return true;
         }
    },
+
   
    // 日期格式化 fmt 格式化字符如 'yyyy-MM-dd hh:mm:ss' v 可以是日期或字符串
    datetimeFormat: function(v, fmt) {
