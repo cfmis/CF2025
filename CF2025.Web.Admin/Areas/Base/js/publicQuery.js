@@ -35,7 +35,7 @@
         this.window_id = document.getElementById("window_id").value;        
         this.initData();
     },
-    methods: {
+    methods: {        
         //格式化欄位標簽翻譯
         formatFieldName(val) {
             var result = "";
@@ -387,9 +387,16 @@
                     });                   
                 }
             })
-        }
+        },
+        formatDate({ cellValue }){
+           return XEUtils.toDateString(cellValue, 'yyyy-MM-dd');
+        },
+        formatDateTime({ cellValue }){
+           return XEUtils.toDateString(cellValue, 'yyyy-MM-dd HH:mm:ss');
+        },
 
     } //end methods
+
     
 }
 var app = new Vue(publicQuery).$mount('#app');
