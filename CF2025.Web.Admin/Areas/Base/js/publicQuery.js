@@ -388,11 +388,13 @@
                 }
             })
         },
-        formatDate({ cellValue }){
-           return XEUtils.toDateString(cellValue, 'yyyy-MM-dd');
+        formatDate({ cellValue }){ 
+           return comm.datetimeFormat(cellValue, 'yyyy-MM-dd');            
+           //return XEUtils.toDateString(d, 'yyyy-MM-dd');
         },
         formatDateTime({ cellValue }){
-           return XEUtils.toDateString(cellValue, 'yyyy-MM-dd HH:mm:ss');
+            return comm.datetimeFormat(cellValue, 'yyyy-MM-dd hh:mm:ss');  
+           //return XEUtils.toDateString(cellValue, 'yyyy-MM-dd HH:mm:ss');
         },
 
     } //end methods
