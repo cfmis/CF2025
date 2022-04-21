@@ -154,9 +154,9 @@
         <vxe-column type="seq" title="#" fixed="left" width="50"></vxe-column>
         <template v-for="(item,i) in fieldNameList">
             <!--i=0第一列為空格所以要隱藏-->
-            <vxe-column width="90" :key="item.value" v-if="i !='0' && item.field_type==='D'" :field="item.value" :title="item.label" :formatter="formatDate"></vxe-column>
-            <vxe-column width="140" :key="item.value" v-else-if="i !='0' && item.field_type==='T'" :field="item.value" :title="item.label" :formatter="formatDateTime"></vxe-column>  
-            <vxe-column width="130" :key="item.value" v-else-if="i !='0' && item.field_type !='D' && item.field_type !='T'" :field="item.value" :title="item.label"></vxe-column>         
+            <vxe-column :width="item.col_width>0?item.col_width:90":key="item.value" v-if="i !='0' && item.field_type==='D'" :field="item.value" :title="item.label" :formatter="formatDate"></vxe-column>
+            <vxe-column :width="item.col_width>0?item.col_width:140":key="item.value" v-else-if="i !='0' && item.field_type==='T'" :field="item.value" :title="item.label" :formatter="formatDateTime"></vxe-column>  
+            <vxe-column :width="item.col_width>0?item.col_width:120":key="item.value" v-else-if="i !='0' && item.field_type !='D' && item.field_type !='T'" :field="item.value" :title="item.label"></vxe-column>         
         </template>
     </vxe-table>
 
