@@ -1,5 +1,5 @@
 var comm= {
-    openWindos: function(id){
+    openWindos(id){
         var url = "/Base/PublicQuery?window_id=" + id;
         this.showMessageDialog(url, "查詢", 1024, 600, true); 
     }, 

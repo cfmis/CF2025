@@ -23,11 +23,12 @@
                 { label: '不等于', value: '<>' },
             ],
             logicList: [ { label: '且', value: 'AND' }, { label: '或者', value: 'OR' },{ label: '', value: '' } ],
-            fieldNameList: [],
+            fieldNameList: [],            
             validRules: {
                 field_name: [{ required: true, message: '請選擇欄位名稱' }],
                 operators: [{ required: true, message: '請選擇操作符' }]                       
-            }            
+            },
+            allTotal:0,
         }
     },
     created() {
@@ -35,7 +36,7 @@
         this.window_id = document.getElementById("window_id").value;        
         this.initData();
     },
-    methods: {
+    methods: {        
         //格式化欄位標簽翻譯
         formatFieldName(val) {
             var result = "";
@@ -125,9 +126,9 @@
         },
         //提取欄位名稱下拉列表
         getfieldNameList(id) {          
-            axios.get("/Base/PublicQuery/GetFieldName?window_id=" + id).then(
+         axios.get("/Base/PublicQuery/GetFieldName?window_id=" + id).then(
                 (response) => {                    
-                    this.fieldNameList = response.data;
+                   this.fieldNameList = response.data;                   
                 },
                 (response) => {
                     alert(response.status);
@@ -329,11 +330,12 @@
             if(strOrderby !==""){
                 strSql +=" Order by "+ strOrderby;
             }
+            console.log(this.ary);
             axios.get("/Base/PublicQuery/Query?sqlText=" + strSql).then(
                 (response) => {
                     if(response.data){
                         var jsonObj = JSON.parse(response.data); //jason字符串转换为json对象
-                        this.tableResult = jsonObj;
+                        this.tableResult = jsonObj;                        
                     }else{
                         this.tableResult=[];
                         this.$XModal.message({ content: '沒有滿足查找條件的數據!', status: 'info' });
@@ -387,9 +389,18 @@
                     });                   
                 }
             })
-        }
+        },
+        formatDate({ cellValue }){ 
+           return comm.datetimeFormat(cellValue, 'yyyy-MM-dd');            
+           //return XEUtils.toDateString(d, 'yyyy-MM-dd');
+        },
+        formatDateTime({ cellValue }){
+            return comm.datetimeFormat(cellValue, 'yyyy-MM-dd hh:mm:ss');  
+           //return XEUtils.toDateString(cellValue, 'yyyy-MM-dd HH:mm:ss');
+        },        
 
-    } //end methods
+     } //end methods
+
     
 }
 var app = new Vue(publicQuery).$mount('#app');

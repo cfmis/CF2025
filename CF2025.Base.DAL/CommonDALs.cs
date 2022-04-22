@@ -26,7 +26,7 @@ namespace CF2025.Base.DAL
             string LanguageID = sh.ConvertLanguage(language_id);
             string strSql = string.Format(
             @"SELECT A.field_name AS value,CASE WHEN LEN(ISNULL(B.col_name,''))>0 THEN B.col_name ELSE a.field_desc END AS label,
-            A.table_name,A.field_type,ISNULL(A.from_table,'') AS from_table,ISNULL(A.table_relation,'') AS table_relation,A.order_by
+            A.table_name,A.field_type,ISNULL(A.from_table,'') AS from_table,ISNULL(A.table_relation,'') AS table_relation,A.order_by,col_width
             FROM sys_query_initialize A Left join sys_dictionary B ON A.field_desc=B.col_code
             WHERE A.window_id ='{0}' AND B.language_id='{1}'
             ORDER BY A.sequence_id", window_id, LanguageID);
@@ -50,7 +50,8 @@ namespace CF2025.Base.DAL
                 obj.field_type = dr["field_type"].ToString();
                 obj.from_table = dr["from_table"].ToString();
                 obj.table_relation = dr["table_relation"].ToString();
-                obj.order_by = dr["order_by"].ToString();                
+                obj.order_by = dr["order_by"].ToString();
+                obj.col_width = int.Parse(dr["col_width"].ToString());
                 lst.Add(obj);
             }
             return lst;
