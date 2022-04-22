@@ -93,8 +93,17 @@ namespace CF2025.Store.DAL
                 }
                 //***begin 更新系統表最大單據編號
                 string dept_id = model.department_id;//105
-                string year_month = model.id.Substring(6, 4);//2201
-                string bill_code = model.id.Substring(1, 12);
+                string year_month = "";// = model.id.Substring(6, 4);//2201
+                string bill_code = "";// model.id.Substring(1, 12);
+                if (model.id.Length > 12)
+                {
+                    year_month = model.id.Substring(6, 4);//2201
+                    bill_code = model.id.Substring(1, 12);
+                }else
+                {
+                    year_month = model.id.Substring(5, 4);//2201
+                    bill_code = model.id.Substring(0, 11);
+                }               
                 string sql_sys_update = "";
                 string sql_sys_id_find = string.Format(
                     @"SELECT bill_code FROM sys_bill_max_separate WHERE within_code='0000' AND bill_id='{0}' AND year_month='{1}' and bill_text2='{2}'",

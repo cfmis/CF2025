@@ -67,7 +67,7 @@
             removeRecords:{}, 
             updateRecords:{},            
             validRules: {
-                mo_id: [                  
+                mo_id: [
                   { required: true, message: '頁數必须填写' }
                 ],
                 goods_id: [
@@ -79,15 +79,7 @@
                 location_id: [
                   { required: true, message: '倉庫必须填写' }
                 ]
-            },            
-            operatorList:[
-             { label: '等于', value: '=' },
-             { label: '開頭', value: 'LIKE' },
-             { label: '包含', value: 'IN' },
-             { label: '大于', value: '>' },
-             { label: '大于', value: '<' }],
-            logicList:[{label:'且',value:'AND'},{label:'或者',value:'OR'}],
-            fieldNameList:[{label:'編號',value:'id'},{label:'日期',value:'transfer_date'}],
+            },
             //windowWidth: document.documentElement.clientWidth, //实时屏幕宽度
             //windowHeight: document.documentElement.clientHeight, //实时屏幕高度
         }
@@ -551,8 +543,9 @@
             //row.$rowIndex;//行索引
             this.curDelRow = row.data[row.$rowIndex];            
         },
-        getHead(_id) {
-            axios.get("GetHeadByID", { params: { id: _id } }).then(
+        getHead(id) {
+            //此處的URL需指定到祥細控制器及之下的動Action,否則在轉出待確認彈窗中的查詢將數出錯,請求相對路徑的問題
+            axios.get("/TransferIn/GetHeadByID", { params: { id: id }}).then(
                 (response) => {                
                     this.headData = {
                         id: response.data.id,
@@ -582,9 +575,9 @@
                 alert(response);
             });
         },
-        getDetails(_id) {
-            var _self = this;
-            axios.get("GetDetailsByID", { params: { id: _id } }).then(
+        getDetails(id) {
+            var _self = this;            
+            axios.get("/TransferIn/GetDetailsByID", { params: { id: id }  }).then(
                 (response) => {
                     this.gridData = response.data;
                 },
@@ -596,8 +589,7 @@
             });
         },
         //開啟公共查詢頁面
-        showQueryEvent(id) {
-            alert("test");
+        showQueryEvent(id) {            
             var url = "/Base/PublicQuery?window_id=" + id;
             comm.showMessageDialog(url, "查詢", 1024, 768, true);
         },
@@ -658,7 +650,7 @@
                   if(res) // res为promise對象中的值,如果值是對象,說明數據校驗通不過
                   {
                       this.$XModal.alert({ content: '注意:明細數據不完整,請返回檢查!', mask: false });
-                  }else{
+                  }else{                      
                       var items_update=null;
                       for(var i=0;i<$table.tableData.length;i++){
                           items_update = $table.tableData[i];                
@@ -672,7 +664,7 @@
                               this.$set(items.insertRecords[i], "row_status", "NEW" );
                               this.tempSaveData.push(items.insertRecords[i]);
                           }
-                      }                      
+                      }
                       if(items.removeRecords.length>0){
                           for(var i=0;i<items.removeRecords.length;i++){
                               this.$set(items.removeRecords[i], "row_status", "DEL" );
