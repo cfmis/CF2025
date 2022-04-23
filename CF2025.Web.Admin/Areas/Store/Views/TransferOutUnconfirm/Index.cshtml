@@ -16,9 +16,9 @@
 <div id="app">
     <vxe-toolbar perfect size="small" style="height:35px;margin-bottom:5px" >
         <template #buttons style="height:35px;margin-bottom:10px">
-            <vxe-button icon="fa fa-check" content="確認" @@click="getSelectionEvent"></vxe-button>
-            <vxe-button icon="fa fa-search" content="查詢" @@click="searchData"></vxe-button>
-            <vxe-button type="reset" icon="fa fa-mail-reply" @@click="resetEvent" content="重置"></vxe-button>            
+            <vxe-button icon="iconfont icon-confirm4" content="確認" @@click="getSelectionEvent"></vxe-button>
+            <vxe-button icon="iconfont icon-search1" content="查詢" @@click="searchData"></vxe-button>
+            <vxe-button type="reset" icon="iconfont icon-autorenew1" @@click="resetEvent" content="重置"></vxe-button>            
         </template>
     </vxe-toolbar>
 
@@ -116,7 +116,6 @@
                             <vxe-button type="reset" content="重置"></vxe-button>
                         </template>
                     </vxe-form-item>*@
-
                 </vxe-form>
             </div>
 
@@ -129,9 +128,12 @@
                    ref="xTable"
                    @*設置最大高度*@
                    @*height='100%'*@
-                   max-height="500"
+                   @*max-height="500"*@
+                   :height="tableHeight"
                    size="small"
                    resizable
+                   show-header-overflow
+                   :header-cell-style="headerCellStyle"
                    @*當前行高亮度*@
                    highlight-hover-row
                    highlight-current-row

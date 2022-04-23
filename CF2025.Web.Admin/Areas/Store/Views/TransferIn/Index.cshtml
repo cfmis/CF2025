@@ -32,18 +32,18 @@
 <div id="app">
     <vxe-toolbar perfect size="small" style="height:35px;margin-bottom:5px">
         <template #buttons style="height:35px;margin-bottom:10px">
-            <vxe-button type="text" icon="fa fa-plus" v-if="!(isEditHead)" @@click="insertEvent()">新增</vxe-button>
-            <vxe-button type="text" status="danger" icon="fa fa-trash" v-if="!(isEditHead)"@@click="delHeadEvent()" style="margin-left: -2px">注銷</vxe-button>
-            <vxe-button type="text" icon="fa fa-pencil" v-if="!(isEditHead)" style="margin-left: -2px" @@click="editHeadEvent()">修改</vxe-button>
-            <vxe-button status="primary" icon="fa fa-save" v-if="isEditHead" @@click="saveEvent()" style="margin-left: -2px">保存</vxe-button>
-            <vxe-button type="text" icon="fa fa-undo" v-if="isEditHead" @@click="revertEvent()">取消</vxe-button>
-            <vxe-button type="text" icon="fa fa-plus" v-if="isEditHead" @@click="insertRowEvent()">項目新增</vxe-button>
-            <vxe-button type="text" icon="fa fa-remove" v-if="isEditHead" @@click="tempDelRowEvent()" style="margin-left: -2px">項目刪除</vxe-button>
-            <vxe-button type="text" icon="fa fa-check" v-if="headData.state=='0' && !(isEditHead)" @@click="approveEvent('1')">批準</vxe-button>
-            <vxe-button type="text" icon="fa fa-remove" v-if="headData.state=='1' && !(isEditHead)" @@click="approveEvent('0')" style="margin-left: -2px">反批準</vxe-button>
-            <vxe-button type="text" icon="fa fa-print" v-if="!(isEditHead)" @@click="printEvent">列印</vxe-button>
+            <vxe-button type="text" icon="iconfont icon-file-add1" v-if="!(isEditHead)" @@click="insertEvent()">新增</vxe-button>
+            <vxe-button type="text" status="danger" icon="iconfont icon-delete2" v-if="!(isEditHead)"@@click="delHeadEvent()" style="margin-left: -2px">注銷</vxe-button>
+            <vxe-button type="text" icon="iconfont icon-edit2" v-if="!(isEditHead)" style="margin-left: -2px" @@click="editHeadEvent()">修改</vxe-button>
+            <vxe-button status="primary" icon="iconfont icon-save1" v-if="isEditHead" @@click="saveEvent()" style="margin-left: -2px">保存</vxe-button>
+            <vxe-button type="text" icon="iconfont icon-chexiaocancel" v-if="isEditHead" @@click="revertEvent()">取消</vxe-button>
+            <vxe-button type="text" icon="iconfont icon-tableaddrows" v-if="isEditHead" @@click="insertRowEvent()">項目新增</vxe-button>
+            <vxe-button type="text" icon="iconfont icon-tabledeleterows" v-if="isEditHead" @@click="tempDelRowEvent()" style="margin-left: -2px">項目刪除</vxe-button>
+            <vxe-button type="text" icon="iconfont icon-zu10011" v-if="headData.state=='0' && !(isEditHead)" @@click="approveEvent('1')">批準</vxe-button>
+            <vxe-button type="text" icon="iconfont icon-cancel7" v-if="headData.state=='1' && !(isEditHead)" @@click="approveEvent('0')" style="margin-left: -2px">反批準</vxe-button>
+            <vxe-button type="text" icon="iconfont icon-print" v-if="!(isEditHead)" @@click="printEvent">列印</vxe-button>
             <input v-model="searchID" maxlenth="13" style="outline-style:none;margin-left: 20px" v-if="flagChild=='' && !(isEditHead)" @@keyup.enter="findByID()" placeholder="搜索">
-            <vxe-button type="text" icon="fa fa-search" v-if="flagChild=='' && !(isEditHead)" @@click="showFindWindos()" style="margin-left: -2px">查找</vxe-button>
+            <vxe-button type="text" icon="iconfont icon-search1" v-if="flagChild=='' && !(isEditHead)" @@click="showFindWindos()" style="margin-left: -2px">查找</vxe-button>
         </template>
     </vxe-toolbar>
     <div class="my-div-header" @*style="margin-bottom:20px; border: 1px solid #dcdfe6;"*@>
@@ -118,10 +118,11 @@
                    :height="tableHeight"
                    size="small"
                    @*欄寬度可調*@
-                   resizable                   
-                   highlight-hover-row
-                   highlight-current-row
+                   resizable
+                   show-header-overflow
                    :header-cell-style="headerCellStyle"
+                   highlight-hover-row
+                   highlight-current-row                  
                    @*loading3顯示查詢動畫*@
                    :loading="loading"
                    @*:sync-resize="selectTab"*@
@@ -296,6 +297,8 @@
                    :height="400"
                    size="small"
                    resizable
+                   show-header-overflow
+                   :header-cell-style="headerCellStyle"
                    highlight-hover-row
                    highlight-current-row
                    @*選中時highlight*@

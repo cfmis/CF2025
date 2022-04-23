@@ -720,9 +720,9 @@
     computed: {
         //
     },
-    mounted() {
-        this.tableHeight=$(parent.window).height()-205;
-        if(this.flagChild ==="1"){            
+    mounted() {        
+        if(this.flagChild ==="1"){  
+            this.tableHeight=$(window).height()-150;
             var $table = this.$refs.xTableIn;
             //-1 為添加至行尾            
             for (var i = 0; i < this.confirmData.length; i++) {
@@ -740,6 +740,8 @@
                     $table.setActiveCell(-1, 'mo_id');
                 })
             }
+        }else{
+            this.tableHeight=$(parent.window).height()-205;
         }
         
         let that = this;       
