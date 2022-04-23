@@ -37,9 +37,9 @@
             <vxe-button type="text" icon="iconfont icon-edit2" v-if="!(isEditHead)" style="margin-left: -2px" @@click="editHeadEvent()">修改</vxe-button>
             <vxe-button status="primary" icon="iconfont icon-save1" v-if="isEditHead" @@click="saveEvent()" style="margin-left: -2px">保存</vxe-button>
             <vxe-button type="text" icon="iconfont icon-chexiaocancel" v-if="isEditHead" @@click="revertEvent()">取消</vxe-button>
-            <vxe-button type="text" icon="iconfont icon-tableaddrows" v-if="isEditHead" @@click="insertRowEvent()">項目新增</vxe-button>
-            <vxe-button type="text" icon="iconfont icon-tabledeleterows" v-if="isEditHead" @@click="tempDelRowEvent()" style="margin-left: -2px">項目刪除</vxe-button>
-            <vxe-button type="text" icon="iconfont icon-zu10011" v-if="headData.state=='0' && !(isEditHead)" @@click="approveEvent('1')">批準</vxe-button>
+            <vxe-button type="text" icon="iconfont icon-row-add" v-if="isEditHead" @@click="insertRowEvent()">項目新增</vxe-button>
+            <vxe-button type="text" icon="iconfont icon-row-del" v-if="isEditHead" @@click="tempDelRowEvent()" style="margin-left: -2px">項目刪除</vxe-button>
+            <vxe-button type="text" icon="iconfont icon-confirm4" v-if="headData.state=='0' && !(isEditHead)" @@click="approveEvent('1')">批準</vxe-button>
             <vxe-button type="text" icon="iconfont icon-cancel7" v-if="headData.state=='1' && !(isEditHead)" @@click="approveEvent('0')" style="margin-left: -2px">反批準</vxe-button>
             <vxe-button type="text" icon="iconfont icon-print" v-if="!(isEditHead)" @@click="printEvent">列印</vxe-button>
             <input v-model="searchID" maxlenth="13" style="outline-style:none;margin-left: 20px" v-if="flagChild=='' && !(isEditHead)" @@keyup.enter="findByID()" placeholder="搜索">
@@ -163,7 +163,7 @@
             <vxe-column field="row_status" title="行編輯狀態" v-if="false" width="70"></vxe-column>
             <vxe-column title="操作" width="140" fixed="right" show-overflow style="text-align:center">
                 <template #default="{ row }">
-                    <vxe-button type="text" icon="fa fa-edit" @@click="editRowEvent(row)" style="color:blue">{{ btnItemTitle }}</vxe-button>
+                    <vxe-button type="text" icon="iconfont icon-edit5" @@click="editRowEvent(row)" style="color:blue">{{ btnItemTitle }}</vxe-button>
                     @*<vxe-button type="text" icon="fa fa-trash-o" @@click="tempDelRowEvent(row)" style="color:red;margin-left: -2px">刪除</vxe-button>*@
                 </template>
             </vxe-column>
@@ -177,7 +177,7 @@
                     <template #default="{ data }">
                         <vxe-input v-model="data.goods_id" maxlength="18" class="input-customize my-search" readonly>
                             <template #suffix>
-                                <i class="fa fa-search" @*@@click="submitEvent"*@></i>
+                                <i class="iconfont icon-search1" @*@@click="submitEvent"*@></i>
                             </template>
                         </vxe-input>
                     </template>
@@ -280,7 +280,7 @@
                     <template #default>
                         @*<vxe-button icon="fa fa-check" status="primary" @@click="tempUpdateRowEvent">確定</vxe-button>*@
                         @*v-if的方式隱藏按鈕會出錯.改用:disabled*@
-                        <vxe-button type="submit" icon="fa fa-check" status="primary" content="修改確認" :disabled="!(isEditHead)"></vxe-button>
+                        <vxe-button type="submit" icon="iconfont icon-confirm4" status="primary" content="修改確認" :disabled="!(isEditHead)"></vxe-button>
                         @*<vxe-button type="reset" icon="fa fa-undo" @@click="tempUndoRowEvent">取消</vxe-button>*@
                     </template>
                 </vxe-form-item>
