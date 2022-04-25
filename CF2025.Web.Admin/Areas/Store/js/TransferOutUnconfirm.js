@@ -3,6 +3,7 @@
         return {            
             selectRow: null,
             loading: false,
+            isDisable: false,
             tableHeight: 450,
             headerCellStyle: { background: '#F5F7FA', color: '#606266', height: '25px', padding: '2px' },
             formData: { mo_id: '', mo_id_end: '', goods_id: '', goods_id_end: '', transfer_date: '', transfer_date_end: '', id: '', id_end: '', customer_id: '', customer_id_end: '', location_id:'',shelf:'' },
@@ -130,7 +131,13 @@
             if (val) {
                 this.$set(this.formData, fieldName, val);
             }
-        }        
+        },
+        handleCreate (val) {//val是新增加的数据
+            this.LocationList.push({
+                value: val,
+                label: val
+            });
+        },
         
     },
     watch: {

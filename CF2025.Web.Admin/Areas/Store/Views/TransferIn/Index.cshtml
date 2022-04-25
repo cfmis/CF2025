@@ -27,6 +27,39 @@
           /*margin-bottom:20px;*/
           border: 1px solid #dcdfe6;
         }
+
+         /*输入框或下拉选框禁用时字體顏色*/
+        .el-select .el-input .is-disabled .el-input__inner{
+            font-size: 10px;
+            height: 10px;
+            font-weight: bolder;
+            padding: 0px;               
+            line-height: 10px;
+            color: #606266 !important;
+        }       
+        /* el-select自定义宽高樣式 */
+        .el-select {
+            margin-top:0px;
+            margin-bottom:1.5px;
+        }
+        .el-select .el-input__inner {
+           /*width: 150px;*/
+           font-size: 10px;
+           height: 22px;
+       }
+       .el-select .el-input__suffix {
+           top: 0px;           
+       }
+       .el-select .el-input__icon {
+           line-height: inherit;
+       }
+       .el-select .el-input__suffix-inner {
+           display: inline-block;
+       }
+       .el-select-dropdown__item:hover{
+           color:#409eff;       
+       }
+
     </style>
 }
 <div id="app">
@@ -62,9 +95,14 @@
                 <vxe-input  type="date" v-model="headData.transfer_date" maxlength="13" class="input-customize" :readonly="isReadOnlyHead" ></vxe-input>
             </vxe-form-item>
             <vxe-form-item title="部門" :item-render="{}" span="6" class="vxe-form-item-customize" style="color:blue">
-                <vxe-select v-model="headData.department_id" size="mini" @@change="getMaxID('ST05',headData.department_id)">
+                @*<vxe-select v-model="headData.department_id" size="mini" @@change="getMaxID('ST05',headData.department_id)">
                    <vxe-option v-for="item in deptList" :key="item.value" :value="item.value" :label="item.label" :disabled="isDisableDropBoxHead"></vxe-option>
-                </vxe-select>
+                </vxe-select>*@
+                <el-select v-model="headData.department_id"
+                            @@change="getMaxID('ST05',headData.department_id)"
+                            filterable clearable :disabled="isDisableDropBoxHead" style="width:100%">
+                    <el-option v-for="item in deptList" :key="item.value" :value="item.value" :label="item.label" style="height:25px;font-size: 9px"/>
+                </el-select>
             </vxe-form-item>
             <vxe-form-item title="經手人" :item-render="{}" span="6" class="vxe-form-item-customize">
                 <vxe-input v-model="headData.handler" maxlength="20" class="input-customize" :readonly="isReadOnlyHead"></vxe-input>
@@ -242,17 +280,27 @@
                     </template>
                 </vxe-form-item>
                 <vxe-form-item field="location_id" title="倉庫" :span="12" :item-render="{}" class="vxe-form-item-customize">
-                    <template #default="{ data }">
+                    @*<template #default="{ data }">
                         <vxe-select v-model="data.location_id" @@change="getCartonCodeList(data.location_id)" size="mini">
                             <vxe-option v-for="item in locationList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
                         </vxe-select>
+                    </template>*@
+                    <template #default="{ data }">
+                        <el-select v-model="data.location_id" @@change="getCartonCodeList(data.location_id)" filterable clearable style="width:100%">
+                            <el-option v-for="item in locationList" :key="item.value" :value="item.value" :label="item.label"style="height:25px;font-size: 9px"/>
+                        </el-select>
                     </template>
                 </vxe-form-item>
                 <vxe-form-item field="shelf" title="架位" :span="12" :item-render="{}" class="vxe-form-item-customize">
-                    <template #default="{ data }">
+                    @*<template #default="{ data }">
                         <vxe-select v-model="data.shelf" size="mini">
                             <vxe-option v-for="item in cartonCodeList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
                         </vxe-select>
+                    </template>*@
+                    <template #default="{ data }">
+                        <el-select v-model="data.shelf" filterable clearable style="width:100%">
+                            <el-option v-for="item in cartonCodeList" :key="item.value" :value="item.value" :label="item.label"style="height:25px;font-size: 9px"/>
+                        </el-select>
                     </template>
                 </vxe-form-item>
                 <vxe-form-item field="lot_no" title="批號" :span="12" :item-render="{}" class="vxe-form-item-customize">
@@ -325,6 +373,8 @@
 
 
 @section PageSpecificJavascriptIncludes{
+    <link rel="stylesheet" href="~/Content/ElementUI/css/element-ui.css" />
+    <script src="~/Content/ElementUI/js/element-ui.js"></script>
     <script src="~/Areas/Store/js/TransferIn.js?v=@Guid.NewGuid().ToString()"></script>
 }
 

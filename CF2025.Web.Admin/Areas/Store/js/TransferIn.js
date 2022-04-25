@@ -259,7 +259,7 @@
         setStatusHead(blValue) {            
             this.isEditHead = blValue; //設置編輯狀態標識            
             this.isReadOnlyHead = !(blValue); //設置對象可編輯狀態
-            this.isDisableDropBoxHead = !(blValue); //設置下拉列表框可編輯狀態
+            this.isDisableDropBoxHead = !(blValue); //設置下拉列表框可編輯狀態           
             if(blValue){
                 this.btnItemTitle="修改";
             }else{

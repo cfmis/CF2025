@@ -312,6 +312,8 @@
     <Content Include="Config\UploadConfig.xml" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\ElementUI\css\element-ui.css" />
+    <Content Include="Content\ElementUI\js\element-ui.js" />
     <Content Include="Content\iconfont\demo.css" />
     <Content Include="Content\iconfont\demo_index.html" />
     <Content Include="Content\iconfont\iconfont.css" />
@@ -351,6 +353,8 @@
     <Content Include="Content\iconfont\iconfont.ttf" />
     <Content Include="Content\iconfont\iconfont.woff" />
     <Content Include="Content\iconfont\iconfont.woff2" />
+    <Content Include="Content\ElementUI\css\fonts\element-icons.ttf" />
+    <Content Include="Content\ElementUI\css\fonts\element-icons.woff" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
