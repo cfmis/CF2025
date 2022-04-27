@@ -1137,7 +1137,7 @@ var Main = {
         },
         printReport(){
             if(this.curReportRow){
-                console.log(this.curReportRow.reportid);
+                this.showPrint = false;
                 var url= "Print?ID=" + this.formData.ID + "&Ver=" + this.formData.Ver+"&report_id=" + this.curReportRow.reportid;
                 comm.showMessageDialog(url,'列印',1024,768,true);
             }else{
