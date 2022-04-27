@@ -164,7 +164,7 @@
         let that = this;       
         window.onresize = () => {
             return (() => {
-                that.tableHeight=$(parent.window).height()-241;                 
+                that.tableHeight = $(parent.window).height() - 241;               
             })()
         };
     }
