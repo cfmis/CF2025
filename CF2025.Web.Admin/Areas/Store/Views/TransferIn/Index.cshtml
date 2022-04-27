@@ -75,7 +75,7 @@
             <vxe-button type="text" icon="iconfont icon-confirm4" v-if="headData.state=='0' && !(isEditHead)" @@click="approveEvent('1')">批準</vxe-button>
             <vxe-button type="text" icon="iconfont icon-cancel7" v-if="headData.state=='1' && !(isEditHead)" @@click="approveEvent('0')" style="margin-left: -2px">反批準</vxe-button>
             <vxe-button type="text" icon="iconfont icon-print" v-if="!(isEditHead)" @@click="printEvent">列印</vxe-button>
-            <input v-model="searchID" maxlenth="13" style="outline-style:none;margin-left: 20px" v-if="flagChild=='' && !(isEditHead)" @@keyup.enter="findByID()" placeholder="搜索">
+            <input v-model="searchID" maxlenth="13" style="outline-style:none;margin-left: 20px" v-if="flagChild=='' && !(isEditHead)" @@keyup.enter="findByID()" placeholder="編號搜索">
             <vxe-button type="text" icon="iconfont icon-search1" v-if="flagChild=='' && !(isEditHead)" @@click="showFindWindos()" style="margin-left: -2px">查找</vxe-button>
         </template>
     </vxe-toolbar>
