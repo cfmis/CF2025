@@ -3,46 +3,14 @@
     ViewBag.Title = "Index";
 }
 @section PageSpecificStyleSheetIncludes{
-    <style scoped >
+    <style>
         .myFieldset {            
             padding-bottom: 15px;
             border-width: 1px;
             border-color: #FCFCFC;
             width: 98.3%;
             /*height:220px;*/
-        }
-        
-        /*输入框或下拉选框禁用时字體顏色*/
-        /*.el-select .el-input .is-disabled .el-input__inner{
-            font-size: 10px;
-            height: 10px;
-            font-weight: bolder;
-            padding: 0px;               
-            line-height: 10px;
-            color: #606266 !important;
-        }*/       
-        /* el-select自定义宽高樣式 */
-        .el-select {
-            margin-top:5px;
-            margin-bottom:1.5px;
-        }
-        .el-select .el-input__inner {
-           /*width: 150px;*/
-           font-size: 10px;
-           height: 22px;
-       }
-       .el-select .el-input__suffix {
-           top: 0px;           
-       }
-       .el-select .el-input__icon {
-           line-height: inherit;
-       }
-       .el-select .el-input__suffix-inner {
-           display: inline-block;
-       }
-       .el-select-dropdown__item:hover{
-           color:#409eff;       
-       }        
+        }      
         
     </style>
 }
@@ -122,7 +90,8 @@
                         <template #default="{ data }" > 
                             <el-select v-model="data.location_id"
                                         @@change="getCartonCodeList(data.location_id)"
-                                        filterable clearable :disabled="isDisable" style="width:130%">
+                                        @*:disabled="isDisable"*@
+                                        filterable clearable style="width:130%">
                                 <el-option v-for="item in LocationList" :key="item.value" :value="item.value" :label="item.label" style="height:25px;font-size: 9px"/>
                             </el-select>             
                         </template>                 
@@ -134,7 +103,7 @@
                                 <vxe-option v-for="item in CartonCodeList" :key="item.value" :value="item.value" :label="item.value"></vxe-option>
                             </vxe-select>*@
                             <el-select v-model="data.shelf" filterable clearable style="width:104%">
-                                <el-option v-for="item in CartonCodeList" :key="item.value" :value="item.value" :label="item.label" style="height:25px;font-size: 9px" />
+                                <el-option v-for="item in CartonCodeList" :key="item.value" :value="item.value" :label="item.label" style="height:25px;font-size: 9px"/>
                             </el-select>
                         </template>
                     </vxe-form-item>
@@ -221,8 +190,7 @@
 </div>
 
 @section PageSpecificJavascriptIncludes{ 
-    <link rel="stylesheet" href="~/Content/ElementUI/css/element-ui.css" /> 
-    <script src="~/Content/ElementUI/js/element-ui.js"></script>  
+    <script src="~/Content/ElementUI/js/element-ui.js"></script>
     <script src="~/Content/js/common.js?v=@Guid.NewGuid().ToString()"></script>
     <script src="~/Areas/Store/js/TransferOutUnconfirm.js?v=@Guid.NewGuid().ToString()"></script>
 }

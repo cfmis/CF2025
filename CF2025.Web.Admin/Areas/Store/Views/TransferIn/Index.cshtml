@@ -26,30 +26,8 @@
           padding-bottom:20px;
           /*margin-bottom:20px;*/
           border: 1px solid #dcdfe6;
-        }
+        }        
         
-        /* el-select自定义宽高樣式*/
-        .el-select {
-            margin-top:0px;
-            margin-bottom:1.5px;
-        }
-        .el-select .el-input__inner {
-           /*width: 150px;*/
-           font-size: 10px;
-           height: 22px;
-       }
-       .el-select .el-input__suffix {
-           top: 0px;           
-       }
-       .el-select .el-input__icon {
-           line-height: inherit;
-       }
-       .el-select .el-input__suffix-inner {
-           display: inline-block;
-       }
-       .el-select-dropdown__item:hover{
-           color:#409eff;       
-       }
 
     </style>
 }
@@ -364,7 +342,6 @@
 
 
 @section PageSpecificJavascriptIncludes{
-    <link rel="stylesheet" href="~/Content/ElementUI/css/element-ui.css" />
     <script src="~/Content/ElementUI/js/element-ui.js"></script>
     <script src="~/Areas/Store/js/TransferIn.js?v=@Guid.NewGuid().ToString()"></script>
 }

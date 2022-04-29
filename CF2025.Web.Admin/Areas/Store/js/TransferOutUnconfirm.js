@@ -10,7 +10,8 @@
             tableData: [] ,
             CustomerList: [],
             LocationList: [],
-            CartonCodeList: [{ label: '', value: '' }],
+            CartonCodeList: [],
+            //CartonCodeList: [{ label: '', value: '' }],
             selectData: [],
             flagCallChild:false,           
         }
