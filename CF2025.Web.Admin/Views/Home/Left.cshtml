@@ -17,12 +17,15 @@
             margin: 0px;
             padding: 0px;            
         }
+        .leftbar{
+            /*覆蓋stylesheet.leftbar min-height預設的高度才起作用*/
+	        min-height: 893px;
+        }
     </style>
     <script src="~/Scripts/jquery-2.1.1.min.js"></script>
 
 </head>
 <body>
-
     @foreach (var group1 in Model)
     {
         <div class="leftbar" id=@group1.DivId>
