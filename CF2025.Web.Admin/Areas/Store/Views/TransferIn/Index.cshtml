@@ -141,7 +141,8 @@
                    @*:edit-config="{trigger: 'click', mode: 'row', showStatus: true}"*@
                    :row-config="{height: 25}"
                    @@cell-dblclick="dbclickEvent"
-                   @@cell-click="cellClickEvent">
+                   @@cell-click="cellClickEvent"
+                   >
             @*<vxe-column type="checkbox" fixed="left" width="50"></vxe-column>*@
             <vxe-column type="seq" title="#" fixed="left" width="40"></vxe-column>
             <vxe-column field="mo_id" title="頁數" fixed="left" width="100"></vxe-column>
@@ -341,8 +342,7 @@
 </div>
 
 
-@section PageSpecificJavascriptIncludes{
-    <script src="~/Content/ElementUI/js/element-ui.js"></script>
+@section PageSpecificJavascriptIncludes{    
     <script src="~/Areas/Store/js/TransferIn.js?v=@Guid.NewGuid().ToString()"></script>
 }
 

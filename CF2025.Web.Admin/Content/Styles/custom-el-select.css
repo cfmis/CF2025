@@ -1,0 +1,33 @@
+﻿/* el-select
+* 自定义宽高樣式
+*/
+.el-select {
+    margin-top:1.5px;
+    margin-bottom:1.5px;
+}
+.el-select .el-input__inner {
+    /*width: 150px;*/
+    font-size: 10px;
+    height: 22px;
+}
+.el-select .el-input__suffix {
+    top: 0px;           
+}
+.el-select .el-input__icon {
+    line-height: inherit;
+}
+.el-select .el-input__suffix-inner {
+    display: inline-block;
+}
+.el-select-dropdown__item:hover{
+    color:#409eff;       
+}
+/*狀態條寬度*/
+.el-scrollbar__bar.is-vertical {
+    width: 15px;   
+    top: 2px;
+}
+/*下拉框最大高度*/
+.el-select-dropdown__wrap {
+   max-height: 400px;
+}

@@ -319,6 +319,9 @@
     <Content Include="Content\iconfont\iconfont.css" />
     <Content Include="Content\iconfont\iconfont.js" />
     <Content Include="Content\Js\common.js" />
+    <Content Include="Content\Styles\111jquery.thickbox.css" />
+    <Content Include="Content\Styles\custom-el-select.css" />
+    <Content Include="Content\Styles\thickbox.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />

@@ -9,9 +9,8 @@
             formData: { mo_id: '', mo_id_end: '', goods_id: '', goods_id_end: '', transfer_date: '', transfer_date_end: '', id: '', id_end: '', customer_id: '', customer_id_end: '', location_id:'',shelf:'' },
             tableData: [] ,
             CustomerList: [],
-            LocationList: [],
-            CartonCodeList: [],
-            //CartonCodeList: [{ label: '', value: '' }],
+            LocationList: [],            
+            CartonCodeList: [{ label: '', value: '' }],
             selectData: [],
             flagCallChild:false,           
         }

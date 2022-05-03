@@ -563,7 +563,9 @@
                         state: response.data.state                 
                     }
                     if(response.data.state==='2'){
-                        this.stateFontColor="color:red";
+                        this.stateFontColor = "color:red";
+                    }else{
+                        this.stateFontColor = "color:black";
                     }
                     //深度複製一個對象，用來判斷數據是否有修改
                     //this.prevForm = JSON.parse(JSON.stringify(this.headData));                    
