@@ -31,3 +31,16 @@
 .el-select-dropdown__wrap {
    max-height: 400px;
 }
+/*聚焦时的样式*/
+/*.el-select .el-input.is-focus .el-input__inner{ 
+    border-color: #0B61AA; 
+    background-color: rgba(1, 28, 82, 0.8); 
+    color:#00D3E9; 
+}*/
+/*鼠标经过下拉框*/ 
+.el-select-dropdown__item.hover, 
+.el-select-dropdown__item:hover{ 
+    color: #FFFFFF; 
+    background-color:dodgerblue; /*#0F3360; */
+}
+
