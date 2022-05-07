@@ -1,0 +1,26 @@
+﻿.my-search.vxe-input {
+    width: 300px;
+    height: 20px;
+         
+}
+.my-search.vxe-input .vxe-input--suffix {
+    width: 40px;
+    height: 18px;
+    top: 1px;
+    text-align: center;
+    border-left: 1px solid #dcdfe6;
+    background-color: #f5f7fa;
+    cursor: pointer;
+}
+.my-search.vxe-input .vxe-input--inner {
+    padding-right: 72px;
+    border: 1px solid #dcdfe6;
+}
+.my-div-header {
+    /*添加于2022.03.22*/
+    padding-bottom:20px;
+    /*margin-bottom:20px;*/
+    border: 1px solid #dcdfe6;
+}
+
+  

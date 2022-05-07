@@ -280,6 +280,7 @@
     <Compile Include="Areas\Sale\Controllers\OrderController.cs" />
     <Compile Include="Areas\Sale\SaleAreaRegistration.cs" />
     <Compile Include="Areas\Store\Controllers\TransferInController.cs" />
+    <Compile Include="Areas\Store\Controllers\TransferOutController.cs" />
     <Compile Include="Areas\Store\Controllers\TransferOutUnconfirmController.cs" />
     <Compile Include="Areas\Store\StoreAreaRegistration.cs" />
     <Compile Include="Common\AdminCacheContext.cs" />
@@ -302,6 +303,7 @@
     <Content Include="Areas\Base\js\publicQuery.js" />
     <Content Include="Areas\Sale\js\Invoice.js" />
     <Content Include="Areas\Store\js\TransferIn.js" />
+    <Content Include="Areas\Store\js\TransferOut.js" />
     <Content Include="Areas\Store\js\TransferOutUnconfirm.js" />
     <Content Include="Config\AdminMenuConfig.xml" />
     <Content Include="Config\CacheConfig.xml" />
@@ -320,6 +322,7 @@
     <Content Include="Content\iconfont\iconfont.js" />
     <Content Include="Content\Js\common.js" />
     <Content Include="Content\Styles\111jquery.thickbox.css" />
+    <Content Include="Content\Styles\common.css" />
     <Content Include="Content\Styles\custom-el-select.css" />
     <Content Include="Content\Styles\thickbox.css" />
     <Content Include="favicon.ico" />
@@ -358,6 +361,7 @@
     <Content Include="Content\iconfont\iconfont.woff2" />
     <Content Include="Content\ElementUI\css\fonts\element-icons.ttf" />
     <Content Include="Content\ElementUI\css\fonts\element-icons.woff" />
+    <Content Include="Areas\Store\Views\TransferOut\Index.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />

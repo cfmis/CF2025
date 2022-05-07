@@ -380,9 +380,9 @@ body{
 .divContent {
     /*padding-right:20px;*/
 }
-    .pagesStyle {
-        color:#ec0000;
-    }
-    .recordsStyle {
-        color: #ec0000;
-    }
+.pagesStyle {
+    color:#ec0000;
+}
+.recordsStyle {
+    color: #ec0000;
+}

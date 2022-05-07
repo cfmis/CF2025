@@ -1,32 +1,29 @@
-﻿
-@{
-    ViewBag.Title = "TransferIn";
+﻿@{
+    ViewBag.Title = "TransferOut";
 }
 @section PageSpecificStyleSheetIncludes{
-    @*<link rel="stylesheet" href="~/Content/Styles/common.css" />*@
+    @*<link rel="stylesheet" href="~/Content/Styles/common.css" />*@  
 }
 <div id="app">
     <vxe-toolbar perfect size="small" style="height:35px;margin-bottom:5px">
         <template #buttons style="height:35px;margin-bottom:10px">
             <vxe-button type="text" icon="iconfont icon-file-add1" v-if="!(isEditHead)" @@click="insertEvent()">新增</vxe-button>
             <vxe-button type="text" status="danger" icon="iconfont icon-delete2" v-if="!(isEditHead)"@@click="delHeadEvent()" style="margin-left: -2px">注銷</vxe-button>
-            <vxe-button type="text" icon="iconfont icon-edit2" v-if="!(isEditHead)" style="margin-left: -2px" @@click="editHeadEvent()">修改</vxe-button>
-            <vxe-button status="primary" icon="iconfont icon-save1" v-if="isEditHead" @@click="saveEvent()" style="margin-left: -2px">保存</vxe-button>
-            <vxe-button type="text" icon="iconfont icon-chexiaocancel" v-if="isEditHead" @@click="revertEvent()">取消</vxe-button>
-            <vxe-button type="text" icon="iconfont icon-row-add" v-if="isEditHead" @@click="insertRowEvent()">項目新增</vxe-button>
-            <vxe-button type="text" icon="iconfont icon-row-del" v-if="isEditHead" @@click="tempDelRowEvent()" style="margin-left: -2px">項目刪除</vxe-button>
+            @*<vxe-button type="text" icon="iconfont icon-edit2" v-if="!(isEditHead)" style="margin-left: -2px" @@click="editHeadEvent()">修改</vxe-button>*@
+            <vxe-button status="primary" icon="iconfont icon-save1" @@click="saveEvent()" style="margin-left: -2px">保存</vxe-button>
+            @*<vxe-button type="text" icon="iconfont icon-chexiaocancel" v-if="isEditHead" @@click="revertEvent()">取消</vxe-button>*@
+            <vxe-button type="text" icon="iconfont icon-row-add" @@click="insertRowEvent()">項目新增</vxe-button>
+            <vxe-button type="text" icon="iconfont icon-row-del" @@click="tempDelRowEvent()" style="margin-left: -2px">項目刪除</vxe-button>
             <vxe-button type="text" icon="iconfont icon-confirm4" v-if="headData.state=='0' && !(isEditHead)" @@click="approveEvent('1')">批準</vxe-button>
             <vxe-button type="text" icon="iconfont icon-cancel7" v-if="headData.state=='1' && !(isEditHead)" @@click="approveEvent('0')" style="margin-left: -2px">反批準</vxe-button>
             <vxe-button type="text" icon="iconfont icon-print" v-if="!(isEditHead)" @@click="printEvent">列印</vxe-button>
-            <input v-model="searchID" maxlenth="13" style="outline-style:none;margin-left: 20px" v-if="flagChild=='' && !(isEditHead)" @@keyup.enter="findByID()" placeholder="編號搜索">
-            <vxe-button type="text" icon="iconfont icon-search1" v-if="flagChild=='' && !(isEditHead)" @@click="showFindWindos()" style="margin-left: -2px">查找</vxe-button>
+            <input v-model="searchID" maxlenth="13" style="outline-style:none;margin-left: 20px" v-if="!(isEditHead)" @@keyup.enter="findByID()" placeholder="編號搜索">
+            <vxe-button type="text" icon="iconfont icon-search1" v-if="!(isEditHead)" @@click="showFindWindos()" style="margin-left: -2px">查找</vxe-button>
         </template>
     </vxe-toolbar>
     <div class="my-div-header" @*style="margin-bottom:20px; border: 1px solid #dcdfe6;"*@>
         <vxe-form :data="headData"
                   ref="formHead"
-                  @*@@submit="searchData"*@
-                  @*@@reset="resetEvent"*@
                   size="mini"
                   title-align="right"
                   title-width="100px"
@@ -319,4 +316,3 @@
 @section PageSpecificJavascriptIncludes{    
     <script src="~/Areas/Store/js/TransferIn.js?v=@Guid.NewGuid().ToString()"></script>
 }
-
