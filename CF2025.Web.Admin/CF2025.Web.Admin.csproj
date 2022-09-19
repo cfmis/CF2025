@@ -89,6 +89,12 @@
     <Reference Include="CF2025.Base.DAL">
       <HintPath>..\CF2025.Base.DAL\bin\Debug\CF2025.Base.DAL.dll</HintPath>
     </Reference>
+    <Reference Include="CF2025.Prod.Contract">
+      <HintPath>..\CF2025.Prod.DAL\bin\Debug\CF2025.Prod.Contract.dll</HintPath>
+    </Reference>
+    <Reference Include="CF2025.Prod.DAL">
+      <HintPath>..\CF2025.Prod.DAL\bin\Debug\CF2025.Prod.DAL.dll</HintPath>
+    </Reference>
     <Reference Include="CF2025.Sale.Contract">
       <HintPath>..\CF2025.Sale.Contract\bin\Debug\CF2025.Sale.Contract.dll</HintPath>
     </Reference>
@@ -274,8 +280,12 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Areas\Base\BaseAreaRegistration.cs" />
     <Compile Include="Areas\Base\Controllers\PrintController.cs" />
+    <Compile Include="Areas\Base\Controllers\CommonController.cs" />
+    <Compile Include="Areas\Base\Controllers\PublicItemQueryController.cs" />
     <Compile Include="Areas\Base\Controllers\PublicQueryController.cs" />
     <Compile Include="Areas\Base\Controllers\DataComboxListController.cs" />
+    <Compile Include="Areas\Prod\Controllers\ProduceAssemblyController.cs" />
+    <Compile Include="Areas\Prod\ProdAreaRegistration.cs" />
     <Compile Include="Areas\Sale\Controllers\InvoiceController.cs" />
     <Compile Include="Areas\Sale\Controllers\OrderController.cs" />
     <Compile Include="Areas\Sale\SaleAreaRegistration.cs" />
@@ -300,7 +310,10 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Areas\Base\js\passwordConfirm.js" />
+    <Content Include="Areas\Base\js\publicItemQuery.js" />
     <Content Include="Areas\Base\js\publicQuery.js" />
+    <Content Include="Areas\Prod\js\ProduceAssembly.js" />
     <Content Include="Areas\Sale\js\Invoice.js" />
     <Content Include="Areas\Store\js\TransferIn.js" />
     <Content Include="Areas\Store\js\TransferOut.js" />
@@ -362,6 +375,12 @@
     <Content Include="Content\ElementUI\css\fonts\element-icons.ttf" />
     <Content Include="Content\ElementUI\css\fonts\element-icons.woff" />
     <Content Include="Areas\Store\Views\TransferOut\Index.cshtml" />
+    <Content Include="Areas\Prod\Views\web.config" />
+    <Content Include="Areas\Prod\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\Prod\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\Prod\Views\ProduceAssembly\Index.cshtml" />
+    <Content Include="Areas\Base\Views\PublicItemQuery\Index.cshtml" />
+    <Content Include="Areas\Base\Views\Common\PasswordConfirm.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -418,7 +437,9 @@
     <Folder Include="App_Data\" />
     <Folder Include="Areas\Base\Models\" />
     <Folder Include="Areas\Base\Views\DataComboxList\" />
+    <Folder Include="Areas\Base\Views\Public\" />
     <Folder Include="Areas\Base\Views\Unit\" />
+    <Folder Include="Areas\Prod\Models\" />
     <Folder Include="Areas\Sale\Models\" />
     <Folder Include="Areas\Store\Models\" />
     <Folder Include="Images\" />

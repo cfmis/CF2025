@@ -29,12 +29,12 @@ namespace CF2025.Web.Admin.Areas.Store.Controllers
             return View();
         }
 
-        //取最大單號
-        public ActionResult GetMaxID(string bill_id,string dept_id)
-        {
-            var result = TransferOutUnconfirmDAL.GetMaxID(bill_id,dept_id);
-            return Json(result, JsonRequestBehavior.AllowGet);
-        }
+        ////取最大單號
+        //public ActionResult GetMaxID(string bill_id,string dept_id,int serial_len)
+        //{
+        //    var result = TransferOutUnconfirmDAL.GetMaxID(bill_id,dept_id, serial_len);
+        //    return Json(result, JsonRequestBehavior.AllowGet);
+        //}
       
         //主檔,明細一起更新
         [HttpPost]

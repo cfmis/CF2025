@@ -6,11 +6,74 @@
   "description": "",
   "glyphs": [
     {
-      "icon_id": "2666222",
-      "name": "cost",
-      "font_class": "cost",
+      "icon_id": "749573",
+      "name": "NEXT",
+      "font_class": "next1",
+      "unicode": "e648",
+      "unicode_decimal": 58952
+    },
+    {
+      "icon_id": "749575",
+      "name": "PREVIOUS",
+      "font_class": "previous1",
+      "unicode": "e64a",
+      "unicode_decimal": 58954
+    },
+    {
+      "icon_id": "128617",
+      "name": "search",
+      "font_class": "search4",
+      "unicode": "e656",
+      "unicode_decimal": 58966
+    },
+    {
+      "icon_id": "394271",
+      "name": "search",
+      "font_class": "caidan03",
       "unicode": "e614",
       "unicode_decimal": 58900
+    },
+    {
+      "icon_id": "1190879",
+      "name": "previous",
+      "font_class": "previous",
+      "unicode": "e66e",
+      "unicode_decimal": 58990
+    },
+    {
+      "icon_id": "6145946",
+      "name": "next",
+      "font_class": "next",
+      "unicode": "e709",
+      "unicode_decimal": 59145
+    },
+    {
+      "icon_id": "6805277",
+      "name": "Reset-Settings",
+      "font_class": "Reset-Settings",
+      "unicode": "e93a",
+      "unicode_decimal": 59706
+    },
+    {
+      "icon_id": "6808256",
+      "name": "Reset-Settings",
+      "font_class": "Reset-Settings1",
+      "unicode": "ed66",
+      "unicode_decimal": 60774
+    },
+    {
+      "icon_id": "19457213",
+      "name": "batch-add",
+      "font_class": "piliangzengjia",
+      "unicode": "e6ad",
+      "unicode_decimal": 59053
+    },
+    {
+      "icon_id": "8017640",
+      "name": "buttongroup",
+      "font_class": "buttongroup",
+      "unicode": "e6d3",
+      "unicode_decimal": 59091
     },
     {
       "icon_id": "12850840",
@@ -18,20 +81,6 @@
       "font_class": "n_cost",
       "unicode": "e727",
       "unicode_decimal": 59175
-    },
-    {
-      "icon_id": "14226705",
-      "name": "deco-cost",
-      "font_class": "deco-cost",
-      "unicode": "e6b5",
-      "unicode_decimal": 59061
-    },
-    {
-      "icon_id": "21885553",
-      "name": "cost",
-      "font_class": "cost1",
-      "unicode": "e710",
-      "unicode_decimal": 59152
     },
     {
       "icon_id": "208936",

@@ -1,0 +1,42 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    @*<link rel="stylesheet" href="~/Content/bootstrap-4.0/css/fonts/font-awesome.css">*@
+    <link rel="stylesheet" href="~/Content/iconfont/iconfont.css">
+    <link rel="stylesheet" href="~/Content/vxe-table/jsdelivr/style.css">
+
+    <!--begin 公共查詢引入Jquery樣式-->
+    <link rel="stylesheet" type="text/css" href="~/Lib/jquery-easyui-1.5/themes/default/easyui.css" />
+    <!--end-->
+    @*<link rel="stylesheet" type="text/css" href="~/Lib/jquery-easyui-1.5/themes/icon.css" />*@
+    <link rel="stylesheet" href="~/Content/ElementUI/css/element-ui.css" />
+    <!--重寫<el-select>樣式-->
+    <link rel="stylesheet" href="~/Content/Styles/custom-el-select.css" />
+    <link rel="stylesheet" href="~/Content/Styles/common.css" />
+
+    @RenderSection("PageSpecificStyleSheetIncludes", required: false)
+    <!--begin 公共查詢引入Jquery-->
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="~/Lib/jquery-easyui-1.5/jquery.easyui.min.js"></script>
+    <!--end-->
+
+    <script src="~/Content/vxe-table/js/vue.js"></script>
+    <script src="~/Content/vxe-table/jsdelivr/xe-utils.js"></script>
+    <script src="~/Content/vxe-table/jsdelivr/vxe-table.js"></script>
+    <script> Vue.config.productionTip = false</script>
+    <script type="text/javascript" src="~/Scripts/axios.js"></script>
+    @*<script src="~/Content/Js/common.js?v=@Guid.NewGuid().ToString()"></script>*@
+    <script src="~/Content/Js/common.js"></script>
+    <script src="~/Content/ElementUI/js/element-ui.js"></script>
+
+
+</head>
+<body>
+    @RenderBody()
+    @RenderSection("PageSpecificJavascriptIncludes", required: false)
+</body>
+</html>

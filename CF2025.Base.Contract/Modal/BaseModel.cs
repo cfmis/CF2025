@@ -29,4 +29,20 @@
         public string sequence_id { get; set; }
         public string row_status { get; set; }
     }
+
+    public class ModelItemQuery
+    {
+        public int results { get; set; }
+        public string type { get; set; }
+        public string blueprint_id { get; set; }
+        public string goods_id { get; set; }
+        public string goods_name { get; set; }
+        public string modality { get; set; }
+        public string datum { get; set; }
+        public string size_id { get; set; }
+        public string big_class { get; set; }
+        public string base_class { get; set; }
+        public string small_class { get; set; }
+    }
+
 }

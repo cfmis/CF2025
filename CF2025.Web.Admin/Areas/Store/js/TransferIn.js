@@ -416,7 +416,7 @@
         getMaxID(bill_id, dept_id) {
             //請求后臺Action并传多個參數,多個參數傳值方法:第一參數用url..."?id="++value,后面的參數用+"&Ver="+value
             var $table = this.$refs.xTableIn;            
-            axios.get("/TransferIn/GetMaxID?bill_id=" + bill_id + "&dept_id=" + dept_id).then(
+            axios.get("/Base/Common/GetMaxID?bill_id=" + bill_id + "&dept_id=" + dept_id + "&serial_len=3").then(
                 (response) => {
                     this.headData.id = response.data;
                     //直接更改表格中某單元格的值,不可以直接更改綁定數組的方式,否則將取不到數據的更改狀態
@@ -593,55 +593,7 @@
         showQueryEvent(id) {            
             var url = "/Base/PublicQuery?window_id=" + id;
             comm.showMessageDialog(url, "查詢", 1024, 768, true);
-        },
-        // 状态过滤
-        formatOperator(val) {                    
-            switch(val){
-                case '=':
-                    return '等于';
-                    break;
-                case 'LIKE':
-                    return '開頭';
-                    break;
-                case 'IN':
-                    return '包含';
-                    break;
-                case 'NOT IN':
-                    return '不包含';
-                    break;
-                case '>':
-                    return '大于';
-                    break; 
-                case '<':
-                    return '小于';
-                    break; 
-                case '>=':
-                    return '大于或等于';
-                    break;
-                case '<=':
-                    return '小于或等于';
-                    break;
-                case '<>':
-                    return '不等于';
-                    break;
-                default:
-                    return '';
-                    break;  
-            }
-        },
-        formatLogic(val) {                    
-            switch(val){
-                case 'AND':
-                    return '且';
-                    break;
-                case 'OR':
-                    return '或者';
-                    break;                
-                default:
-                    return '';
-                    break;  
-            }
-        },
+        },        
         saveAll: async function() {
               const $table = this.$refs.xTableIn;
               const errMap = $table.fullValidate().catch(errMap => errMap);
@@ -651,6 +603,7 @@
                   if(res) // res为promise對象中的值,如果值是對象,說明數據校驗通不過
                   {
                       this.$XModal.alert({ content: '注意:明細數據不完整,請返回檢查!', mask: false });
+                      return;
                   }else{                      
                       var items_update=null;
                       for(var i=0;i<$table.tableData.length;i++){

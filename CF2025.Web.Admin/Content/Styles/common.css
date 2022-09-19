@@ -1,7 +1,7 @@
-﻿.my-search.vxe-input {
+﻿/*頁面表頭中的查詢輸入框 begin*/
+.my-search.vxe-input {
     width: 300px;
-    height: 20px;
-         
+    height: 20px;         
 }
 .my-search.vxe-input .vxe-input--suffix {
     width: 40px;
@@ -16,11 +16,54 @@
     padding-right: 72px;
     border: 1px solid #dcdfe6;
 }
+/*頁面表頭中的查詢輸入框 end*/
+
+/*頁面表頭Div容器加入對像自動向下撐開 begin*/
 .my-div-header {
     /*添加于2022.03.22*/
     padding-bottom:20px;
     /*margin-bottom:20px;*/
     border: 1px solid #dcdfe6;
 }
+/*頁面表頭Div容器加入對像自動向下撐開 end*/
+
+/*2022/05/06 begin
+  將Area之下各模塊對應View/Shared/_ViewStart.cshtml
+  以下代碼抽出放到common.css中,達到共用
+*/
+.div-left {
+    float: left;
+    width: 80%;
+    background-color: aqua;
+    /*border:dotted;*/
+}
+.div-right {
+    float: right;
+    width: 16%;
+    background-color: yellow;
+}
+.vxe-form-item-customize {
+    /*width:25%;*/
+    /*margin-top: -20px;*/
+    height: 20px;
+}
+.input-customize {
+    height: 20px;
+    font-size: 10px;
+    width: 25%;
+}
+.vxe-select > .vxe-input {
+    width: 100%;
+    height: 18px;
+}
+.vxe-input {
+    height: 20px;
+}
+/*每一行悬浮*/
+/*.vxe-table--render-default .vxe-body--row.row--hover{
+    background: rgba(25,254,255,0.10)*/
+}       
+/*2022/05/06 end */
+
 
   

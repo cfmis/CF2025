@@ -284,6 +284,7 @@ namespace CF.SQLServer.DAL
         public string DataTableToJson(DataTable table)
         {
             var jsonString = new StringBuilder();
+            //var keyValue = "";
             if (table.Rows.Count > 0)
             {
                 jsonString.Append("[");
@@ -292,13 +293,17 @@ namespace CF.SQLServer.DAL
                     jsonString.Append("{");
                     for (int j = 0; j < table.Columns.Count; j++)
                     {
+                        //keyValue = string.IsNullOrEmpty(table.Rows[i][j].ToString()) ? "" : table.Rows[i][j].ToString();//2022/07/14 add
+                        //keyValue = keyValue.Replace("/", "//");
                         if (j < table.Columns.Count - 1)
                         {
-                            jsonString.Append("\"" + table.Columns[j].ColumnName.ToString()+ "\":" + "\"" + table.Rows[i][j].ToString() + "\",");
+                            jsonString.Append("\"" + table.Columns[j].ColumnName.ToString()+ "\":" + "\"" + table.Rows[i][j].ToString() + "\","); //2022/07/14 cancel
+                            //jsonString.Append("\"" + table.Columns[j].ColumnName.ToString() + "\":" + "\"" + keyValue + "\",");
                         }
                         else if (j == table.Columns.Count - 1)
                         {
                             jsonString.Append("\"" + table.Columns[j].ColumnName.ToString() + "\":" + "\"" + table.Rows[i][j].ToString() + "\"");
+                            //jsonString.Append("\"" + table.Columns[j].ColumnName.ToString() + "\":" + "\"" + keyValue + "\"");
                         }
                     }
                     if (i == table.Rows.Count - 1)
@@ -311,8 +316,8 @@ namespace CF.SQLServer.DAL
                     }
                 }
                 jsonString.Append("]");
-            }
-            return jsonString.ToString();
+            }          
+            return jsonString.ToString(); 
         }
 
         

@@ -4,24 +4,7 @@
 }
 
 @section PageSpecificStyleSheetIncludes{
-    <style>
-        .my-search.vxe-input {
-            height: 20px;
-            width: 300px;
-        }
-        .my-search.vxe-input .vxe-input--suffix {
-            width: 40px;
-            height: 18px;
-            top: 1px;
-            text-align: center;
-            border-left: 1px solid #dcdfe6;
-            background-color: #f5f7fa;
-            cursor: pointer;
-        }
-        .my-search.vxe-input .vxe-input--inner {
-            padding-right: 72px;
-            border: 1px solid #dcdfe6;
-        }
+    <style>        
         .my_fieldset{
             /*padding-bottom属性设置元素的下内边距（底部空白）
             *不可設置元素高度,否則元素不會隨內容的多少自動撐開
@@ -44,7 +27,7 @@
    
     <fieldset class="my_fieldset">
         <legend>查詢條件</legend>
-        <vxe-toolbar perfect size="small" style="height:35px;margin-bottom:5px">
+        <vxe-toolbar perfect size="small" style="height:35px;margin-bottom:0px">
             <template #buttons style="height:35px;margin-bottom:10px">
                 <vxe-button icon="iconfont icon-row-add" @@click="insertRowEvent()">項目增加</vxe-button>
                 <vxe-button icon="iconfont icon-row-del" @@click="delRowEvent()" style="margin-left: -2px">項目刪除</vxe-button>
@@ -65,7 +48,7 @@
                     :header-cell-style="headerCellStyle"
                     :keyboard-config="{isArrow: true}"
                     :column-config="{resizable: true}"
-                    :edit-config="{trigger: 'click', mode: 'row'}"
+                    :edit-config="{trigger: 'click', mode: 'row',showIcon:false}"
                     :edit-rules="validRules"
                     :row-config="{height: 25}"
                     @@cell-click="cellClickEvent" >

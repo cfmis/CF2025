@@ -184,7 +184,7 @@
         },
         okEvent(){
             if(this.curResultRow){
-                this.setParentFind(this.curResultRow.id);
+                this.setParentFind(this.curResultRow.id);                
             }else{
                 this.$XModal.alert({ content: '請首先在查詢結果中指定當前行!',mask: false });
             }
@@ -195,7 +195,7 @@
             parent.comm.closeWindow();//关闭窗口
         },
         //查詢
-        searchEvent(window_id) {
+        searchEvent() {            
             var $table = this.$refs.tableConditionRef;
             if($table.tableData.length===0){
                 this.$XModal.alert({ content: '查詢條件不可為空!', mask: false });
@@ -306,14 +306,15 @@
                 }
             }
             var strJoin ="";
-            if(joinArr[0].length>0){
+            //if(joinArr[0].length>0){            
+            if(joinArr.length>0){
                 strJoin = joinArr[0];
             }else{
                 strJoin = " 1=1 ";
             }
             //構建From表來源
             var strTable ="";
-            if(fromArr[0].length>0){
+            if(fromArr.length>0){
                 strTable = fromArr[0];
             }else{
                 this.$XModal.alert({ content: '注意:后臺查詢構造語字段【from_table】內容不正確!', mask: false });
@@ -321,21 +322,20 @@
             }
             //構建排序
             var strOrderby="";
-            if(orderbyArr[0].length>0){
+            if(orderbyArr.length>0){
                 strOrderby = orderbyArr[0];            
-            }
+            }            
             //構建完整的sql語句
             //在strTable(table_from)中寫有inner join left join,strJoin(table_relation)就不用寫           
-            var strSql="SELECT " + strSelect +" FROM "+ strTable +" WHERE "+ strJoin +" AND "+ strValue 
+            var strSql="SELECT TOP 5000 " + strSelect +" FROM "+ strTable +" WHERE "+ strJoin +" AND "+ strValue 
             if(strOrderby !==""){
                 strSql +=" Order by "+ strOrderby;
-            }
-            console.log(this.ary);
+            }            
             axios.get("/Base/PublicQuery/Query?sqlText=" + strSql).then(
                 (response) => {
                     if(response.data){
-                        var jsonObj = JSON.parse(response.data); //jason字符串转换为json对象
-                        this.tableResult = jsonObj;                        
+                       var jsonObj = JSON.parse(response.data); //json字符串转换为json对象                       
+                        this.tableResult = jsonObj;
                     }else{
                         this.tableResult=[];
                         this.$XModal.message({ content: '沒有滿足查找條件的數據!', status: 'info' });

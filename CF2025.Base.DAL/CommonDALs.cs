@@ -2,8 +2,10 @@
 using CF.SQLServer.DAL;
 using CF2025.Base.Contract;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -14,6 +16,69 @@ namespace CF2025.Base.DAL
     public class CommonDAL
     {
         private static SQLHelper sh = new SQLHelper(CachedConfigContext.Current.DaoConfig.OA);
+
+        public static string GeoEncrypt(string strEncrypt)
+        {
+            //函數說明：傳入用戶密碼(原碼),返回加密之後的字串
+            //參數：as_code(輸入的密碼原碼).
+            //返回值：ls_EncryptPass 加密之後的字串
+            //ChingFung可以寫一個類似的函數，將加密之後的字串與目前資料庫中保存的密碼去比較,如果相等就表示輸入的密碼正確。
+            //定義函數使用到的變數
+            string ls_TempString, ls_Work, ls_EncryptPass, ls_DecryptString, ls_EncryptString, as_code;
+            int li_Length, li_Position, li_Multiplier, li_Offset, li_Count;
+            as_code = strEncrypt;// 輸入的密碼
+            //--將輸入的密碼轉化為小寫字元
+            ls_TempString = as_code.ToLower();
+            //定義加密解密的字串,這一些字元是固定的.不允許修改.
+            //以雙引號開始,同樣以雙引號結束，比如："123456",表示123456這幾個字元.
+
+            ls_DecryptString = " !" + "\"" + "#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[" + "\\" + "]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+            ls_EncryptString = "~{[}u;Ce83KX%:VIm!|gs]_aL-QEOpx<UlzZjBq6#1($" + "\\" + "\"" + "FS5H0'cM&>Po.NGA*Jr)Y" + " " + "Dv/t9kd?^fni,hR2Wy=`+4T@7wb";
+
+
+            //取得輸入的密碼長度
+            li_Length = as_code.Trim().Length;
+            //--根據不同的密碼長度得到不同的加密方法的字元長度倍數
+            if (1 <= li_Length && li_Length <= 3)
+                li_Multiplier = 1;
+            else
+                if (4 <= li_Length && li_Length <= 6)
+                li_Multiplier = 2;
+            else
+                    if (7 <= li_Length && li_Length <= 9)
+                li_Multiplier = 3;
+            else
+                li_Multiplier = 4;
+            ls_EncryptPass = "";//先將保存加密之後字串清空。
+
+            //以下為迴圈密碼每一位元字元,對每一位元字元進行加密
+            for (li_Count = 1; li_Count <= li_Length; li_Count++)
+            {
+                li_Offset = li_Count * li_Multiplier;
+                //取密碼中的第li_count位元的字元，長度為1
+                //使用方法：Mid(需要取值的字串,開始位置，長度)
+                ls_Work = as_code.Substring(li_Count - 1, 1);//SUBSTR(as_code, li_Count, 1);
+                //取到ls_work字元在ls_decryptstring中的第一個位置
+                //使用方法：Pos(用來查找的字串，需要查找的字串)
+                li_Position = ls_DecryptString.IndexOf(ls_Work) + 1;//substring(ls_Work,ls_DecryptString);
+                li_Position = li_Position + li_Offset;
+                //Mod是取模函數，即取到Li_positon除以95之後的餘數
+                li_Position = li_Position % 95;//Mod(li_Position, 95);
+                //將li_position值加1 ，相當於li_postion = li_postion + 1
+                li_Position = li_Position + 1;
+                //取到ls_EncryptString中第li_Position開始的1位元字元
+                ls_Work = ls_EncryptString.Substring(li_Position - 1, 1);//SUBSTR(ls_EncryptString, li_Position, 1);
+                //將加密之後的字元相加,得到加密結果字串.
+                ls_EncryptPass = ls_EncryptPass + ls_Work;
+                //重新設置加密方法的字元長度倍數
+                if (1 <= li_Multiplier && li_Multiplier <= 3)
+                    li_Multiplier = li_Multiplier + 1;
+                else
+                    li_Multiplier = 1;
+            }
+            //--將加密之後的字元返回
+            return ls_EncryptPass;
+        }
 
         /// <summary>
         /// 欄位名稱下拉列表框
@@ -141,11 +206,64 @@ namespace CF2025.Base.DAL
         {
             DataTable dt = sh.ExecuteSqlReturnDataTable(sqlText);
             var Result = sh.DataTableToJson(dt);
+            
             return Result;
         }
+
+
+        public static List<ModelItemQuery> ItemQueryList(ModelItemQuery SearchAry)
+        {
+            SqlParameter[] paras = new SqlParameter[]
+            {
+                new SqlParameter("@results",SearchAry.results),
+                new SqlParameter("@type",SearchAry.type),
+                new SqlParameter("@blueprint_id",string.IsNullOrEmpty(SearchAry.blueprint_id)?"":SearchAry.blueprint_id),
+                new SqlParameter("@goods_id",string.IsNullOrEmpty(SearchAry.goods_id)?"":SearchAry.goods_id),
+                new SqlParameter("@goods_name",string.IsNullOrEmpty(SearchAry.goods_name)?"":SearchAry.goods_name),
+                new SqlParameter("@modality",SearchAry.modality),
+                new SqlParameter("@datum",string.IsNullOrEmpty(SearchAry.datum)?"":SearchAry.datum),
+                new SqlParameter("@size_id",string.IsNullOrEmpty(SearchAry.size_id)?"":SearchAry.size_id),
+                new SqlParameter("@big_class",string.IsNullOrEmpty(SearchAry.big_class)?"":SearchAry.big_class),
+                new SqlParameter("@base_class",string.IsNullOrEmpty(SearchAry.base_class)?"":SearchAry.base_class),
+                new SqlParameter("@small_class",string.IsNullOrEmpty(SearchAry.small_class)?"":SearchAry.small_class)
+            };           
+            DataSet dts = sh.RunProcedure("zz_base_item_query", paras,"items",20);            
+            DataTable dt = dts.Tables[0];
+            List<ModelItemQuery> lst = DataTableToList<ModelItemQuery>(dt);
+            return lst;            
+        }
+
+        //檢查頁數是否正確
+        public static string CheckMo(string mo_id)
+        {
+            string strSql = string.Format(@"Select mo_id FROM jo_bill_mostly a with(nolock) Where within_code='0000' and mo_id='{0}' and state not in('0','2','V')", mo_id);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            string result = "";
+            if (dt.Rows.Count > 0)
+            {
+                result = dt.Rows[0]["mo_id"].ToString();
+            }
+            return result;
+        }
         
+        //檢查貨品編碼是否正確
+        public static string CheckItem(string goods_id)
+        {
+            string strSql = string.Format(@"Select name as goods_name FROM it_goods a with(nolock) Where within_code='0000' and id='{0}' and state='0'", goods_id);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            string result = "";
+            if (dt.Rows.Count > 0)
+            {
+                result = dt.Rows[0]["goods_name"].ToString();
+            }
+            return result;
+        }
+
         /// <summary> 
+        /// Allen 2022-02-20
         /// 利用反射將DataTable转换为List<T>对象
+        /// 調用方式：List<Entity> list = CommonDAL.DataTableToList<Entity>(dt);
+        /// Entity即為要轉成List的數據模型,必須預先定義,省不了
         /// </summary> 
         /// <param name="dt">DataTable 对象</param> 
         /// <returns>List<T>集合</returns> 
@@ -181,10 +299,97 @@ namespace CF2025.Base.DAL
                 //对象添加到泛型集合中 
                 ts.Add(t);
             }
-            return ts;
-            //使用方式：Entity即為要轉成List的數據模型,必須預先定義,省不了
-            //List<Entity> list = CommonDAL.DataTableToList<Entity>(dt);
+            return ts;            
         }
+
+        /// <summary>
+        /// Allen 2022-08-23
+        /// 集合轉成DataTable
+        /// 調用方式：DataTable dt = CommonDAL.ListToDataTable<Entity>(listData);
+        /// 參數:Entity 即為實體數據模型,必須預先定義,
+        ///     listData,與Entity類相同的集合數據
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static DataTable ListToDataTable<T>(IEnumerable<T> list)
+        {
+            PropertyInfo[] modelItemType = typeof(T).GetProperties();
+            DataTable dataTable = new DataTable();
+            dataTable.Columns.AddRange(modelItemType.Select(Columns => new DataColumn(Columns.Name, Columns.PropertyType)).ToArray());
+            if (list.Count() > 0)
+            {
+                for (int i = 0; i < list.Count(); i++)
+                {
+                    ArrayList tempList = new ArrayList();
+                    foreach (PropertyInfo pi in modelItemType)
+                    {
+                        object obj = pi.GetValue(list.ElementAt(i), null);
+                        tempList.Add(obj);
+                    }
+                    object[] dataRow = tempList.ToArray();
+                    dataTable.LoadDataRow(dataRow, true);
+                }
+            }
+            return dataTable;
+        }
+
+
+        //最大單據號
+        public static string GetMaxID(string bill_id, string dept_id, int serial_len)
+        {
+            string strSql = string.Format("Select dbo.fn_zz_sys_bill_max_separate('{0}','{1}',{2}) as max_id", bill_id, dept_id, serial_len);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            string id = dt.Rows.Count > 0 ? dt.Rows[0]["max_id"].ToString() : "";
+            return id;
+        }
+
+        //取單據批準狀態
+        public static string CheckApproveStatus(string table_name, string id)
+        {
+            string strSql = string.Format("Select state From {0} WHERE within_code='0000' and id='{1}'", table_name, id);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            string result = dt.Rows[0]["state"].ToString();
+            return result;
+        }
+
+        //檢查用戶是否存在
+        public static string GetUserName(string user_id)
+        {
+            string strSql = string.Format("Select user_name From sys_user WHERE within_code='' and user_id='{0}'", user_id);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            string rtn = "";
+            if (dt.Rows.Count > 0)
+                rtn = dt.Rows[0]["user_name"].ToString();
+            return rtn;
+        }
+        //檢查用戶與密碼
+        public static string GetUserInfo(string user_id, string password)
+        {
+            string strSql = string.Format("Select user_name,password From sys_user WHERE within_code='' and user_id='{0}'", user_id);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            string rtn = "";
+            if (dt.Rows.Count > 0)
+            {
+                string strPwd = "";
+                if (!string.IsNullOrEmpty(password))
+                {
+                    strPwd = GeoEncrypt(password);
+                }                
+                if (strPwd != dt.Rows[0]["password"].ToString())
+                {
+                    //密碼錯誤
+                    rtn = "PASSWORD_ERROR";
+                }
+            }
+            else
+            {
+                rtn = "USER_ID_ERROR";
+            }           
+            return rtn;
+        }
+
+       
 
     }
 }

@@ -11,6 +11,7 @@ using CF2025.Store.Contract;
 using CF2025.Base.DAL;
 using System.Data.SqlClient;
 
+
 namespace CF2025.Store.DAL
 {
     public static class TransferOutUnconfirmDAL
@@ -64,14 +65,14 @@ namespace CF2025.Store.DAL
             return lstModel;
         }
 
-        //最大單據號
-        public static string GetMaxID(string bill_id ,string dept_id)
-        {            
-            string strSql = string.Format("Select dbo.fn_zz_sys_bill_max_separate('{0}','{1}') as max_id", bill_id, dept_id);
-            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
-            string id = dt.Rows.Count > 0 ? dt.Rows[0]["max_id"].ToString() : "";
-            return id;
-        }
+        ////最大單據號
+        //public static string GetMaxID(string bill_id ,string dept_id, int serial_len)
+        //{            
+        //    string strSql = string.Format("Select dbo.fn_zz_sys_bill_max_separate('{0}','{1}',{2}) as max_id", bill_id, dept_id, serial_len);
+        //    DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+        //    string id = dt.Rows.Count > 0 ? dt.Rows[0]["max_id"].ToString() : "";
+        //    return id;
+        //}
 
         //更新轉入單表頭
         public static string SaveAll(TransferInHead model,List<TransferInDetails> lstMdl)
@@ -89,7 +90,7 @@ namespace CF2025.Store.DAL
                 if (CheckHeadID(id))
                 {
                     //已存在此單據號,重新取最大單據號
-                    model.id = GetMaxID("ST05", model.department_id);//DDI1052201001
+                    model.id = CommonDAL.GetMaxID("ST05", model.department_id,3);//DDI1052201001                  
                 }
                 //***begin 更新系統表最大單據編號
                 string dept_id = model.department_id;//105

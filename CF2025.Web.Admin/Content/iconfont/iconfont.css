@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3344909 */
-  src: url('iconfont.woff2?t=1650543428408') format('woff2'),
-       url('iconfont.woff?t=1650543428408') format('woff'),
-       url('iconfont.ttf?t=1650543428408') format('truetype');
+  src: url('iconfont.woff2?t=1652750911859') format('woff2'),
+       url('iconfont.woff?t=1652750911859') format('woff'),
+       url('iconfont.ttf?t=1652750911859') format('truetype');
 }
 
 .iconfont {
@@ -13,20 +13,48 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-cost:before {
+.icon-next1:before {
+  content: "\e648";
+}
+
+.icon-previous1:before {
+  content: "\e64a";
+}
+
+.icon-search4:before {
+  content: "\e656";
+}
+
+.icon-caidan03:before {
   content: "\e614";
+}
+
+.icon-previous:before {
+  content: "\e66e";
+}
+
+.icon-next:before {
+  content: "\e709";
+}
+
+.icon-Reset-Settings:before {
+  content: "\e93a";
+}
+
+.icon-Reset-Settings1:before {
+  content: "\ed66";
+}
+
+.icon-piliangzengjia:before {
+  content: "\e6ad";
+}
+
+.icon-buttongroup:before {
+  content: "\e6d3";
 }
 
 .icon-n_cost:before {
   content: "\e727";
-}
-
-.icon-deco-cost:before {
-  content: "\e6b5";
-}
-
-.icon-cost1:before {
-  content: "\e710";
 }
 
 .icon-print:before {

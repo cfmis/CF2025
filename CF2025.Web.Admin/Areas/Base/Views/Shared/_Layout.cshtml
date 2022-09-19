@@ -13,43 +13,7 @@
 
     <!--2022.04.02 add-->
     <link rel="stylesheet" type="text/css" href="~/Lib/jquery-easyui-1.5/themes/default/easyui.css" />
-
-    <style>
-        .div-left {
-            float: left;
-            width: 80%;
-            background-color: aqua;
-            /*border:dotted;*/
-        }
-
-        .div-right {
-            float: right;
-            width: 16%;
-            background-color: yellow;
-        }
-
-        .vxe-form-item-customize {
-            /*width:25%;*/
-            /*margin-top: -20px;*/
-            height: 20px;
-        }
-
-        .input-customize {
-            height: 20px;
-            font-size: 10px;
-            width: 25%;
-        }
-
-        .vxe-select > .vxe-input {
-            width: 100%;
-            height: 18px;
-        }
-
-        .vxe-input {
-            height: 20px;
-        }
-    </style>
-
+    
     @RenderSection("PageSpecificStyleSheetIncludes", required: false)   
     <!--begin 公共查詢需引入以下版本(1.10.2)的Jquery-->
     <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
@@ -60,7 +24,16 @@
     <script src="~/Content/vxe-table/jsdelivr/xe-utils.js"></script>
     <script src="~/Content/vxe-table/jsdelivr/vxe-table.js"></script>
     <script type="text/javascript" src="~/Scripts/axios.js"></script>
-    <script src="~/Content/Js/common.js"></script>
+    <script src="~/Content/Js/common.js?v=@Guid.NewGuid().ToString()"></script>
+    <link rel="stylesheet" href="~/Content/Styles/common.css" />
+
+    <!--2022/07/15新加入-->
+    <link rel="stylesheet" href="~/Content/ElementUI/css/element-ui.css" />
+    <!--重寫<el-select>樣式-->
+    <link rel="stylesheet" href="~/Content/Styles/custom-el-select.css" />
+    <script src="~/Content/ElementUI/js/element-ui.js"></script>
+
+
 </head>
 <body>
     @RenderBody()
