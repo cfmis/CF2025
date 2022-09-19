@@ -1351,8 +1351,8 @@
             let li_rtn,li_rc,li_row,li_prd_id,li_count,li_row_no;
             let	ls_op_dept='',ls_assembly_dept='',ls_sequence_id='',ls_lot_no='',ls_materiel_id='',ls_message='',ls_materiel_mo_id='',ls_parameter='';          
             let	ls_mo_id='',ls_goods_id='',ls_id='',ls_in_dept='',ls_id_tmp='';
-            let	lb_pope = false;//,lb_prompt = false
-            this.lb_prompt = false;
+            let	lb_pope = false,lb_prompt = false;
+            //this.lb_prompt = false;
             let	ldc_assembly_qty=0,ldc_qty_other=0,ldc_sec_qty_other=0,ldc_prod_qty=0,ldc_prod_sec_qty=0,ldc_qc_qty=0,ldc_qc_sec_qty=0,ldc_sec_qty=0;
             this.preUpdateFlag = true;
             //清空移交單臨時數據
@@ -1386,6 +1386,7 @@
             //} 
             for(let li_row=0;li_row<this.tableData1.length;li_row++){
                 li_row_no = this.$utils.toInteger(li_row)+1;
+                console.log(li_row_no);//*********
                 ls_mo_id = this.tableData1[li_row].mo_id;
                 ls_goods_id = this.tableData1[li_row].goods_id;
                 ldc_assembly_qty = parseFloat(this.tableData1[li_row].con_qty);
@@ -1486,7 +1487,7 @@
                     break;
                 }                
                 //--ls_parameter:检查是否允許超过生产数量移交,0為不允許,但可通過密碼確認放行
-                if(ls_parameter === '0' && this.lb_prompt === false){
+                if(ls_parameter === '0' && lb_prompt === false){
                     if(ldc_assembly_qty+ldc_qty_other>ldc_prod_qty){
                       await this.$XModal.confirm(`第${li_row_no}行:【${ls_mo_id}--${ls_goods_id}】\n移交数已超過生產數，如要繼續保存，請選擇【确定】\n并在彈出窗口中輸入有權限的用户和密碼!`).then(type => {
                            if (type === 'cancel') {
@@ -1505,29 +1506,54 @@
                      //     }
                      //    })
                //    //********
-                      await this.$prompt(`用戶名称:${this.userId}\n\n密碼:`,'提示',
-                       {
-                           confirmButtonText: '确定',
-                           cancelButtonText: '取消',
-                           type:"warning",            // 图标样式 "warning"|"error"...
-                           inputValue: '输入框默认值',
-                           inputErrorMessage: '输入不能为空',
-                           inputValidator: (value) => {// 点击按钮时，对文本框里面的值进行验证
-                               if(!value) {
-                                   return '输入不能为空';
-                               }
-                           },
-                           // callback:function(action, instance){
+                      await this.$prompt(`當前用戶: ${this.userId}`,'請輸入密碼',
+                      {
+                          confirmButtonText: '确定',
+                          cancelButtonText: '取消',
+                          closeOnClickModal: false,//禁需點擊彈窗之外空白處或選中是自動關閉的問題
+                          type:"warning", // 图标样式 "warning"|"error"...
+                          inputType:"Password",
+                          inputValue: '',                          
+                           //inputErrorMessage: '输入不能为空',
+                           //inputValidator: (value) => {// 点击按钮时，对文本框里面的值进行验证
+                           //    if(!value) {
+                           //        return '输入不能为空';
+                           //    }
+                           //},
+                           //callback:function(action, instance){
                            //     if(action === 'confirm'){
                            //         // do something...
                            //         console.log(instance.inputValue);
                            //     }
-                           // }
-                           // 阻止关闭（beforeClose中如果不调用done()弹框就无法关闭）
+                           // },
+                           //阻止关闭（beforeClose中如果不调用done()弹框就无法关闭）
                            beforeClose: (action, instance, done) => {
-                               if(action === 'confirm' ){//&& !ipReg.test(instance.inputValue)
-                                   this.$message(instance.inputValue);
+                               if(action === 'confirm' ){//&& !ipReg.test(instance.inputValue)                                 
+                                   let strPassword=instance.inputValue;                                  
+                                    axios.get("/Base/Common/GetUserInfo?user_id=" + this.userId + "&password=" + strPassword).then(
+                                       (response) => {
+                                           if (response.data === "USER_ID_ERROR") {
+                                               this.valid_user_id = false;
+                                               this.$message({type:'warning',message: '輸入用戶有誤!'});                                              
+                                               return;
+                                           }
+                                           if (response.data === "PASSWORD_ERROR") {
+                                               this.valid_user_id = false;
+                                               this.$message({type:'warning',message: '輸入的密碼有誤!!'+response});
+                                               return;
+                                           }
+                                           this.valid_user_id = true;//用戶密碼檢查通過
+                                           lb_prompt = true;//**??   只需彈出密碼檢查一次
+                                           done();
+                                       } 
+                                   ).catch(function (response) {
+                                       this.valid_user_id = false;
+                                       this.$message({type:'warning',message: '程序錯誤!'+response});
+                                       alert(response);
+                                   }); 
                                }else{
+                                   this.$message("cancel");
+                                   this.valid_user_id = false;
                                    done();
                                } 
                            }
@@ -1537,59 +1563,14 @@
                       }).catch((err) => {
                           console.log(err);
                       });  
-               ////************
-                     // var html='<span slot="footer"class="dialog-footer"><el-button type="info" icon="el-icon-close" size="small" plain>取消</el-button><el-button type="primary" icon="el-icon-check" size="small" plain>確認</el-button></span>'
-                     
-                      //await this.$confirm("", '提示', {
-                      //        confirmButtonText: '确定',
-                      //        cancelButtonText: '取消',
-                      //        type: 'warning'
-                      //}).then(() => {
-                      //    this.$message({
-                      //        type: 'success',
-                      //        message: '删除成功!'
-                      //    });
-                      //}).catch(() => {
-                      //    this.$message({
-                      //        type: 'info',
-                      //        message: '已取消删除'
-                      //    });          
-                      //});
-                     
-                     // return;
-                     //await this.$XModal.confirm(
-                     //     {
-                     //         title: "确认调整",//标题
-                     //         render: (h, params) => {
-                     //             return h("test1",{
-                     //                 props:{
-                     //                     value:"ABC",
-                     //                     icon:'',
-                     //                     width:"510px",
-                     //                     height:"400px",
-                     //                     autofocus:true,
-                     //                 }
-                     //             });
-                     //         },
-                     //         loading: true,
-                     //         onOk: () => {
-                     //             //点击确认的方法
-                     //         },
-                     //     }
-                     // ).then(type => {
-                     //     if (type === 'cancel') {
-                     //         this.preUpdateFlag = false;
-                     //     }
-                     // });
-                          
+                      ////************
 
-                     
                       //this.showPwd = true;                      
-                      debugger;
+                      
                       if(this.valid_user_id ===false){ //this.valid_user_id為密碼確認窗口檢查通過時/this.valid_user_id=true,不通過this.valid_user_id=false
                           console.log("dfdfdf");
                           this.preUpdateFlag = false; //保存前檢查通不過,退出循環
-                          break;
+                          break;//退出循環
                       }else{
                           this.preUpdateFlag = true; //保存前檢查通過,繼續循環
                       }                                           
@@ -1651,61 +1632,61 @@
             });
         },   
         
-        //檢查用戶與密碼是否正確
-        confirmEvent: async function() {
-            if (this.loginData.user_id === "") {
-                this.$XModal.alert({ content: '用戶不可以為空!',status: 'info', mask: false });
-                return;
-            }
-            await axios.get("/Base/Common/GetUserInfo?user_id=" + this.loginData.user_id + "&password=" + this.loginData.password).then(
-                (response) => {
-                    this.isPass = true;
-                    if (response.data === "USER_ID_ERROR") {
-                        this.isPass = false;
-                        this.$XModal.alert({ content: '輸入用戶有誤!', status: 'warning', mask: false });
-                        return;
-                    }
-                    if (response.data === "PASSWORD_ERROR") {
-                        this.isPass = false;
-                        this.$XModal.alert({ content: '輸入的密碼有誤!', status: 'warning', mask: false });
-                        return;
-                    }                                      
-                    this.valid_user_id = this.isPass;
-                    if(this.valid_user_id===false){ 
-                        this.preUpdateFlag = false;
-                        return;
-                    }else{
-                        this.preUpdateFlag = true;
-                    }     
-                    this.lb_prompt = true;//当有多个货品时,也只提示一次  //lb_prompt = true; 
+        ////檢查用戶與密碼是否正確
+        //confirmEvent: async function() {
+        //    if (this.loginData.user_id === "") {
+        //        this.$XModal.alert({ content: '用戶不可以為空!',status: 'info', mask: false });
+        //        return;
+        //    }
+        //    await axios.get("/Base/Common/GetUserInfo?user_id=" + this.loginData.user_id + "&password=" + this.loginData.password).then(
+        //        (response) => {
+        //            this.isPass = true;
+        //            if (response.data === "USER_ID_ERROR") {
+        //                this.isPass = false;
+        //                this.$XModal.alert({ content: '輸入用戶有誤!', status: 'warning', mask: false });
+        //                return;
+        //            }
+        //            if (response.data === "PASSWORD_ERROR") {
+        //                this.isPass = false;
+        //                this.$XModal.alert({ content: '輸入的密碼有誤!', status: 'warning', mask: false });
+        //                return;
+        //            }                                      
+        //            this.valid_user_id = this.isPass;
+        //            if(this.valid_user_id===false){ 
+        //                this.preUpdateFlag = false;
+        //                return;
+        //            }else{
+        //                this.preUpdateFlag = true;
+        //            }     
+        //            this.lb_prompt = true;//当有多个货品时,也只提示一次  //lb_prompt = true; 
                          
-                    axios.get("/ProduceAssembly/GetUserPope", { params: { user_id:this.headData.create_by} }).then(
-                        (response) => {
-                            lb_pope = response.data;
-                        }
-                    );
-                    if(!lb_pope){
-                        this.$XModal.alert({ content: '當前用戶沒有移交特批的權限!',status: 'info' , mask: false });
-                        this.preUpdateFlag = false;
-                        //break;
-                    }
-                    //this.setParentFind();
-                }               
-            ).catch(function (response) {
-                this.isPass = false;
-                alert(response);
-            });
-        },
-        cancelEvent() {
-            this.isPass = false;            
-            this.setParentFind();
-        }, 
-        setParentFind(){
-            this.valid_user_id = this.isPass; //值賦給父窗口中的變量
-            this.showPwd = false;
-            //parent.comm.closeWindow();//关闭窗口
-        },
-        //***END**********用戶密碼確認 *** 
+        //            axios.get("/ProduceAssembly/GetUserPope", { params: { user_id:this.headData.create_by} }).then(
+        //                (response) => {
+        //                    lb_pope = response.data;
+        //                }
+        //            );
+        //            if(!lb_pope){
+        //                this.$XModal.alert({ content: '當前用戶沒有移交特批的權限!',status: 'info' , mask: false });
+        //                this.preUpdateFlag = false;
+        //                //break;
+        //            }
+        //            //this.setParentFind();
+        //        }               
+        //    ).catch(function (response) {
+        //        this.isPass = false;
+        //        alert(response);
+        //    });
+        //},
+        //cancelEvent() {
+        //    this.isPass = false;            
+        //    this.setParentFind();
+        //}, 
+        //setParentFind(){
+        //    this.valid_user_id = this.isPass; //值賦給父窗口中的變量
+        //    this.showPwd = false;
+        //    //parent.comm.closeWindow();//关闭窗口
+        //},
+        ////***END**********用戶密碼確認 *** 
 
 
        //beforeHideMethod: async () => {
