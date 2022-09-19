@@ -409,20 +409,7 @@
         </vxe-toolbar>
         <span slot="footer" class="dialog-footer"><el-button type="primary" >确定</el-button> <el-button type="info" >取 消</el-button> </span>
         </vxe-modal>*@
-
-  
-
-        <el-dialog
-          title="提示"
-          :visible.sync="showPwd"
-          width="30%"
-          @*:before-close="handleClose"*@>
-          <span>这是一段信息</span>
-          <span slot="footer" class="dialog-footer">
-            <el-button @@click="showPwd = false">取 消</el-button>
-            <el-button type="primary" @@click="showPwd = false">确 定</el-button>
-          </span>
-        </el-dialog>
+                
 
         @*彈窗:表格一中根據生產計劃流程,顯示部門相關流程*@
         <vxe-modal v-model="showGoods" title="貨品編碼" width="750" :position="{top: showGoodsY, left: showGoodsX}":mask="false" resize destroy-on-close>

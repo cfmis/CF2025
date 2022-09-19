@@ -110,11 +110,10 @@
             tmp_turn_over_qc:[],//QC移交單臨時數據
             valid_user_id:false,
 
-            showPwd:false,
+            //showPwd:false,
             isPass: true,
-
-            loginData:{ user_id:'',user_name:'',password:'' },
-            lb_prompt:false,//是否重復彈密碼確認口.
+            //loginData:{ user_id:'',user_name:'',password:'' },
+            //lb_prompt:false,//是否重復彈密碼確認口.
         }
     },    
     created() {
