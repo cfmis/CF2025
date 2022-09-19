@@ -22,9 +22,6 @@ namespace CF2025.Base.DAL
             string LanguageID = sh.ConvertLanguage(language_id);
             switch (SourceType)
             {
-                case "BillOrigin"://開單來源,單據種類等
-                    strSql += string.Format("SELECT id,name FROM sys_bill_origin WHERE function_id='JO06' AND [language]='{0}' AND [state]='0'", LanguageID);
-                    break;
                 case "QtyUnitList"://數量單位
                     strSql += "Select id,name,english_name From cd_units Where kind='05' Order By id";
                     break;
@@ -61,17 +58,8 @@ namespace CF2025.Base.DAL
                 case "StateList"://狀態 
                     strSql += string.Format(@"SELECT id, matter as name FROM sy_bill_state WHERE language_id = '{0}'", LanguageID); ;
                     break;
-                case "BigClass"://大類
-                    strSql += "Select id,id+'--'+name AS name From cd_goods_class WHERE within_code='"+ within_code + "' and gc_type='0' and state='0' ORDER BY id";
-                    break;
-                case "BaseClass"://中類(產品類型,貨品編碼的第3,4位)
-                    strSql += "Select DISTINCT id,id+'--'+name AS name From cd_goods_class WHERE within_code='" + within_code + "' and gc_type='1' and state='0' ORDER BY id";
-                    break;
-                case "SmallClass"://小類
-                    strSql += "Select id,id+'--'+name AS name From cd_goods_class WHERE within_code='" + within_code + "' and gc_type='2' and state='0' ORDER BY id";
-                    break;
-                case "Datum"://材質(產品類型,貨品編碼的第1,2位)
-                    strSql += "Select id,id+'--'+name AS name From cd_datum WHERE within_code='" + within_code + "' and state='0' ORDER BY id";
+                case "set_state_list"://設定狀態
+                    strSql += "SELECT id,id+'--' + name AS name FROM cd_mo_type WHERE within_code='" + within_code + "' AND mo_type='T' ORDER BY id";
                     break;
                 default:
                     strSql += "";

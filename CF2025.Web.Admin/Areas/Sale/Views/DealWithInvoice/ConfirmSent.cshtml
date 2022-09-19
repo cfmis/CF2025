@@ -1,0 +1,185 @@
+﻿
+@{
+    //Layout = null;
+    ViewBag.Title = "Index";
+}
+
+@section PageSpecificStyleSheetIncludes1{
+<style>
+    .vxe-form-item-width-search {
+        width: 350px !important;
+        height: 20px;
+        /*background-color:aqua;*/
+    }
+    .input-search {
+            height: 20px;
+            font-size: 10px;
+            width: 40% !important;
+        }
+    .input-search1 {
+            height: 20px;
+            font-size: 10px;
+            width: 86% !important;
+        }
+</style>
+}
+
+<div id="app">
+    <vxe-toolbar perfect size="medium" style="height:35px" class="tools-menus" >
+        <template #buttons>
+            <vxe-button type="text" icon="iconfont icon-search1" style="width:70px;margin-left:-10px;" class="thickbox" @@click="findInvoice()" size="mini">查找</vxe-button>
+            <vxe-button type="text" icon="iconfont icon-Flight" style="width:90px;margin-left:-15px;" @@click="showModalSent()" size="mini">發貨確認</vxe-button>
+        </template>
+    </vxe-toolbar>
+    <!--表頭記錄-->
+
+    <div>
+        <vxe-form :data="formData" size="mini"  title-align="right" title-width="100px" prevent-submit title-colon custom-layout>@* style="width:350px"*@
+                 <vxe-form-item title="發票日期" field="oi_date_from" :item-render="{}" class="vxe-form-item-width-search" span="8">
+                    <template #default="{ data }" class="aa">
+                        <vxe-input type="date" v-model="data.oi_date_from" class="input-search"></vxe-input>
+                        <vxe-label name="label1"> ~ </vxe-label>
+                        <vxe-input type="date" v-model="data.oi_date_to" class="input-search"></vxe-input>
+                    </template>
+                </vxe-form-item>
+                <vxe-form-item title="發貨日期" field="sd_date_from" :item-render="{}" class="vxe-form-item-width-search" span="8">
+                    <template #default="{ data }">
+                        <vxe-input type="date" v-model="data.sd_date_from" class="input-search"></vxe-input>
+                        <vxe-label name="label2">~</vxe-label>
+                        <vxe-input type="date" v-model="data.sd_date_to" class="input-search"></vxe-input>
+                    </template>
+                </vxe-form-item>
+                <vxe-form-item title="客戶編號" field="it_customer_from" :item-render="{}" class="vxe-form-item-width-search" span="8">
+                    <template #default="{ data }">
+                        <vxe-input v-model="data.it_customer_from" class="input-search"></vxe-input>
+                        <vxe-label name="label3">~</vxe-label>
+                        <vxe-input v-model="data.it_customer_to" class="input-search"></vxe-input>
+                    </template>
+                </vxe-form-item>
+                <vxe-form-item title="發票編號" field="ID" :item-render="{}" class="vxe-form-item-width-search" span="8">
+                    <template #default="{ data }">
+                        <vxe-input v-model="data.ID" class="input-search1"></vxe-input>
+                    </template>
+                </vxe-form-item>
+                <vxe-form-item title="頁數" field="mo_id" :item-render="{}" class="vxe-form-item-width-search" span="8">
+                    <template #default="{ data }">
+                        <vxe-input v-model="data.mo_id" class="input-search1"></vxe-input>
+                    </template>
+                </vxe-form-item>
+                <vxe-form-item title="發貨狀態" field="state" :item-render="{}" class="vxe-form-item-width-search" span="8">
+                    <template #default="{ data }">
+                        <vxe-select v-model="data.state" class="input-search1" size="mini">
+                            <vxe-option v-for="item in set_state_list" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                        </vxe-select>
+                    </template>
+                </vxe-form-item>
+
+        </vxe-form>
+    </div>
+   <!--附加費列表-->
+    <div style="margin-top:20px">
+        <vxe-table border
+                   show-overflow
+                   height="550"
+                   size="mini"
+                   :row-config="{height: 20}"
+                   highlight-current-row
+                   ref="xTable"
+                   :loading="loading3"
+                   :checkbox-config="{highlight: true, range: true}"
+                   :data="tableDetails"
+                   >
+            <vxe-column type="seq" title="序號" width="60"></vxe-column>
+            <vxe-column type="checkbox" width="60"></vxe-column>
+            <vxe-column field="sent_goods_state" title="發貨狀態" width="120" :edit-render="{}">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.sent_goods_state" style="height:20px"></vxe-input>
+                </template>
+            </vxe-column>
+            <vxe-column field="return_state" title="回單狀態" width="120" :edit-render="{}">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.return_state" style="height:20px"></vxe-input>
+                </template>
+            </vxe-column>
+            <vxe-column field="transport_style" title="運輸途徑" width="100" :edit-render="{}">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.transport_style" style="height:20px"></vxe-input>
+                </template>
+            </vxe-column>
+            <vxe-column field="ID" title="編號" width="100" :edit-render="{}">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.ID" style="height:20px"></vxe-input>
+                </template>
+            </vxe-column>
+            <vxe-column field="oi_date" title="發票日期" width="100" :edit-render="{}">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.oi_date" style="height:20px" disabled></vxe-input>
+                </template>
+            </vxe-column>
+            <vxe-column field="it_customer" title="客戶編號" width="80" :edit-render="{}">
+                <template #edit="{ row }">
+                    <vxe-checkbox v-model="row.it_customer" size="mini" style="height:20px"></vxe-checkbox>
+                </template>
+            </vxe-column>
+            <vxe-column field="cust_cname" title="名稱" width="160" :edit-render="{}">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.cust_cname" style="height:20px"></vxe-input>
+                </template>
+            </vxe-column>
+            <vxe-column field="seller_id" title="銷售員編號" width="80" :edit-render="{}">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.seller_id" style="height:20px"></vxe-input>
+                </template>
+            </vxe-column>
+             <vxe-column field="consignment_date" title="發貨日期" width="100" :edit-render="{}">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.consignment_date" style="height:20px"></vxe-input>
+                </template>
+            </vxe-column>
+            <vxe-column field="create_by" title="建檔人" width="100" :edit-render="{}">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.create_by" style="height:20px"></vxe-input>
+                </template>
+            </vxe-column>
+            <vxe-column field="state" title="狀態" width="120" :edit-render="{}">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.state" style="height:20px"></vxe-input>
+                </template>
+            </vxe-column>
+            <vxe-column field="check_by" title="確認人" width="100" :edit-render="{}">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.check_by" style="height:20px"></vxe-input>
+                </template>
+            </vxe-column>
+        </vxe-table>
+    </div>
+    <!--彈窗處理發貨確認-->
+    <vxe-modal ref="xModalSent" v-model="showSent" title="發貨確認" width="500" height="300" resize destroy-on-close>
+
+        <template #default>
+            <vxe-form title-align="right" title-width="100" custom-layout>
+
+                <vxe-form-item title="發貨狀態:" field="issues_state" :item-render="{}" :span="24" class="vxe-form-item-customize">
+                    <template #default="{ data }">
+                        <vxe-select v-model="issues_state" size="mini">
+                            <vxe-option v-for="item in issues_state_list" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                        </vxe-select>
+                    </template>
+                </vxe-form-item>
+
+                <vxe-form-item align="center" span="24" style="margin-top:50px">
+                    <template #default>
+                        @*<vxe-button type="text" @@click="confirmSent()" status="primary">確定</vxe-button>*@
+                        <vxe-button size="medium" @@click="confirmSent()" content="批準"></vxe-button>
+                        <vxe-button size="medium" @@click="$refs.xModalSent.close()" content="關閉"></vxe-button>
+                        @*<vxe-button type="text" icon="fa fa-undo" @@click="$refs.xModalSent.close()">取消</vxe-button>*@
+                    </template>
+                </vxe-form-item>
+           </vxe-form>
+        </template>
+    </vxe-modal>
+</div>
+@section PageSpecificJavascriptIncludes{
+    <script src="~/Areas/Sale/js/DealWithInvoice.js?v=@Guid.NewGuid().ToString()"></script>
+
+}

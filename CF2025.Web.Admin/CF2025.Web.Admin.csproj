@@ -286,6 +286,7 @@
     <Compile Include="Areas\Base\Controllers\DataComboxListController.cs" />
     <Compile Include="Areas\Prod\Controllers\ProduceAssemblyController.cs" />
     <Compile Include="Areas\Prod\ProdAreaRegistration.cs" />
+    <Compile Include="Areas\Sale\Controllers\DealWithInvoiceController.cs" />
     <Compile Include="Areas\Sale\Controllers\InvoiceController.cs" />
     <Compile Include="Areas\Sale\Controllers\OrderController.cs" />
     <Compile Include="Areas\Sale\SaleAreaRegistration.cs" />
@@ -314,6 +315,7 @@
     <Content Include="Areas\Base\js\publicItemQuery.js" />
     <Content Include="Areas\Base\js\publicQuery.js" />
     <Content Include="Areas\Prod\js\ProduceAssembly.js" />
+    <Content Include="Areas\Sale\js\DealWithInvoice.js" />
     <Content Include="Areas\Sale\js\Invoice.js" />
     <Content Include="Areas\Store\js\TransferIn.js" />
     <Content Include="Areas\Store\js\TransferOut.js" />
@@ -381,6 +383,7 @@
     <Content Include="Areas\Prod\Views\ProduceAssembly\Index.cshtml" />
     <Content Include="Areas\Base\Views\PublicItemQuery\Index.cshtml" />
     <Content Include="Areas\Base\Views\Common\PasswordConfirm.cshtml" />
+    <Content Include="Areas\Sale\Views\DealWithInvoice\ConfirmSent.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
