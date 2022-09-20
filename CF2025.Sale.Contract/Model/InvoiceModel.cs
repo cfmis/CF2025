@@ -265,5 +265,21 @@ namespace CF2025.Sale.Contract
         public string ship_remark3 { get; set; }
     }
 
+    public class view_so_invoice_mostly : InvoiceModel
+    {
+        public string oi_date { get; set; }
+        public string sd_date { get; set; }
+        public string return_state { get; set; }
+        public string it_customer { get; set; }
+        public string cust_cname { get; set; }
+        public string separate { get; set; }
+        public string sent_goods_state { get; set; }
+        public string transport_style { get; set; }
+        public string seller_id { get; set; }
+        public string consignment_date { get; set; }
+        public string create_by { get; set; }
+        public string create_time { get; set; }
+        public string check_by { get; set; }
+    }
 
 }
