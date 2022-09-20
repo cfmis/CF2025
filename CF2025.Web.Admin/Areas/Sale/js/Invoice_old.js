@@ -243,30 +243,15 @@ var Main = {
             // this.selectRow = null;
 			this.tableFareDetails.push(this.editFareDetails);
 		},
-		getDataDetails(mo_id){
-			let row=null;
-			this.getDataFromOC(row);
-		},
-		mo_idRowEvent(row)
-		{
-			if(row.EditFlag==0)
-				return;
-			this.getDataFromOC(row);
-		},
 		getDataFromOC(row){
-			let mo_id='';
-			if(row==null)
-				mo_id=this.editDetails.mo_id;
-			else
-				mo_id=row.mo_id;
-			if(mo_id=='')
+			if(row.mo_id=='')
 				return;
 			if(this.newDocFlag==1 && this.tableDetails.length==1)
 			{
-				this.getMostlyFromOc(mo_id);
+				this.getMostlyFromOc(row.mo_id);
 			}
 			
-			this.getDetailsFromOc(row,mo_id);
+			this.getDetailsFromOc(row);
 
 			// debugger;
 		},
@@ -312,7 +297,6 @@ var Main = {
             alert(response);
         });
         },
-		////產生發票編號類型
 		getBillTypeNo(it_customer,m_id)
 		{
 			let cust_type=it_customer.substr(0,2);
@@ -331,9 +315,9 @@ var Main = {
 				bill_type_no='R';
 			return bill_type_no;
 		},
-        getDetailsFromOc(row,mo_id) {
+        getDetailsFromOc(row) {
             //axios.get("GetGoodsDetails", { params: { goods_id: _id, } })//也可以將參數寫在這裡
-			//var mo_id=row.mo_id;
+			var mo_id=row.mo_id;
             axios.post("GetDetailsFromOc", { mo_id }).then(
             (response) => {
 				var ocData=response.data;
@@ -346,35 +330,6 @@ var Main = {
 				}
 				else
 				{
-					if(row==null)
-					{
-						this.editDetails.goods_id=ocData.goods_id;
-						this.editDetails.goods_id = ocData.goods_id;
-					this.editDetails.goods_name = ocData.goods_name;
-					this.editDetails.customer_goods = ocData.customer_goods;
-					this.editDetails.customer_color_id = ocData.customer_color_id;
-					this.editDetails.u_invoice_qty = ocData.u_invoice_qty;
-					this.editDetails.goods_unit = ocData.goods_unit;
-					this.editDetails.invoice_price = ocData.invoice_price;
-					this.editDetails.p_unit = ocData.p_unit;
-					this.editDetails.color = ocData.color;
-					this.editDetails.contract_cid = ocData.contract_cid;
-					this.editDetails.order_id = ocData.order_id;
-					this.editDetails.disc_rate = ocData.disc_rate;
-					this.editDetails.location_id = ocData.location_id;
-					this.editDetails.big_class = ocData.big_class;
-					this.editDetails.is_free = ocData.is_free;
-					this.editDetails.is_print = ocData.is_print;
-					this.editDetails.table_head = ocData.table_head;
-					this.editDetails.remark = ocData.remark;
-					this.editDetails.customer_test_id = ocData.customer_test_id;
-					this.editDetails.so_ver = ocData.so_ver;
-					this.editDetails.so_sequence_id = ocData.so_sequence_id;
-					this.editDetails.ncv = '0';
-					this.editDetails.shipment_suit='1';
-					this.editDetails.state='0';
-					}
-					else{
 					//////在表格中插入行的方法有兩種：
 					//////第一種方法，替換當前行的值
 					row.goods_id = ocData.goods_id;
@@ -404,16 +359,14 @@ var Main = {
 					//////第二種方法，刪除當前行，再插入新的行，但這種方法插入後，單元格會失去焦點，要重新點擊以獲取焦點
 					// this.tableDetails.splice(this.selectedRowIndex,1);
 					// this.tableDetails.push(ocData.ocDetails);
-					}
-					
-					if(ocData.location_id.substr(0,1)=='Y')
+					if(row.location_id.substr(0,1)=='Y')
 						this.formData.issues_wh='H';
 					else
 						this.formData.issues_wh='D';
-					const find_mo_id=this.tableFareDetails.find(fare_mo_id=>fare_mo_id.mo_id===mo_id);//row.mo_id
+					const find_mo_id=this.tableFareDetails.find(fare_mo_id=>fare_mo_id.mo_id===row.mo_id);
 					if(find_mo_id==undefined)
 					{
-					if(ocData.ocOtherFare[0].mo_id!=null)
+					if(ocData.ocOtherFare[0].mo_id!='')
 					{
 					for (var i = 0; i < ocData.ocOtherFare.length; i++) {
 						var ocOtherFare=ocData.ocOtherFare[i];
@@ -428,6 +381,7 @@ var Main = {
 					}
 					this.getGoodsWegFromStore(row);
 					this.sumGoodsAmt(row);
+					
 				}
             },
             (response) => {
@@ -448,44 +402,19 @@ var Main = {
 		},
 		sumGoodsAmt(row)
 		{
+			// this.checkGoodsQty(row);
 			let total_sum=0;
-			let u_invoice_qty=0;
-			let invoice_price=0;
-			let disc_rate=0;
+			let u_invoice_qty=row.u_invoice_qty;
+			let invoice_price=row.invoice_price;
+			let disc_rate=row.disc_rate;
 			let disc_amt=0;
-			let goods_unit_rate=0;
-			let p_unit_rate=1; 
-			if(row==null)
-			{
-			u_invoice_qty=this.editDetails.u_invoice_qty;
-			invoice_price=this.editDetails.invoice_price;
-			disc_rate=this.editDetails.disc_rate;
-			disc_amt=0;
-			this.editDetails.disc_price = Number((invoice_price - (invoice_price * (disc_rate/100))).toFixed(2));//折扣後單價
-			if(this.editDetails.goods_unit==this.editDetails.p_unit)
-				total_sum=u_invoice_qty * invoice_price;
-			else
-			{
-				const Unit=this.QtyUnitRateList.find(Unit=>Unit.value===this.editDetails.goods_unit);
-				goods_unit_rate=Unit.rate;
-				p_unit_rate=this.QtyUnitRateList.find(Unit=>Unit.value===this.editDetails.p_unit).rate;
-				total_sum=((u_invoice_qty * goods_unit_rate ) / p_unit_rate) * invoice_price
-			}
-			disc_amt=Number((total_sum * (disc_rate/100)).toFixed(2));//折扣額
-			this.editDetails.disc_amt=disc_amt;
-			this.editDetails.total_sum=Number(total_sum - disc_amt).toFixed(2);
-			}
-			else
-			{
-			u_invoice_qty=row.u_invoice_qty;
-			invoice_price=row.invoice_price;
-			disc_rate=row.disc_rate;
-			disc_amt=0;
 			row.disc_price = Number((invoice_price - (invoice_price * (disc_rate/100))).toFixed(2));//折扣後單價
 			if(row.goods_unit==row.p_unit)
 				total_sum=u_invoice_qty * invoice_price;
 			else
 			{
+				let goods_unit_rate=0;
+				let p_unit_rate=1;
 				const Unit=this.QtyUnitRateList.find(Unit=>Unit.value===row.goods_unit);
 				goods_unit_rate=Unit.rate;
 				p_unit_rate=this.QtyUnitRateList.find(Unit=>Unit.value===row.p_unit).rate;
@@ -494,7 +423,6 @@ var Main = {
 			disc_amt=Number((total_sum * (disc_rate/100)).toFixed(2));//折扣額
 			row.disc_amt=disc_amt;
 			row.total_sum=Number(total_sum - disc_amt).toFixed(2);
-			}
 			this.sumInvAmt();
 		},
 		sumOtherFareAmt(row)
@@ -523,33 +451,14 @@ var Main = {
 			// this.formData.total_sum=this.formatterAmount(this.formData.total_sum);
 		},
 		getGoodsWegFromStore(row){
-			let mo_id='';
-			let goods_id='';
-			let location_id='';
-			let u_invoice_qty='';
-			let goods_unit='';
-			if(row==null)
-			{
-				mo_id=this.editDetails.mo_id;
-				goods_id=this.editDetails.goods_id;
-				location_id=this.editDetails.location_id;
-				u_invoice_qty=this.editDetails.u_invoice_qty;
-				goods_unit=this.editDetails.goods_unit;
-			}
-			else
-			{
-				mo_id=row.mo_id;
-				goods_id=row.goods_id;
-				location_id=row.location_id;
-				u_invoice_qty=row.u_invoice_qty;
-				goods_unit=row.goods_unit;
-			}
+			let mo_id=row.mo_id;
+			let goods_id=row.goods_id;
+			let location_id=row.location_id;
+			let u_invoice_qty=row.u_invoice_qty;
+			let goods_unit=row.goods_unit;
 			axios.post("GetGoodsWegFromStore", {mo_id,goods_id,location_id,u_invoice_qty,goods_unit }).then(
             (response) => {
-				if(row==null)
-					this.editDetails.sec_qty=response.data;
-				else
-					row.sec_qty=response.data;
+				row.sec_qty=response.data;
             },
             (response) => {
                 alert(response.status);
@@ -798,53 +707,19 @@ var Main = {
 			// alert("1");
 		},
         editRowEvent (row) {
-            // this.editDetails = {
-                // EditFlag: 0,
-				// mo_id:row.mo_id,
-				// shipment_suit:row.shipment_suit,
-                // goods_id: row.goods_id,
-                // table_head: row.table_head,
-                // goods_name: row.goods_name,
-                // u_invoice_qty:row.u_invoice_qty,
-                // goods_unit: row.goods_unit,
-                // sec_qty: row.sec_qty,
-				// sec_unit:row.sec_unit,
-				// invoice_price:row.invoice_price,
-                // disc_rate: row.disc_rate,
-                // disc_price: row.disc_price,
-                // total_sum: row.total_sum,
-                // disc_amt:row.disc_amt,
-                // buy_id: row.buy_id,
-                // order_id: row.order_id,
-				// issues_id:row.issues_id,
-				// ref1:row.ref1,
-                // ref2: row.ref2,
-                // ncv: row.ncv,
-                // apprise_id: row.apprise_id,
-                // is_free:row.is_free,
-                // corresponding_code: row.corresponding_code,
-                // nwt: row.nwt,
-				// gross_wt:row.gross_wt,
-				// package_num:row.package_num,
-                // box_no: row.box_no,
-                // color: row.color,
-                // spec: row.spec,
-                // subject_id:row.subject_id,
-                // contract_cid: row.contract_cid,
-                // Delivery_Require: row.Delivery_Require,
-				// location_id:row.location_id,
-				// brand_category:row.brand_category,
-                // customer_test_id: row.customer_test_id,
-                // customer_goods: row.customer_goods,
-                // customer_color_id: row.customer_color_id,
-                // remark:row.remark
-            // }
-			
+            this.editDetails = {
+                EditFlag: 0,
+                GoodsID: row.GoodsID,
+                GoodsCname: row.GoodsCname,
+                RequestQty: row.RequestQty,
+                RequestDate:row.RequestDate,
+                WipID: row.WipID,
+                NextWipID: row.NextWipID
+            }
             //深度複製一個對象，用來判斷數據是否有修改
             this.preveditDetails = JSON.parse(JSON.stringify(this.editDetails));
-            this.selectRow = row;
-			Object.assign(this.editDetails,this.selectRow );
-            this.showEdit = true;
+            this.selectRow = row
+            this.showEdit = true
         },
         saveEvent() {
             if (!this.validData())
@@ -1263,7 +1138,7 @@ var Main = {
         },
         printReport(){
             if(this.curReportRow){
-                console.log(this.curReportRow.reportid);
+                this.showPrint = false;
                 var url= "Print?ID=" + this.formData.ID + "&Ver=" + this.formData.Ver+"&report_id=" + this.curReportRow.reportid;
                 comm.showMessageDialog(url,'列印',1024,768,true);
             }else{
@@ -1285,12 +1160,9 @@ var Main = {
                        // }
                    // }
                    // console.log(this.editFormChanged);
-				    if(this.formData.it_customer!=null)
-						this.formData.it_customer=this.formData.it_customer.toUpperCase();
-				    if(this.formData.phone!=null)
-						this.formData.phone=this.formData.phone.toUpperCase();
-					if(this.formData.fax!=null)
-						this.formData.fax=this.formData.fax.toUpperCase();
+				   this.formData.it_customer=this.formData.it_customer.toUpperCase();
+				   this.formData.phone=this.formData.phone.toUpperCase();
+				   this.formData.fax=this.formData.fax.toUpperCase();
                },
                deep: true
             },

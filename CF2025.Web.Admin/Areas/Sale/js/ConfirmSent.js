@@ -4,6 +4,7 @@ var Main = {
     data() {
         return {
             tableDetails: [],
+			headerCellStyle: { background: '#F5F7FA', color: '#606266', height: '25px', padding: '2px' },
             loading3: false,
 			showSent:false,
             formData:{
