@@ -15,7 +15,7 @@
     <!--表頭記錄-->
 
     <div>
-        <vxe-form :data="formData" size="mini"  title-align="right" title-width="100px" prevent-submit title-colon custom-layout>@* style="width:350px"*@
+        <vxe-form :data="formData" size="mini"  title-align="right" style="min-width: 1024px;" title-width="100px" prevent-submit title-colon custom-layout>@* style="width:350px"*@
                  <vxe-form-item title="發票日期" field="oi_date_from" :item-render="{}" class="vxe-form-item-group-search" span="8">
                     <template #default="{ data }" class="aa">
                         <vxe-input type="date" v-model="data.oi_date_from" class="vxe-form-item-input-search"></vxe-input>
@@ -63,8 +63,10 @@
                    show-overflow
                    height="550"
                    size="mini"
+                   :header-cell-style="headerCellStyle"
                    :row-config="{height: 20}"
                    highlight-current-row
+                   show-header-overflow
                    ref="xTable"
                    :loading="loading3"
                    :checkbox-config="{highlight: true, range: true}"
@@ -107,7 +109,7 @@
                     <vxe-input v-model="row.cust_cname" style="height:20px"></vxe-input>
                 </template>
             </vxe-column>
-            <vxe-column field="seller_id" title="銷售員編號" width="80" :edit-render="{}">
+            <vxe-column field="seller_id" title="銷售員編號" width="100" :edit-render="{}">
                 <template #edit="{ row }">
                     <vxe-input v-model="row.seller_id" style="height:20px"></vxe-input>
                 </template>
@@ -134,7 +136,7 @@
             </vxe-column>
         </vxe-table>
     </div>
-    <!--彈窗處理發貨確認-->
+    <!--明細表記錄-->
     <vxe-modal ref="xModalSent" v-model="showSent" title="發貨確認" width="500" height="300" resize destroy-on-close>
 
         <template #default>
@@ -161,6 +163,6 @@
     </vxe-modal>
 </div>
 @section PageSpecificJavascriptIncludes{
-    <script src="~/Areas/Sale/js/DealWithInvoice.js?v=@Guid.NewGuid().ToString()"></script>
+    <script src="~/Areas/Sale/js/ConfirmSent.js?v=@Guid.NewGuid().ToString()"></script>
 
 }

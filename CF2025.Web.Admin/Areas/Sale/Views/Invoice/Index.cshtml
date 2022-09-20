@@ -30,7 +30,7 @@
     </vxe-toolbar>
     <!--表頭記錄-->
     <div>
-        <vxe-form :data="formData" size="mini"  title-align="right" title-width="100px" prevent-submit title-colon custom-layout>@**@
+        <vxe-form :data="formData" size="mini"  title-align="right" style="min-width: 1024px;max-width:1600px" title-width="100px" prevent-submit title-colon custom-layout>@**@
                 <vxe-form-item title="編號" field="ID" :item-render="{}" span="6" class="vxe-form-item-group">
                     <template #default="{ data }">
                         <vxe-input v-model="data.ID" class="input-customize" style="width:74%" @@blur="getInvoiceByID(data.ID)"></vxe-input>
@@ -373,8 +373,10 @@
                    show-overflow
                    height="350"
                    size="mini"
+                   :header-cell-style="headerCellStyle"
                    :row-config="{height: 20,isCurrent: true, isHover: true}"
                    highlight-current-row
+                   show-header-overflow
                    ref="xTable"
                    :loading="loading3"
                    :sync-resize="selectTab"
@@ -627,6 +629,7 @@
                    show-overflow
                    height="150"
                    size="mini"
+                   :header-cell-style="headerCellStyle"
                    :row-config="{height: 20}"
                    highlight-current-row
                    ref="xTableFare"
