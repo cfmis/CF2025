@@ -194,6 +194,9 @@
             parent.app.findByID();//調用父窗口的函數
             parent.comm.closeWindow();//关闭窗口
         },
+        exitEvent(){
+            parent.comm.closeWindow();//关闭窗口
+        },
         //查詢
         searchEvent() {            
             var $table = this.$refs.tableConditionRef;

@@ -18,6 +18,10 @@
         .my-black {
           color: #000000;
         }   
+        .span{
+            color:red;
+            /*font-weight:bold;*/
+        }
     </style>
 }
 <div id="app"> 
@@ -29,6 +33,7 @@
         <legend>查詢條件</legend>
         <vxe-toolbar perfect size="small" style="height:35px;margin-bottom:0px">
             <template #buttons style="height:35px;margin-bottom:10px">
+                <vxe-button icon="iconfont icon-Cancel" @@click="exitEvent()"><span class="span">退出</span></vxe-button>
                 <vxe-button icon="iconfont icon-row-add" @@click="insertRowEvent()">項目增加</vxe-button>
                 <vxe-button icon="iconfont icon-row-del" @@click="delRowEvent()" style="margin-left: -2px">項目刪除</vxe-button>
                 <vxe-button icon="iconfont icon-save1 my-black" @@click="saveEvent()" style="margin-left: -2px">保存</vxe-button>
