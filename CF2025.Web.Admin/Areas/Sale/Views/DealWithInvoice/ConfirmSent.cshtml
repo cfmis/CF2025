@@ -4,25 +4,6 @@
     ViewBag.Title = "Index";
 }
 
-@section PageSpecificStyleSheetIncludes1{
-<style>
-    .vxe-form-item-width-search {
-        width: 350px !important;
-        height: 20px;
-        /*background-color:aqua;*/
-    }
-    .input-search {
-            height: 20px;
-            font-size: 10px;
-            width: 40% !important;
-        }
-    .input-search1 {
-            height: 20px;
-            font-size: 10px;
-            width: 86% !important;
-        }
-</style>
-}
 
 <div id="app">
     <vxe-toolbar perfect size="medium" style="height:35px" class="tools-menus" >
@@ -35,40 +16,40 @@
 
     <div>
         <vxe-form :data="formData" size="mini"  title-align="right" title-width="100px" prevent-submit title-colon custom-layout>@* style="width:350px"*@
-                 <vxe-form-item title="發票日期" field="oi_date_from" :item-render="{}" class="vxe-form-item-width-search" span="8">
+                 <vxe-form-item title="發票日期" field="oi_date_from" :item-render="{}" class="vxe-form-item-group-search" span="8">
                     <template #default="{ data }" class="aa">
-                        <vxe-input type="date" v-model="data.oi_date_from" class="input-search"></vxe-input>
+                        <vxe-input type="date" v-model="data.oi_date_from" class="vxe-form-item-input-search"></vxe-input>
                         <vxe-label name="label1"> ~ </vxe-label>
-                        <vxe-input type="date" v-model="data.oi_date_to" class="input-search"></vxe-input>
+                        <vxe-input type="date" v-model="data.oi_date_to" class="vxe-form-item-input-search"></vxe-input>
                     </template>
                 </vxe-form-item>
-                <vxe-form-item title="發貨日期" field="sd_date_from" :item-render="{}" class="vxe-form-item-width-search" span="8">
+                <vxe-form-item title="發貨日期" field="sd_date_from" :item-render="{}" class="vxe-form-item-group-search" span="8">
                     <template #default="{ data }">
-                        <vxe-input type="date" v-model="data.sd_date_from" class="input-search"></vxe-input>
+                        <vxe-input type="date" v-model="data.sd_date_from" class="vxe-form-item-input-search"></vxe-input>
                         <vxe-label name="label2">~</vxe-label>
-                        <vxe-input type="date" v-model="data.sd_date_to" class="input-search"></vxe-input>
+                        <vxe-input type="date" v-model="data.sd_date_to" class="vxe-form-item-input-search"></vxe-input>
                     </template>
                 </vxe-form-item>
-                <vxe-form-item title="客戶編號" field="it_customer_from" :item-render="{}" class="vxe-form-item-width-search" span="8">
+                <vxe-form-item title="客戶編號" field="it_customer_from" :item-render="{}" class="vxe-form-item-group-search" span="8">
                     <template #default="{ data }">
-                        <vxe-input v-model="data.it_customer_from" class="input-search"></vxe-input>
+                        <vxe-input v-model="data.it_customer_from" class="vxe-form-item-input-search"></vxe-input>
                         <vxe-label name="label3">~</vxe-label>
-                        <vxe-input v-model="data.it_customer_to" class="input-search"></vxe-input>
+                        <vxe-input v-model="data.it_customer_to" class="vxe-form-item-input-search"></vxe-input>
                     </template>
                 </vxe-form-item>
-                <vxe-form-item title="發票編號" field="ID" :item-render="{}" class="vxe-form-item-width-search" span="8">
+                <vxe-form-item title="發票編號" field="ID" :item-render="{}" class="vxe-form-item-group-search" span="8">
                     <template #default="{ data }">
-                        <vxe-input v-model="data.ID" class="input-search1"></vxe-input>
+                        <vxe-input v-model="data.ID" class="vxe-form-item-input-search1"></vxe-input>
                     </template>
                 </vxe-form-item>
-                <vxe-form-item title="頁數" field="mo_id" :item-render="{}" class="vxe-form-item-width-search" span="8">
+                <vxe-form-item title="頁數" field="mo_id" :item-render="{}" class="vxe-form-item-group-search" span="8">
                     <template #default="{ data }">
-                        <vxe-input v-model="data.mo_id" class="input-search1"></vxe-input>
+                        <vxe-input v-model="data.mo_id" class="vxe-form-item-input-search1"></vxe-input>
                     </template>
                 </vxe-form-item>
-                <vxe-form-item title="發貨狀態" field="state" :item-render="{}" class="vxe-form-item-width-search" span="8">
+                <vxe-form-item title="發貨狀態" field="state" :item-render="{}" class="vxe-form-item-group-search" span="8">
                     <template #default="{ data }">
-                        <vxe-select v-model="data.state" class="input-search1" size="mini">
+                        <vxe-select v-model="data.state" class="vxe-form-item-input-search1" size="mini">
                             <vxe-option v-for="item in set_state_list" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
                         </vxe-select>
                     </template>
