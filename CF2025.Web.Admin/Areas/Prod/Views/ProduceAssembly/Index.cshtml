@@ -380,34 +380,7 @@
 
             </vxe-form>
           </template>
-        </vxe-modal>
-        
-
-        @*用戶密碼確認*@        
-        @*<vxe-modal v-model="showPwd" title="用戶密碼確認" width="500" min-width="500" min-height="300" resize destroy-on-close type='confirm'>
-        <div style="margin-top:40px;margin-bottom:60px;margin-right:0px">
-             <vxe-form :data="loginData" ref="formHead" size="mini" title-align="right" title-width="100px" style="width:80%" custom-layout>
-                <vxe-form-item title="用戶:" :item-render="{}" span="24" class="my-vxe-form-item">
-                    <vxe-input v-model="loginData.user_id" maxlength="20" class="input-customize" @@blur="getUserName(loginData.user_id)" ></vxe-input>
-                </vxe-form-item>
-                <vxe-form-item title=" " :item-render="{}" span="24" class="my-vxe-form-item">
-                    <vxe-input v-model="loginData.user_name" maxlength="30" class="input-customize" readonly ></vxe-input>
-                </vxe-form-item>
-                    <vxe-form-item title="密碼:" :item-render="{}" span="24" class="my-vxe-form-item">
-                    <vxe-input v-model="loginData.password" maxlength="20" class="input-customize" placeholder="請輸入密码" type="password"></vxe-input>
-                </vxe-form-item>
-             </vxe-form>
-        </div>
-
-        <vxe-toolbar perfect size="small" style="height:35px;margin-bottom:0px;" align="center">
-            <template #buttons style="height:35px;margin-bottom:10px;">
-                <vxe-button icon="iconfont icon-cancel" @@click="cancelEvent()">取消</vxe-button>
-                <vxe-button status="success" icon="iconfont icon-confirm4" @@click="confirmEvent()" style="margin-left: 50px">確認</vxe-button>
-            </template>
-        </vxe-toolbar>
-        <span slot="footer" class="dialog-footer"><el-button type="primary" >确定</el-button> <el-button type="info" >取 消</el-button> </span>
-        </vxe-modal>*@
-                
+        </vxe-modal>     
 
         @*彈窗:表格一中根據生產計劃流程,顯示部門相關流程*@
         <vxe-modal v-model="showGoods" title="貨品編碼" width="750" :position="{top: showGoodsY, left: showGoodsX}":mask="false" resize destroy-on-close>
