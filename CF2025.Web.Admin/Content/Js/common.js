@@ -9,11 +9,7 @@ var comm= {
     }, 
     openPassword: function(user_id){
         var url = "/Base/Common/PasswordConfirm?user_id=" + user_id;
-        this.showMessageDialog(url, "密碼確認", 500, 300, true); 
-       //return new Promise(resolve => {           
-       //     setTimeout(this.showMessageDialog(url, "密碼確認1", 500, 300, true), 1000);
-       // }); 
-        
+        this.showMessageDialog(url, "密碼確認", 500, 300, true);
     }, 
     showMessageDialog: function(url, title, width, height, shadow){ 
         var content = '<iframe src="' + url + '" width="100%" height="99%" frameborder="0" scrolling="no"></iframe>';       
@@ -32,27 +28,6 @@ var comm= {
             }
         });
         win.dialog('open');
-
-        //return new Promise(function(resolve){
-        //    setTimeout(function(){
-        //        var content = '<iframe src="' + url + '" width="100%" height="99%" frameborder="0" scrolling="no"></iframe>';       
-        //        //content += '<a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" style="width:80px" onclick="javascript:$(' + '\'#msgwindow\'' + ').dialog(' + '\'close\'' + ')">' + '关闭' + '</a>';
-        //        var boarddiv = '<div id="msgwindow" title="' + title + '"></div>'//style="overflow:hidden;"可以去掉滚动条       
-        //        $(document.body).append(boarddiv);
-        //        var win = $('#msgwindow').dialog({
-        //            content: content,
-        //            width: width,
-        //            height: height,
-        //            modal: shadow,
-        //            title: title,
-        //            onClose: function () {
-        //                //$(this).dialog('destroy');//后面可以关闭后的事件
-        //                //document.getElementById('btnSerach').click();
-        //            }
-        //        });
-        //        win.dialog('open');
-        //    },500)
-        //})
     },
     closeWindow:function(){
         $('#msgwindow').dialog('close');
@@ -209,7 +184,7 @@ var comm= {
                 result = res.data;
             });
         return result;
-    },
+    },  
 
     //獲取當前日期時間
     getWipID: async  function() {
