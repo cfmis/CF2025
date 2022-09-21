@@ -4,6 +4,9 @@
 @section PageSpecificStyleSheetIncludes{ 
    <style></style>
 }
+@section common_item_group{
+    <link rel="stylesheet" href="~/Content/Styles/common-item-group.css" />
+}
 <div id="app">
     <vxe-toolbar perfect size="small" style="height:30px;margin-bottom:0px;min-width:1024px;" >
         <template #buttons style="height:30px;margin-bottom:5px">
@@ -61,11 +64,8 @@
                 <vxe-form-item title="經手人" :item-render="{}" span="6" class="vxe-form-item-group">
                     <vxe-input v-model="headData.handler" maxlength="20" class="input-customize" :readonly="isReadOnly"></vxe-input>
                 </vxe-form-item>
-                @*<vxe-form-item title="" :item-render="{}" span="6" class="vxe-form-item-group"></vxe-form-item>*@          
-
-               
-                @*<vxe-form-item title="" :item-render="{}" span="6" class="vxe-form-item-group"> </vxe-form-item>*@
-         
+                @*<vxe-form-item title="" :item-render="{}" span="6" class="vxe-form-item-group"></vxe-form-item>*@  
+                @*<vxe-form-item title="" :item-render="{}" span="6" class="vxe-form-item-group"> </vxe-form-item>*@         
                 <vxe-form-item title="建檔人" :item-render="{}" span="6" class="vxe-form-item-group">
                     <vxe-input v-model="headData.create_by" maxlength="20" class="input-customize" readonly></vxe-input>
                 </vxe-form-item>
@@ -387,6 +387,7 @@
             <template #default>
               <vxe-toolbar perfect size="small" style="height:40px;margin-bottom:0px;background:#F5F7FA">
                     <template #buttons style="height:35px;margin-bottom:0px">
+                        <vxe-button icon="iconfont icon-Cancel" @@click="showGoods=false"><span style="color:red">退出</span></vxe-button>    
                         <vxe-button status="primary" size="mini" icon="iconfont icon-confirm4" @@click="changeItem()" content="確認"></vxe-button>
                     </template>
               </vxe-toolbar>

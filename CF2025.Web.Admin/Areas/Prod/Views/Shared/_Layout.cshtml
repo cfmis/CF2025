@@ -31,38 +31,9 @@
     <script type="text/javascript" src="~/Scripts/axios.js"></script>
     @*<script src="~/Content/Js/common.js?v=@Guid.NewGuid().ToString()"></script>*@
     <script src="~/Content/Js/common.js"></script>
-    <script src="~/Content/ElementUI/js/element-ui.js"></script>    
-    <style>
-        .vxe-form-item-group {
-            width: 250px !important;
-            height: 20px;
-            /*background-color:aqua;*/
-        }
-
-        .vxe-form-item-model {
-            width: 250px !important;
-            height: 20px;
-            /*background-color:aqua;*/
-        }
-
-        .vxe-form-item-group-search {
-            width: 350px !important;
-            height: 20px;
-            /*background-color:aqua;*/
-        }
-
-        .vxe-form-item-input-search {
-            height: 20px;
-            font-size: 10px;
-            width: 40% !important;
-        }
-
-        .vxe-form-item-input-search1 {
-            height: 20px;
-            font-size: 10px;
-            width: 86% !important;
-        }
-    </style>
+    <script src="~/Content/ElementUI/js/element-ui.js"></script> 
+    @RenderSection("common_item_group", required: false)   
+    
 
 </head>
 <body>

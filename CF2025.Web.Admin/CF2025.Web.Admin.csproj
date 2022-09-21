@@ -337,6 +337,7 @@
     <Content Include="Content\iconfont\iconfont.js" />
     <Content Include="Content\Js\common.js" />
     <Content Include="Content\Styles\111jquery.thickbox.css" />
+    <Content Include="Content\Styles\common-item-group.css" />
     <Content Include="Content\Styles\common.css" />
     <Content Include="Content\Styles\custom-el-select.css" />
     <Content Include="Content\Styles\thickbox.css" />

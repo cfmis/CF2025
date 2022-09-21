@@ -16,18 +16,22 @@
         }
         .my-black {
             color: #000000;
+        }
+        .my-font-color{
+            color:red;
+            /*font-weight:bold;*/
         }        
     </style>
     
 }
 <div id="app">
-    @*查詢*@
-   
+    @*查詢*@  
 
     <fieldset class="my_fieldset">
         <legend>查詢條件</legend>
         <vxe-toolbar perfect size="small" style="height:35px;margin-bottom:0px">
-            <template #buttons style="height:35px;margin-bottom:10px">                
+            <template #buttons style="height:35px;margin-bottom:10px">
+                <vxe-button icon="iconfont icon-Cancel" @@click="exitEvent()"><span class="my-font-color">退出</span></vxe-button>            
                 <vxe-button status="primary" icon="iconfont icon-search1" @@click="searchEvent()" style="margin-left: 50px">查詢</vxe-button>
                 <vxe-button status="success" icon="iconfont icon-confirm4" @@click="okEvent()" style="margin-left: 50px">確認</vxe-button>
             </template>
@@ -35,7 +39,7 @@
         <div>
             <vxe-form :data="formData" size="mini" title-align="right" title-width="100px" custom-layout >
                 <vxe-form-item title="類型" :item-render="{}" span="12" class="vxe-form-item-customize">
-                    <el-select v-model="formData.type" filterable clearable style="width:100%">
+                    <el-select v-model="formData.type" filterable @*clearable*@ style="width:100%">
                         <el-option v-for="item in typeList" :key="item.value" :value="item.value" :label="item.label" style="height:25px;font-size: 9px" />
                     </el-select>
                 </vxe-form-item>
