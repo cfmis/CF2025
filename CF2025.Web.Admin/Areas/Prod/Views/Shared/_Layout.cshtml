@@ -31,8 +31,9 @@
     <script type="text/javascript" src="~/Scripts/axios.js"></script>
     @*<script src="~/Content/Js/common.js?v=@Guid.NewGuid().ToString()"></script>*@
     <script src="~/Content/Js/common.js"></script>
-    <script src="~/Content/ElementUI/js/element-ui.js"></script>
-
+    <script src="~/Content/ElementUI/js/element-ui.js"></script> 
+    @RenderSection("common_item_group", required: false)   
+    
 
 </head>
 <body>

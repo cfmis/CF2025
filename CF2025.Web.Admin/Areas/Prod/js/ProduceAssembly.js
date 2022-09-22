@@ -1201,7 +1201,7 @@
             }
             //保存前對成份明細資料2進行有效性檢查
             let items_update = null,row_no=0,sequence_id="",check_tableData2_flag = true;
-            let strDept="102,202,302,122,222,322,104,124";
+            let strDept="102,202,302,122,222,322,104,124"; //定義開料部門
             for(let i=0;i<$table.tableData.length;i++){
                 row_no = i+1;
                 items_update = $table.tableData[i];
@@ -1388,7 +1388,7 @@
                     }
                 }                
                 //--end
-                //--start从生产数据库中批量增加时,有可能生产计划中的流程已经改变
+                //--start从生产数据库中批量增加时,有可能生产计划中的流程已经改变,所以此處保存前檢查是否有對應的生產計劃
                 if(ls_in_dept !=''){
                     await axios.post("/ProduceAssembly/CheckIsExistsPlan",{mo_id:ls_mo_id, goods_id:ls_goods_id, wp_id:ls_assembly_dept, next_wp_id:ls_in_dept}).then(
                         (response) => {
@@ -1401,9 +1401,10 @@
                     }
                 }
                 //--end
+
                 //将当前数据Copy到移交单数据中
                 //dw_detail.RowsCopy(ll_row,ll_row,Primary!,ids_turn_over,ids_turn_over.RowCount() + 1,Primary!)
-                this.tmp_turn_over.push(JSON.parse(JSON.stringify(this.tableData1[li_row])));               
+                this.tmp_turn_over.push(JSON.parse(JSON.stringify(this.tableData1[li_row])));
                 //--判断当前流程是否有未完成的对应的QC流程,如果有提示当前组装数量是否包含QC数量
                 //檢查是否有交QC的流程  ldc_qc_qty = wf_get_qc_qty(ll_row)
                 await axios.post("/ProduceAssembly/GetQcQty",{mo_id:ls_mo_id, goods_id:ls_goods_id, wp_id:ls_assembly_dept}).then(
