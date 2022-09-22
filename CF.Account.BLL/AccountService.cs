@@ -98,7 +98,7 @@ namespace CF.Account.BLL
             CacheHelper.Remove(string.Format(_LoginInfoKeyFormat, token));
         }
 
-        public void ModifyPwd(User user)
+        public void ModifyPwd(t_User user)
         {
             user.Password = Encrypt.MD5(user.Password);
 
@@ -109,7 +109,7 @@ namespace CF.Account.BLL
                     if (!string.IsNullOrEmpty(user.NewPassword))
                         user.Password = Encrypt.MD5(user.NewPassword);
 
-                    dbContext.Update<User>(user);
+                    dbContext.Update<t_User>(user);
                 }
                 else
                 {
@@ -118,7 +118,7 @@ namespace CF.Account.BLL
             }
         }
 
-        public User GetUser(int id)
+        public t_User GetUser(int id)
         {
             using (var dbContext = new AccountDbContext())
             {
@@ -126,13 +126,13 @@ namespace CF.Account.BLL
             }
         }
 
-        public IEnumerable<User> GetUserList(UserRequest request = null)
+        public IEnumerable<t_User> GetUserList(UserRequest request = null)
         {
             request = request ?? new UserRequest();
 
             using (var dbContext = new AccountDbContext())
             {
-                IQueryable<User> users = dbContext.Users.Include("Roles");
+                IQueryable<t_User> users = dbContext.Users.Include("Roles");
 
                 if (!string.IsNullOrEmpty(request.LoginName))
                     users = users.Where(u => u.LoginName.Contains(request.LoginName));
@@ -144,13 +144,13 @@ namespace CF.Account.BLL
             }
         }
 
-        public void SaveUser(User user)
+        public void SaveUser(t_User user)
         {
             using (var dbContext = new AccountDbContext())
             {
                 if (user.ID > 0)
                 {
-                    dbContext.Update<User>(user);
+                    dbContext.Update<t_User>(user);
 
                     var roles = dbContext.Roles.Where(r => user.RoleIds.Contains(r.ID)).ToList();
                     user.Roles = roles;
@@ -158,14 +158,14 @@ namespace CF.Account.BLL
                 }
                 else
                 {
-                    var existUser = dbContext.FindAll<User>(u => u.LoginName == user.LoginName);
+                    var existUser = dbContext.FindAll<t_User>(u => u.LoginName == user.LoginName);
                     if (existUser.Count > 0)
                     {
                         throw new BusinessException("LoginName", "此登录名已存在！");
                     }
                     else
                     {
-                        dbContext.Insert<User>(user);
+                        dbContext.Insert<t_User>(user);
 
                         var roles = dbContext.Roles.Where(r => user.RoleIds.Contains(r.ID)).ToList();
                         user.Roles = roles;

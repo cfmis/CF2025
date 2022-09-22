@@ -17,7 +17,7 @@ namespace CF.Account.Contract
         public string Name { get; set; }
         public string Info { get; set; }
 
-        public virtual List<User> Users { get; set; }
+        public virtual List<t_User> Users { get; set; }
 
 
         public string BusinessPermissionString { get; set; }

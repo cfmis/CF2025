@@ -22,7 +22,7 @@ namespace CF2025.Sys.DAL
                 " Inner Join AuthorityLang b ON a.AuthorityID = b.AuthorityID" +
                 " Inner Join RoleAuthority c ON a.AuthorityID = c.AuthorityID" +
                 " Inner Join UserRole d ON c.RoleID = d.RoleID" +
-                " Inner Join [User] e ON d.UserID = e.ID" +
+                " Inner Join t_User e ON d.UserID = e.ID" +
                 " Where a.TypeID = '20000' And b.LangID = '" + LanguageID + "' And e.LoginName = '" + LoginName + "'";
             DataTable dtMenu = sh.ExecuteSqlReturnDataTable(strSql);
             for (int i = 0; i < dtMenu.Rows.Count; i++)
@@ -50,7 +50,7 @@ namespace CF2025.Sys.DAL
                 " Inner Join AuthorityLang b ON a.AuthorityID = b.AuthorityID" +
                 " Inner Join RoleAuthority c ON a.AuthorityID = c.AuthorityID" +
                 " Inner Join UserRole d ON c.RoleID = d.RoleID" +
-                " Inner Join [User] e ON d.UserID = e.ID";
+                " Inner Join t_User e ON d.UserID = e.ID";
             string strSql = strSql1 + " Where a.TypeID='20000' And b.LangID='" + LanguageID + "' And e.LoginName='" + LoginName + "'";
             DataTable dtMenu = sh.ExecuteSqlReturnDataTable(strSql);
             for (int i = 0; i < dtMenu.Rows.Count; i++)

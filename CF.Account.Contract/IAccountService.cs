@@ -8,11 +8,11 @@ namespace CF.Account.Contract
         LoginInfo GetLoginInfo(Guid token);
         LoginInfo Login(string loginName, string password,string languageid);
         void Logout(Guid token);
-        void ModifyPwd(User user);
+        void ModifyPwd(t_User user);
 
-        User GetUser(int id);
-        IEnumerable<User> GetUserList(UserRequest request = null);
-        void SaveUser(User user);
+        t_User GetUser(int id);
+        IEnumerable<t_User> GetUserList(UserRequest request = null);
+        void SaveUser(t_User user);
         void DeleteUser(List<int> ids);
 
         Role GetRole(int id);

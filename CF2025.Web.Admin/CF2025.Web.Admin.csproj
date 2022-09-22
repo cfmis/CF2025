@@ -294,6 +294,8 @@
     <Compile Include="Areas\Store\Controllers\TransferOutController.cs" />
     <Compile Include="Areas\Store\Controllers\TransferOutUnconfirmController.cs" />
     <Compile Include="Areas\Store\StoreAreaRegistration.cs" />
+    <Compile Include="Areas\Sys\Controllers\UserController.cs" />
+    <Compile Include="Areas\Sys\SysAreaRegistration.cs" />
     <Compile Include="Common\AdminCacheContext.cs" />
     <Compile Include="Common\AdminControllerBase.cs" />
     <Compile Include="Common\AdminCookieContext.cs" />
@@ -384,6 +386,10 @@
     <Content Include="Areas\Base\Views\PublicItemQuery\Index.cshtml" />
     <Content Include="Areas\Base\Views\Common\PasswordConfirm.cshtml" />
     <Content Include="Areas\Sale\Views\DealWithInvoice\ConfirmSent.cshtml" />
+    <Content Include="Areas\Sys\Views\web.config" />
+    <Content Include="Areas\Sys\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\Sys\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\Sys\Views\User\Pwd.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -445,6 +451,8 @@
     <Folder Include="Areas\Prod\Models\" />
     <Folder Include="Areas\Sale\Models\" />
     <Folder Include="Areas\Store\Models\" />
+    <Folder Include="Areas\Sys\js\" />
+    <Folder Include="Areas\Sys\Models\" />
     <Folder Include="Images\" />
     <Folder Include="Lib\" />
     <Folder Include="Reports\" />

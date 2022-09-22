@@ -63,7 +63,7 @@
             <form>
                 <div class="logoHead">
                     <!--<h2 style="margin-top: 15px">房产销售平台管理系统</h2>-->
-                    CF System Log In
+                    CF System LogIn
                 </div>
                 <div class="usernameWrapDiv">
                     <div class="usernameLabel">
@@ -162,15 +162,15 @@
             var loginPassword = $('#loginPassword').val();
             var languageID = $('#languageID').val();
             if ($.trim(loginUsername) == '' || $.trim(loginUsername).length<=0){
-                layer.alert("用户名不能为空");
+                layer.alert("賬號不能为空！");
                 return false;
             }
             if ($.trim(loginPassword) == '' || $.trim(loginPassword).length<=0){
-                layer.alert("密码不能为空");
+                layer.alert("密码不能为空！");
                 return false;
             }
             if ($.trim(languageID) != '0' && $.trim(languageID) != '1' && $.trim(languageID) != '2') {
-                layer.alert("語言不能为空");
+                layer.alert("語言不能为空!");
                 return false;
             }
             return true;
@@ -208,11 +208,13 @@
                     success:function (data) {
                         layer.close(loginLoadIndex);
                         var jsonData = JSON.parse(data);
-                        if (jsonData == 'OK'){
+                        if (jsonData == 'OK') {
                             window.location.href = 'Index';//'./static/templates/main.html';
                         }
-                        else
+                        else {
+                            layer.alert("賬號或密碼不正確!");
                             $('#loginBtn').val("Log In");
+                        }
                     },
                     error:function () {
                         layer.close(loginLoadIndex);
@@ -274,51 +276,51 @@
             })
         }
     </script>
-
-</body>
-<div class="registerPage">
-    <div class="registerDiv">
-        <form>
-            <div class="usernameWrapDiv">
-                <div class="usernameLabel">
-                    <label>用户名:</label>
+    <div class="registerPage">
+        <div class="registerDiv">
+            <form>
+                <div class="usernameWrapDiv">
+                    <div class="usernameLabel">
+                        <label>用户名:</label>
+                    </div>
+                    <div class="usernameDiv">
+                        <i class="layui-icon layui-icon-username adminIcon"></i>
+                        <input id="registerUsername" class="layui-input adminInput" type="text" name="username" placeholder="输入用户名">
+                    </div>
                 </div>
-                <div class="usernameDiv">
-                    <i class="layui-icon layui-icon-username adminIcon"></i>
-                    <input id="registerUsername" class="layui-input adminInput" type="text" name="username" placeholder="输入用户名">
+                <div class="usernameWrapDiv">
+                    <div class="usernameLabel">
+                        <label>密码:</label>
+                    </div>
+                    <div class="passwordDiv">
+                        <i class="layui-icon layui-icon-password adminIcon"></i>
+                        <input id="registerPassword" class="layui-input adminInput" type="password" name="password" placeholder="输入密码">
+                    </div>
                 </div>
-            </div>
-            <div class="usernameWrapDiv">
-                <div class="usernameLabel">
-                    <label>密码:</label>
+                <div class="usernameWrapDiv">
+                    <div class="usernameLabel">
+                        <label>确认密码:</label>
+                    </div>
+                    <div class="passwordDiv">
+                        <i class="layui-icon layui-icon-password adminIcon"></i>
+                        <input id="registerWellPassword" class="layui-input adminInput" type="password" name="password" placeholder="输入密码">
+                    </div>
                 </div>
-                <div class="passwordDiv">
-                    <i class="layui-icon layui-icon-password adminIcon"></i>
-                    <input id="registerPassword" class="layui-input adminInput" type="password" name="password" placeholder="输入密码">
+                <div class="usernameWrapDiv">
+                    <div class="usernameLabel">
+                        <label>角色类型:</label>
+                    </div>
+                    <div class="passwordDiv">
+                        <select id="roleSelect" class="layui-select">
+                            <option value="">请选择...</option>
+                            <option value="0">经纪人</option>
+                            <option value="1">房东</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <div class="usernameWrapDiv">
-                <div class="usernameLabel">
-                    <label>确认密码:</label>
-                </div>
-                <div class="passwordDiv">
-                    <i class="layui-icon layui-icon-password adminIcon"></i>
-                    <input id="registerWellPassword" class="layui-input adminInput" type="password" name="password" placeholder="输入密码">
-                </div>
-            </div>
-            <div class="usernameWrapDiv">
-                <div class="usernameLabel">
-                    <label>角色类型:</label>
-                </div>
-                <div class="passwordDiv">
-                    <select id="roleSelect" class="layui-select">
-                        <option value="">请选择...</option>
-                        <option value="0">经纪人</option>
-                        <option value="1">房东</option>
-                    </select>
-                </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
+</body>
+
 </html>
