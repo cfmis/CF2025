@@ -24,11 +24,12 @@ namespace CF2025.Web.Admin.Areas.Sale.Controllers
             return View();
         }
 
-        public JsonResult FindInvoice(string it_customer_from, string it_customer_to
+
+        public JsonResult FindInvoice(string search_type,string it_customer_from, string it_customer_to
             , string oi_date_from, string oi_date_to, string sd_date_from, string sd_date_to,string ID, string mo_id,string state)
         {
             //PlanDAL clsPlanDAL = new PlanDAL();
-            var result = DealWithInvoiceDAL.FindInvoice(it_customer_from, it_customer_to
+            var result = DealWithInvoiceDAL.FindInvoice(search_type,it_customer_from, it_customer_to
                 , oi_date_from, oi_date_to, sd_date_from, sd_date_to, ID, mo_id, state);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
@@ -45,6 +46,18 @@ namespace CF2025.Web.Admin.Areas.Sale.Controllers
                     break;
             }
             return Json(result, JsonRequestBehavior.AllowGet);
+        }
+        //收貨設定
+        [HttpPost]
+        public JsonResult ConfirmReceipt(List<InvoiceModel> InvoiceModel, string conf_flag, string return_state)
+        {
+            UpdateStatusModel result = new UpdateStatusModel();
+            result = DealWithInvoiceDAL.ConfirmReceipt(InvoiceModel, conf_flag, return_state);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult ConfirmReceipt()
+        {
+            return View();
         }
     }
 }

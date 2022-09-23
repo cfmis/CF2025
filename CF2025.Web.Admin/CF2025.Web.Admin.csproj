@@ -391,6 +391,7 @@
     <Content Include="Areas\Sys\Views\_ViewStart.cshtml" />
     <Content Include="Areas\Sys\Views\Shared\_Layout.cshtml" />
     <Content Include="Areas\Sys\Views\User\Pwd.cshtml" />
+    <Content Include="Areas\Sale\Views\DealWithInvoice\ConfirmReceipt.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
