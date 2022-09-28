@@ -249,22 +249,18 @@ namespace CF2025.Prod.DAL
 
         //保存
         public static string Save(jo_assembly_mostly headData, List<jo_assembly_details> lstDetailData1, List<jo_assembly_details_part> lstDetailData2, 
-            List<jo_assembly_details> lstDelData1, List<jo_assembly_details_part> lstDelData2, 
-            List<jo_assembly_details> lstTurnOver, List<jo_assembly_details> lstTurnOverQc )
+                                  List<jo_assembly_details> lstDelData1, List<jo_assembly_details_part> lstDelData2, 
+                                  List<jo_assembly_details> lstTurnOver, List<jo_assembly_details> lstTurnOverQc )
         {
             string str = "", lot_no = "";
             StringBuilder strSql = new StringBuilder(" SET XACT_ABORT ON ");
-            strSql.Append(@" BEGIN TRANSACTION ");
-            //string strSql = "", lot_no = "";            
-            //strSql += string.Format(@" SET XACT_ABORT ON ");
-            //strSql += string.Format(@" BEGIN TRANSACTION ");
-            
+            strSql.Append(" BEGIN TRANSACTION ");            
             string id = headData.id;
             string head_insert_status = headData.head_status;
             string sql_lot_no = string.Format(
-                    @"DECLARE @lot_no nvarchar(20)
-                       EXEC usp_create_lot_no '{0}','{1}','{2}',@lot_no OUTPUT
-                       SELECT @lot_no AS lot_no", within_code, headData.out_dept, headData.out_dept);
+                    @"DECLARE @lot_no nvarchar(20) 
+                      EXEC usp_create_lot_no '{0}','{1}','{2}',@lot_no OUTPUT 
+                      SELECT @lot_no AS lot_no", within_code, headData.out_dept, headData.out_dept);
             DataTable dtLotNo = new DataTable();
 
             if (head_insert_status == "NEW")//全新的單據
@@ -276,14 +272,11 @@ namespace CF2025.Prod.DAL
                 }
                 //***begin 更新系統表組裝轉換的最大單據編號
                 string dept_id = headData.out_dept;//105
-                string year_month = "";//model.id.Substring(6, 4);//2201
-                string bill_code = "";//model.id.Substring(1, 13);DC105220800001
-                year_month = headData.id.Substring(5, 4);//2201
-                bill_code = headData.id.Substring(1, 13);//C105220800001
+                string year_month = ""; //model.id.Substring(6, 4);//2201
+                string bill_code = "";  //model.id.Substring(1, 13);DC105220800001
+                year_month = headData.id.Substring(5, 4);   //2201
+                bill_code = headData.id.Substring(1, 13);   //C105220800001
                 string sql_sys_update1 = "";
-                //string sql_sys_id_find = string.Format(
-                //    @"SELECT bill_code FROM sys_bill_max_separate WHERE within_code='0000' AND bill_id='{0}' AND year_month='{1}' and bill_text2='{2}'",
-                //    "JO19", year_month, dept_id);
                 string sql_sys_id_insert = string.Format(
                     @" INSERT INTO sys_bill_max_separate(within_code,bill_code,bill_id,year_month,bill_text2,bill_text1,bill_text3,bill_text4,bill_text5) 
                     VALUES('0000','{0}','{1}','{2}','{3}','','','','')",
@@ -291,7 +284,6 @@ namespace CF2025.Prod.DAL
                 string sql_sys_id_udate = string.Format(
                     @" UPDATE sys_bill_max_separate SET bill_code='{0}' WHERE within_code='0000' AND bill_id='{1}' AND year_month='{2}' and bill_text2='{3}'",
                     bill_code, "JO19", year_month, dept_id);
-                //DataTable dt = sh.ExecuteSqlReturnDataTable(sql_sys_id_find);
                 if (bill_code.Substring(7, 5) != "00001")
                     sql_sys_update1 = sql_sys_id_udate;
                 else
@@ -302,17 +294,13 @@ namespace CF2025.Prod.DAL
                 string sql_max_id = string.Format(@"SELECT dbo.fn_zz_sys_bill_max_jo07('{0}','{1}','{2}') as id", headData.out_dept, headData.in_dept, "T");
                 DataTable dt = sh.ExecuteSqlReturnDataTable(sql_max_id);
                 string max_id = dt.Rows[0]["id"].ToString(); //max_id value is DT10560134510
-                string billCode = max_id.Substring(1, 12);//biiCode value is T10560134510
-                //string strSql_f = string.Format(
-                //    @"SELECT bill_code FROM sys_bill_max_jo07 WHERE within_code='0000' and bill_id='JO07' AND bill_text1='T' AND bill_text2='{0}' and bill_text3='{1}'",
-                //    headData.out_dept, headData.in_dept);
+                string billCode = max_id.Substring(1, 12);   //biiCode value is T10560134510
                 string strSql_i = string.Format(
                 @" INSERT INTO sys_bill_max_jo07(within_code,bill_id,year_month,bill_code,bill_text1,bill_text2,bill_text3,bill_text4,bill_text5) 
                 VALUES('0000','JO07','','{0}','T','{1}','{2}','','')",billCode, headData.out_dept, headData.in_dept);
                 string strSql_u = string.Format(
                 @" UPDATE sys_bill_max_jo07 SET bill_code='{0}' WHERE within_code='0000' AND bill_id='JO07' AND bill_text1='T' AND bill_text2='{1}' and bill_text3='{2}'",
                 billCode, headData.out_dept, headData.in_dept);
-                //dt = sh.ExecuteSqlReturnDataTable(strSql_f);
                 string sql_sys_update2 = "";
                 if (billCode.Substring(6,5) !="00001")
                     sql_sys_update2 = strSql_u;
@@ -457,7 +445,7 @@ namespace CF2025.Prod.DAL
             {
                 //首先處理刪除(表格一) 
                 //注意加選項with(ROWLOCK),只有用到主鍵時才會用到行級鎖
-                if (lstDelData1.Count > 0)
+                if (lstDelData1 != null)
                 {
                     string assembly_id = "", assembly_seq_id = "";
                     foreach (var item in lstDelData1)
@@ -474,7 +462,7 @@ namespace CF2025.Prod.DAL
                     }
                 }
                 //首先處理刪除(表格二)
-                if (lstDelData2.Count > 0)
+                if (lstDelData2 !=null)
                 {
                     foreach (var item in lstDelData2)
                     {
@@ -520,7 +508,7 @@ namespace CF2025.Prod.DAL
                             @" UPDATE jo_assembly_details with(Rowlock) 
                             Set jo_id='{3}',jo_sequence_id='{4}',goods_id='{5}',con_qty={6},unit_code='{7}',sec_qty={8},sec_unit='{9}', mo_id='{10}', package_num={11},
                             location='{12}',carton_code='{13}',lot_no='{14}',prd_id={15},qc_qty={16}
-                            WHERE within_code='{0} AND id='{1}' AND sequence_id='{2}'",
+                            WHERE within_code='{0}' AND id='{1}' AND sequence_id='{2}'",
                             within_code, headData.id, item.sequence_id, item.jo_id, item.jo_sequence_id, item.goods_id, item.con_qty, item.unit_code, item.sec_qty, item.sec_unit, 
                             item.mo_id, item.package_num, item.location, item.carton_code, lot_no, item.prd_id,item.qc_qty);                           
                             strSql.Append(str);
@@ -653,8 +641,9 @@ namespace CF2025.Prod.DAL
                             lot_no = item.lot_no;
                             str = string.Format(
                             @" UPDATE jo_assembly_details_part with(Rowlock) SET mo_id='{4}',goods_id='{5}',con_qty={6},unit_code='{7}',sec_qty={8},sec_unit='{9}',package_num={10},
-                            remark='{11}',bom_qty={12},base_qty={13},lot_no='{14}' WHERE within_code='{0}' AND id='{1}' AND upper_sequence='{2}' AND sequence_id='{3}'", 
-                            within_code,headData.id,item.upper_sequence,item.sequence_id,item.mo_id,item.goods_id,item.con_qty,item.unit_code,item.sec_qty,item.sec_unit,                           
+                            remark='{11}',bom_qty={12},base_qty={13},lot_no='{14}' 
+                            WHERE within_code='{0}' AND id='{1}' AND upper_sequence='{2}' AND sequence_id='{3}'", 
+                            within_code,headData.id,item.upper_sequence,item.sequence_id, item.mo_id,item.goods_id,item.con_qty,item.unit_code,item.sec_qty,item.sec_unit,                           
                             item.package_num, item.remark, item.bom_qty, item.base_qty, item.lot_no) ;
                         }
                         else
