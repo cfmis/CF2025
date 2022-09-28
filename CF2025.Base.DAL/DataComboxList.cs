@@ -22,23 +22,26 @@ namespace CF2025.Base.DAL
             string LanguageID = sh.ConvertLanguage(language_id);
             switch (SourceType)
             {
+                case "BillOrigin"://開單來源,單據種類等
+                    strSql += string.Format("SELECT id,name FROM sys_bill_origin WHERE function_id='JO06' AND [language]='{0}' AND [state]='0'", LanguageID);
+                    break;
                 case "QtyUnitList"://數量單位
-                    strSql += "Select id,name,english_name From cd_units Where kind='05' Order By id";
+                    strSql += "SELECT id,name,english_name FROM cd_units WHERE kind='05' Order By id";
                     break;
                 case "WegUnitList"://重量單位
-                    strSql += "Select id,name,english_name From cd_units Where kind='03' Order By id";                    
+                    strSql += "SELECT id,name,english_name FROM cd_units WHERE kind='03' Order By id";                    
                     break;
                 case "SalesmanList"://營業員&跟單員
-                    strSql += "Select id,id+'--'+name As name,english_name From cd_personnel Where within_code='" + within_code + "' And sales_group is not null and state='0' Order By id";
+                    strSql += "SELECT id,id+'--'+name As name,english_name FROM cd_personnel WHERE within_code='" + within_code + "' AND sales_group is not null AND state='0' Order By id";
                     break;
                 case "CurrList"://貨幣代號
-                    strSql += "Select id,id+'--'+name As name,english_name From cd_money Where within_code='" + within_code + "' Order By id";
+                    strSql += "SELECT id,id+'--'+name As name,english_name FROM cd_money WHERE within_code='" + within_code + "' Order By id";
                     break;
                 case "AccountList"://銀行賬號
-                    strSql += "Select abbreviate As id,accounts As name,accounts As english_name From cd_company_accounts Where within_code='" + within_code + "' Order By abbreviate";
+                    strSql += "SELECT abbreviate As id,accounts As name,accounts As english_name FROM cd_company_accounts WHERE within_code='" + within_code + "' Order By abbreviate";
                     break;
                 case "MoGroupList"://負責組別
-                    strSql += "Select id,id+'--'+name As name,english_name From cd_mo_type Where within_code='" + within_code + "' And mo_type='3' Order By id";
+                    strSql += "SELECT id,id+'--'+name As name,english_name FROM cd_mo_type WHERE within_code='" + within_code + "' AND mo_type='3' Order By id";
                     break;
                 case "LocationList"://倉庫
                     strSql += "SELECT id,id+'--'+ name AS name FROM cd_productline WHERE within_code='"+ within_code + "' AND state='0' AND id<>'ZZZ' ORDER BY id";
@@ -47,7 +50,7 @@ namespace CF2025.Base.DAL
                     strSql += "SELECT id,id+'--' + name AS name FROM it_customer WHERE within_code='" + within_code + "' AND customer_group='1' AND state<>'2' ORDER BY id";
                     break;
                 case "TackFareList"://附加費用
-                    strSql += "Select id,name,english_name From cd_tack_fare Where within_code='" + within_code + "' Order By id";
+                    strSql += "SELECT id,name,english_name FROM cd_tack_fare WHERE within_code='" + within_code + "' Order By id";
                     break;
                 case "issues_state_list"://發貨狀態
                     strSql += "SELECT id,id+'--' + name AS name FROM cd_mo_type WHERE within_code='" + within_code + "' AND mo_type='A' ORDER BY id";
@@ -58,9 +61,22 @@ namespace CF2025.Base.DAL
                 case "StateList"://狀態 
                     strSql += string.Format(@"SELECT id, matter as name FROM sy_bill_state WHERE language_id = '{0}'", LanguageID); ;
                     break;
+                case "BigClass"://大類
+                    strSql += "SELECT id,id+'--'+name AS name FROM cd_goods_class WHERE within_code='" + within_code + "' AND gc_type='0' AND state='0' ORDER BY id";
+                    break;
+                case "BaseClass"://中類(產品類型,貨品編碼的第3,4位)
+                    strSql += "SELECT DISTINCT id,id+'--'+name AS name FROM cd_goods_class WHERE within_code='" + within_code + "' AND gc_type='1' AND state='0' ORDER BY id";
+                    break;
+                case "SmallClass"://小類
+                    strSql += "SELECT id,id+'--'+name AS name FROM cd_goods_class WHERE within_code='" + within_code + "' AND gc_type='2' AND state='0' ORDER BY id";
+                    break;
+                case "Datum"://材質(產品類型,貨品編碼的第1,2位)
+                    strSql += "SELECT id,id+'--'+name AS name FROM cd_datum WHERE within_code='" + within_code + "' AND state='0' ORDER BY id";
+                    break;
+               
                 case "set_state_list"://設定狀態
                     strSql += "SELECT id,id+'--' + name AS name FROM cd_mo_type WHERE within_code='" + within_code + "' AND mo_type='T' ORDER BY id";
-                    break;
+                    break;               
                 default:
                     strSql += "";
                     break;

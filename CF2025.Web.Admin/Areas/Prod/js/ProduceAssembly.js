@@ -1236,20 +1236,12 @@
                 this.$XModal.alert({ content: `第${row_no}行:【${items_update.mo_id}】【${items_update.goods_id}】\n對應成份資料數據不完整,請返回檢查!`, mask: false });
                 return;
             }            
-            //保存前各项檢查,是否交QC,是否大于生产数等,返回放棄當前保存
+            //保存前各项檢查,是否交QC,是否大于生产数等
             await this.checkPreUpdate();
             if(!this.preUpdateFlag){
-                console.log("no pass");
-                //console.log(this.tmp_turn_over);
-                //console.log(this.tmp_turn_over_qc);
-                return;
-            }            
-            if(this.preUpdateFlag){
-                console.log("pass");
+                //各项檢查通不過
                 return;
             }
-           
-            return;
 
             //檢查成份庫存是否夠扣減
             //傳給后端的存儲過程的表數據類型參數結構
@@ -1258,7 +1250,7 @@
                 this.partData.push(
                     {within_code:'0000',out_dept:this.headData.out_dept,upper_sequence:this.originData2[i].upper_sequence,sequence_id:this.originData2[i].sequence_id,
                     mo_id:this.originData2[i].mo_id,goods_id:this.originData2[i].goods_id,lot_no:this.originData2[i].lot_no,con_qty:this.originData2[i].con_qty,
-                    sec_qty:this.originData2[i].sec_qty});                
+                    sec_qty:this.originData2[i].sec_qty});
             }
             var partData = this.partData;
             await this.checkStock(partData); //此處必須加await,且checkStock函數也要設置成同步執行
