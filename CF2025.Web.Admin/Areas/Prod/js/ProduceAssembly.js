@@ -33,7 +33,7 @@
             rowDataEdit: {
                 id: '', mo_id: '', goods_id: '', goods_name: '',con_qty: 0,  unit_code: 'PCS', sec_qty: 0.00,sec_unit: 'KG',lot_no:'', package_num: '0',color_name: '', 
                 four_color: '', app_supply_side: '', remark: '',
-                return_qty_nonce: '',sequence_id: '', location: '',carton_code:'', prd_id: 0,  jo_id:'',jo_sequence_id:'',row_status:''
+                return_qty_nonce: '',sequence_id: '', location: '',carton_code:'', prd_id: 0,  jo_id:'',jo_sequence_id:'',qc_qty:0,row_status:''
             },
             rowAssembly:{mo_id:'',goods_id:'',goods_name:'',lot_no:'',con_qty:0,unit_code:'PCS',sec_qty:0,sec_unit:'KG',package_num:0,remark:'',bom_qty:0,base_qty:0,
                 row_status:'',upper_sequence:'',sequence_id:''},
@@ -1270,11 +1270,10 @@
 
             this.headData.head_status = this.headEditFlag;//表頭新增或修改的標識
             var headData = JSON.parse(JSON.stringify(this.headData));
-            var lstDetailData1 = this.tableData1;
-            var lstDetailData2 = this.originData2;
-            var lstDelData1 = this.delData1;
-            var lstDelData2 = this.delData2;           
-            axios.post("/ProduceAssembly/Save",{headData,lstDetailData1,lstDetailData2,lstDelData1,lstDelData2 }).then(
+            var lstDetailData1 = this.tableData1, lstDetailData2 = this.originData2;
+            var lstDelData1 = this.delData1, lstDelData2 = this.delData2;     
+            var lstTurnOver = this.tmp_turn_over, lstTurnOverQc = this.tmp_turn_over_qc;
+            axios.post("/ProduceAssembly/Save",{headData,lstDetailData1,lstDetailData2,lstDelData1,lstDelData2,lstTurnOver,lstTurnOverQc}).then(
                 (response) => {
                     if(response.data=="OK"){                                  
                         this.setStatusHead(false);
@@ -1371,7 +1370,7 @@
                 ldc_sec_qty = parseFloat(this.tableData1[li_row].sec_qty);
                 ls_sequence_id = this.tableData1[li_row].sequence_id;                
                 li_prd_id = parseInt(this.tableData1[li_row].prd_id);
-                if(li_prd_id===null){
+                if(li_prd_id ===null){
                     li_prd_id=0;
                 }
                 //--start 檢查使用批量組裝功能時避免重復做組裝轉換
@@ -1388,6 +1387,7 @@
                     }
                 }                
                 //--end
+                
                 //--start从生产数据库中批量增加时,有可能生产计划中的流程已经改变,所以此處保存前檢查是否有對應的生產計劃
                 if(ls_in_dept !=''){
                     await axios.post("/ProduceAssembly/CheckIsExistsPlan",{mo_id:ls_mo_id, goods_id:ls_goods_id, wp_id:ls_assembly_dept, next_wp_id:ls_in_dept}).then(
@@ -1421,8 +1421,7 @@
                     if(!this.preUpdateFlag){
                         break;
                     }
-                    //--先计算正常移交单的数量
-                    var li_row_qc =0;
+                    //--先计算正常移交单的数量                    
                     if(ldc_assembly_qty > ldc_qc_qty){ //即有正常移交单数量的情况
                         ldc_qc_sec_qty = 0.01;  //默认QC重量
                         ldc_assembly_qty = ldc_assembly_qty - ldc_qc_qty;
@@ -1430,44 +1429,45 @@
                         if(ldc_sec_qty <0.01){
                             ldc_sec_qty = 0.01;  //默认最小重量
                         }
+                        Object.assign(this.tableData1[li_row].qc_qty, ldc_qc_qty);//記錄QC數量,以便于更新移交單
                         Object.assign(this.tmp_turn_over[li_row].con_qty, ldc_assembly_qty); //如果要生成交QC移交單,需修改原來非交QC移交單的數量
                         Object.assign(this.tmp_turn_over[li_row].sec_qty, ldc_sec_qty); //如果要生成交QC移交單,需修改原來非交QC移交單的重量
                         //插入一行交QC的移交單數據
                         this.tmp_turn_over_qc.push(JSON.parse(JSON.stringify(this.tableData1[li_row]))); //將當前數據Copy到移交單數據中
-                        li_row_qc = this.tmp_turn_over_qc.length;
-                        Object.assign(this.tmp_turn_over_qc[li_row_qc].con_qty, ldc_qc_qty); //当作QC数据
-                        Object.assign(this.tmp_turn_over_qc[li_row_qc].sec_qty, ldc_qc_sec_qty); //当作QC数据
+                        Object.assign(this.tmp_turn_over_qc[li_row_qc].con_qty, ldc_qc_qty); //QC數量
+                        Object.assign(this.tmp_turn_over_qc[li_row_qc].sec_qty, ldc_qc_sec_qty); //QC數量
                     }else{
                         this.tmp_turn_over_qc.push(JSON.parse(JSON.stringify(this.tableData1[li_row]))); //仅QC移交單數據
-                        li_row_qc = this.tmp_turn_over_qc.length;
                     }
-                    Object.assign(this.tmp_turn_over_qc[li_row_qc].location, '702');
-                    Object.assign(this.tmp_turn_over_qc[li_row_qc].carton_code, '702');
+                    //var li_row_qc =0;
+                    //li_row_qc = this.tmp_turn_over_qc.length;
+                    //Object.assign(this.tmp_turn_over_qc[li_row_qc].location, '702');
+                    //Object.assign(this.tmp_turn_over_qc[li_row_qc].carton_code, '702');
                 }
                 //--判断組裝数量是否大于生產計劃單中的數量
                 ldc_qty_other = 0;
                 ldc_sec_qty_other = 0;
                 //--已组装过的数量
                 await axios.post("/ProduceAssembly/GetAssemblyQty", { id:ls_id,mo_id: ls_mo_id,goods_id:ls_goods_id,out_dept:ls_assembly_dept } ).then(
-                    (response) => {                            
+                    (response) => {
                         ldc_qty_other = parseFloat(response.data[0].con_qty);
-                        ldc_sec_qty_other = response.data[0].sec_qty;
+                        ldc_sec_qty_other = parseFloat(response.data[0].sec_qty);
                     }
                 );
                 //检查流程中的生产数量
                 await axios.post("/ProduceAssembly/GetPlanProdQty", { out_dept:ls_assembly_dept,mo_id: ls_mo_id,goods_id:ls_goods_id }).then(
-                    (response) => {                            
+                    (response) => {
                         ldc_prod_qty = parseFloat(response.data);
                     }
-                );                
-                if(ldc_prod_qty === 0){                    
+                );
+                if(ldc_prod_qty === 0){
                     await this.$XModal.alert({ content: `第 ${li_row_no} 行【${ls_mo_id} -- ${ls_goods_id}】\n\n對應生計劃流程中的生產數量為 0，不允許保存！`,status: 'warning' , mask: false });
                     this.preUpdateFlag = false;
                     break;
                 }                
                 //--ls_parameter:检查是否允許超过生产数量移交,0為不允許,但可通過密碼確認放行
                 if(ls_parameter === '0' && lb_prompt === false){
-                    if(ldc_assembly_qty+ldc_qty_other>ldc_prod_qty){
+                    if(ldc_assembly_qty + ldc_qty_other>ldc_prod_qty){
                       await this.$XModal.confirm(`第${li_row_no}行:【${ls_mo_id}--${ls_goods_id}】\n移交数已超過生產數，如要繼續保存，請選擇【确定】\n并在彈出窗口中輸入有權限的用户和密碼!`).then(type => {
                            if (type === 'cancel') {
                                this.preUpdateFlag = false;
@@ -1476,8 +1476,8 @@
                       if(!this.preUpdateFlag){
                           break;
                       }
-                      //*****************************
-                      //打開密碼確認窗口,要等此窗口做完所有的事情才執后面的語句,否則就處于等待狀態   
+                      //**************打開密碼確認窗口***************
+                      //要等此窗口做完所有的事情才執后面的語句,否則就處于等待狀態   
                       await this.$prompt(`當前用戶: ${this.userId}`,"請輸入密碼",{
                           confirmButtonText: '确定',
                           cancelButtonText: '取消',
@@ -1494,7 +1494,7 @@
                           //阻止关闭（beforeClose中如果不调用done()弹框就无法关闭）
                           beforeClose: (action, instance, done) => {
                                if(action === 'confirm' ){//&& !ipReg.test(instance.inputValue)                                 
-                                   let strPassword = instance.inputValue;                                  
+                                    let strPassword = instance.inputValue;                                  
                                     axios.get("/Base/Common/GetUserInfo?user_id=" + this.userId + "&password=" + strPassword).then(
                                        (response) => {
                                            if (response.data === "USER_ID_ERROR") {
@@ -1528,7 +1528,7 @@
                       }).catch((err) => {
                           console.log(err);
                       }); 
-                      ////************
+                      //************
                       
                       if(this.valid_user_id ===false){ //this.valid_user_id為密碼確認窗口檢查通過時/this.valid_user_id=true,不通過this.valid_user_id=false                         
                           this.preUpdateFlag = false; //保存前檢查通不過,退出循環

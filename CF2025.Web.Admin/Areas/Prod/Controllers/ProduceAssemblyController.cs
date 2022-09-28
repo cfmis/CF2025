@@ -98,9 +98,10 @@ namespace CF2025.Web.Admin.Areas.Produce.Controllers
 
         //保存
         [HttpPost]
-        public JsonResult Save(jo_assembly_mostly headData, List<jo_assembly_details> lstDetailData1, List<jo_assembly_details_part> lstDetailData2, List<jo_assembly_details> lstDelData1, List<jo_assembly_details_part> lstDelData2)
+        public JsonResult Save(jo_assembly_mostly headData, List<jo_assembly_details> lstDetailData1, List<jo_assembly_details_part> lstDetailData2, 
+            List<jo_assembly_details> lstDelData1, List<jo_assembly_details_part> lstDelData2, List<jo_assembly_details> lstTurnOver, List<jo_assembly_details> lstTurnOverQc)
         {
-            var result = ProduceAssemblyDAL.Save(headData, lstDetailData1, lstDetailData2, lstDelData1, lstDelData2);
+            var result = ProduceAssemblyDAL.Save(headData, lstDetailData1, lstDetailData2, lstDelData1, lstDelData2, lstTurnOver, lstTurnOverQc);
             if (result == "")
                 result = "OK";
             else

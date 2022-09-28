@@ -78,5 +78,17 @@ namespace CF.SQLServer.DAL
             result = BillCode;
             return result;
         }
+        public string GetSequenceID(int index)
+        {
+            //返回序號
+            string result = "";            
+            if (index > 0)
+               result = index.ToString().PadLeft(4, '0') + "h";
+            else
+            {               
+               result =  "0001h";
+            }               
+            return result;
+        }
     }
 }
