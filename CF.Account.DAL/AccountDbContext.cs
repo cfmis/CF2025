@@ -19,7 +19,7 @@ namespace CF.Account.DAL
         {
             Database.SetInitializer<AccountDbContext>(null);
 
-            modelBuilder.Entity<User>()
+            modelBuilder.Entity<t_User>()
                 .HasMany(e => e.Roles)
                 .WithMany(e => e.Users)
                 .Map(m =>
@@ -33,7 +33,7 @@ namespace CF.Account.DAL
         }
 
         public DbSet<LoginInfo> LoginInfos { get; set; }
-        public DbSet<User> Users { get; set; }
+        public DbSet<t_User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<VerifyCode> VerifyCodes { get; set; }
     }

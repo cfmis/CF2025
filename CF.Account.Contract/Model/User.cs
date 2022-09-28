@@ -10,10 +10,10 @@ using System.ComponentModel.DataAnnotations;
 namespace CF.Account.Contract
 {
     [Auditable]
-    [Table("User")]
-    public partial class User : ModelBase
+    [Table("t_User")]
+    public partial class t_User : ModelBase
     {
-        public User()
+        public t_User()
         {
             this.Roles = new List<Role>();
             this.IsActive = true;

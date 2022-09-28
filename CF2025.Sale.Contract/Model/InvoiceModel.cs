@@ -280,6 +280,8 @@ namespace CF2025.Sale.Contract
         public string create_by { get; set; }
         public string create_time { get; set; }
         public string check_by { get; set; }
+        public string receipt_person { get; set; }
+        public string receipted_date { get; set; }
     }
 
 }
