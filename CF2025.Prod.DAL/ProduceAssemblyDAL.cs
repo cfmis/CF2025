@@ -422,7 +422,7 @@ namespace CF2025.Prod.DAL
                     @" INSERT INTO sys_bill_max_jo07(within_code,bill_id,year_month,bill_code,bill_text1,bill_text2,bill_text3,bill_text4,bill_text5) 
                     VALUES('0000','JO07','','{0}','T','{1}','{2}','','')", billCode, headData.out_dept, in_dept);
                     strSql_u = string.Format(
-                    @" UPDATE sys_bill_max_jo07 SET bill_code='{0}' 
+                    @" UPDATE sys_bill_max_jo07 SET bill_code='{0}'
                     WHERE within_code='0000' AND bill_id='JO07' AND bill_text1='T' AND bill_text2='{1}' and bill_text3='{2}'",billCode,headData.out_dept,in_dept);
                     sql_sys_update2 = billCode.Substring(6, 5) != "00001" ? strSql_u : strSql_i;                    
                     strSql.Append(sql_sys_update2);
@@ -564,8 +564,7 @@ namespace CF2025.Prod.DAL
                                 ('{0}','{1}','{2}','{3}','{4}','{5}',{6},{7},{8},'{9}',{10},'{11}','{12}','{13}',{14},'{15}','{16}','{17}','{18}','{19}')",
                                 within_code, headData.handover_id,item.sequence_id,item.jo_id,item.jo_sequence_id,item.goods_id,jo_qty,c_qty,ldc_con_qty,item.unit_code,
                                 ldc_sec_qty, item.sec_unit, item.remark, item.mo_id, item.package_num, item.location, item.carton_code, item.lot_no, aim_jo_id, aim_jo_sequence);
-                                strSql.Append(str);
-                                
+                                strSql.Append(str);                                
                                 if (item.qc_qty > 0 && headData.in_dept!="702")/*&& item.con_qty > item.qc_qty*/
                                 {
                                     //查找此組裝單號有沒生成QC的移交單,有就利用原有的移交單
@@ -581,7 +580,7 @@ namespace CF2025.Prod.DAL
                                             //已有交QC的原始數據,在原有移交單上插入記錄
                                             strQcID = dt.Rows[0]["id"].ToString();
                                             str = string.Format(
-                                            @" Insert Into jo_materiel_con_details
+                                            @" Insert Into jo_materiel_con_details 
                                             (within_code,id,sequence_id,jo_id,jo_sequence_id,goods_id,jo_qty,c_qty,con_qty,unit_code,sec_qty,sec_unit,remark,mo_id,package_num,
                                             location,carton_code,lot_no,aim_jo_id,aim_jo_sequence) Values
                                             ('{0}','{1}','{2}','{3}','{4}','{5}',{6},{7},{8},'{9}',{10},'{11}','{12}','{13}',{14},'{15}','{16}','{17}','{18}','{19}')",
