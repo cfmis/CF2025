@@ -22,6 +22,7 @@ var Main = {
 			selectedFareRowIndex:-1,
 			showSent:false,
             showPrint:false,
+			showEditItem:false,
 			issues_state:'',
 			newDocFlag:0,
             // formData:{
@@ -61,6 +62,7 @@ var Main = {
 			GetQtyUnitRateList:[],
 			TackFareList:[],
 			issues_state_list:[],
+			AreaList:[],
             tableData: [
             // { id: 10001, name: 'Test1', role: 'Develop', sex: 'Man', age: 28, address: 'test abc',sex:'1' },
             // { id: 10002, name: 'Test2', role: 'Test', sex: 'Women', age: 22, address: 'Guangzhou',sex:'0' },
@@ -72,9 +74,6 @@ var Main = {
             // { id: 10008, name: 'Test8', role: 'Develop', sex: 'Man', age: 35, address: 'test abc',sex:'1' },
           
 			],
-            name: '',
-            sex: 1,
-            date:'',
     }
     },
     created() {
@@ -165,6 +164,7 @@ var Main = {
 			separate:'1',
 			Shop_no:'',
             it_customer: '',
+			it_customer_name:'',
             phone: '',
             fax: '',
             payment_date: '',
@@ -177,6 +177,8 @@ var Main = {
             merchandiser: '',
             merchandiser_phone: '',
             po_no:'',
+			address:'',
+			bill_address:'',
             shipping_methods:'',
 			seller_id:'',
             m_id: '',
@@ -212,6 +214,7 @@ var Main = {
             ap_id: '',
             tranship_port: '',
             finally_buyer: '',
+			finally_buyer_name:'',
             mo_group:'',
             packinglistno: '',
             box_no: '',
@@ -226,6 +229,7 @@ var Main = {
 			state_name:'未批準',
             check_date: '',
 			};
+			
 		},
 		addNewItem(){
 			this.initDetailsValue();
@@ -278,7 +282,8 @@ var Main = {
 				{
 				var retData=response.data;
                 this.formData.it_customer = retData.it_customer;
-				this.formData.finally_buyer = retData.finally_buyer;
+				this.formData.finally_buyer = retData.it_customer;
+				this.formData.finally_buyer_name = retData.it_customer_name;
 				this.formData.seller_id = retData.seller_id;
 				this.formData.po_no = retData.po_no;
 				this.formData.phone = retData.phone;
@@ -298,6 +303,51 @@ var Main = {
 				this.formData.area = retData.area;
 				this.formData.m_rate = retData.m_rate;
 				this.formData.remark = retData.remark;
+				this.formData.it_customer_name=" ";
+				if(retData.it_customer_name!=null)
+					this.formData.it_customer_name +=retData.it_customer_name;
+				this.formData.fake_bill_address=" ";
+				if(retData.fake_s_address!=null)
+					this.formData.fake_bill_address +=retData.fake_s_address;
+				this.formData.address=" ";
+				this.formData.bill_address=" ";
+				if(retData.comments!=null)
+				{
+					this.formData.address=retData.comments;
+					this.formData.bill_address=retData.comments;
+				}
+				if(retData.s_address!=null)
+					this.formData.address +="\r\n" + retData.s_address;
+				if(retData.fake_e_address!=null)
+					this.formData.address +=retData.fake_e_address;
+				if(retData.e_address!=null)
+					this.formData.bill_address +="\r\n" + retData.e_address;
+				if(retData.linkman!=null)
+				{
+					this.formData.address +="\r\n"+ "ATTN:" + retData.linkman;
+					this.formData.bill_address +="\r\n"+ "ATTN:" + retData.linkman;
+					this.formData.fake_bill_address +="\r\n"+" ATTN:"+ this.formData.linkman;
+				}
+				if(retData.l_phone!=null)
+				{
+					this.formData.address += " TEL:"+retData.l_phone;
+					this.formData.bill_address += " TEL:"+retData.l_phone;
+					this.formData.fake_bill_address +=" TEL:"+retData.l_phone;
+				}
+				if(this.formData.fax!=null)
+				{
+					this.formData.fake_bill_address +="\r\n"+" FAX:"+this.formData.fax;
+					this.formData.bill_address +="\r\n"+" FAX:"+this.formData.fax;
+				}
+				if(this.formData.email!=null)
+				{
+					this.formData.fake_bill_address +=" EMAIL:"+this.formData.email;
+					this.formData.bill_address +=" EMAIL:"+this.formData.email;
+				}
+				this.formData.fake_name=" ";
+				if(retData.fake_name!=null)
+					this.formData.fake_name+=retData.fake_name;
+				this.formData.fake_address=this.formData.fake_name + "\r\n" + this.formData.fake_bill_address;
 				// this.formData=response.data;
 
                 //深度複製一個對象，用來判斷數據是否有修改
@@ -642,7 +692,8 @@ var Main = {
 		async getComboxList(SourceType) {
             var _self = this;///Base/BaseData///, { params: { ProductMo: this.editDetails.GoodsID } }
 			var url="GetComboxList";
-			if(SourceType=="QtyUnitList" || SourceType=="MoGroupList" || SourceType=="SalesmanList" || SourceType=="CurrList" || SourceType=="TackFareList" || SourceType=="issues_state_list")
+			if(SourceType=="QtyUnitList" || SourceType=="MoGroupList" || SourceType=="SalesmanList" || SourceType=="CurrList"
+				|| SourceType=="TackFareList" || SourceType=="issues_state_list" || SourceType=="AreaList")
 				url="/Base/DataComboxList/GetComboxList";
 			else if(SourceType=="QtyUnitRateList")
 				url="/Base/DataComboxList/GetQtyUnitRateList";
@@ -681,6 +732,8 @@ var Main = {
 						this.TackFareList = response.data;
 					else if(SourceType=="issues_state_list")
 						this.issues_state_list = response.data;
+					else if(SourceType=="AreaList")
+						this.AreaList = response.data;
                 },
                 (response) => {
                     alert(response.status);
@@ -695,7 +748,8 @@ var Main = {
 			this.initMostlyValue();
 			this.initDetailsValue();
 			this.initFareDetailsValue();
-            await axios.post("GetInvoiceByID", {ID }).then(
+			let flag=this.$refs.input1.value;
+            await axios.post("GetInvoiceByID", {ID,flag }).then(
             (response) => {
 				// this.initMostlyValue();
 				// let ocMostly=response.data[0].ocMostly;
@@ -847,10 +901,11 @@ var Main = {
             this.showEdit = true;
         },
         saveEvent() {
-            if (!this.validData())
-			{
-				return false;
-			}
+            // if (!this.validData())
+			// {
+				// return false;
+			// }
+			this.formData.flag=this.$refs.input1.value;
             let InvMostly = this.formData;
             let InvDetails = this.tableDetails;
 			let InvOtherFare=this.tableFareDetails;
@@ -1190,6 +1245,19 @@ var Main = {
 				alert(response);
 			});
         },
+		//項目修改
+		showModalEditItem(){
+			// if(this.formData.state!="0")
+			// {
+				// this.$XModal.alert("非編輯狀態，不能再進行修改!");
+				// return;
+			// }
+			if(this.AreaList.length===0)
+			{
+				this.getComboxList("AreaList");
+			}
+			this.showEditItem=true;
+		},
 		formatterRowAmount ({ cellValue }) {
               return XEUtils.commafy(XEUtils.toNumber(cellValue), { digits: 2 })
             },

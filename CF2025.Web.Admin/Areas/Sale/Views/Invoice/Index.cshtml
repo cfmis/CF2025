@@ -4,7 +4,6 @@
     ViewBag.Title = "Index";
 }
 
-
 <div id="app">
     <vxe-toolbar perfect size="medium" style="height:35px" class="tools-menus" >
         <template #buttons>
@@ -13,6 +12,7 @@
             <vxe-button type="text" icon="iconfont icon-zu10011" style="width:70px;margin-left:-15px;" content="批準" @@click="approveEvent()"></vxe-button>
             <vxe-button type="text" icon="iconfont icon-add7" style="width:80px;margin-left:-15px;" content="新版本" @@click="newVersion()"></vxe-button>
             <vxe-button type="text" icon="iconfont icon-tableaddrows" style="width:90px;margin-left:-15px;" @@click="addNewItem()" size="mini">項目新增</vxe-button>
+            <vxe-button type="text" icon="iconfont icon-tableaddrows" style="width:90px;margin-left:-15px;" @@click="showModalEditItem()" size="mini">項目修改</vxe-button>
             <vxe-button type="text" icon="iconfont icon-tabledeleterows" style="width:90px;margin-left:-15px;" @@click="deleteTableItemEvent()" size="mini">項目刪除</vxe-button>
             <vxe-button type="text" icon="iconfont icon-cancel7" style="width:70px;margin-left:-15px;" @@click="cancelDoc()" content="注銷"></vxe-button>
             <vxe-button type="text" icon="iconfont icon-n_cost" style="width:100px;margin-left:-15px;" @@click="addNewFareItem()" size="mini">新增附加費</vxe-button>
@@ -35,6 +35,7 @@
                     <template #default="{ data }">
                         <vxe-input v-model="data.ID" class="input-customize" style="width:74%" @@blur="getInvoiceByID(data.ID)"></vxe-input>
                         <vxe-input v-model="data.Ver" class="input-customize" style="width:20%"></vxe-input>
+                        <input type="text" value="0" style="width:10%;display:none" ref="input1">
                     </template>
                 </vxe-form-item>
                 <vxe-form-item title="發票日期" field="oi_date" :item-render="{}" span="6" class="vxe-form-item-group">
@@ -371,7 +372,7 @@
     <div style="margin-top:20px">
         <vxe-table border
                    show-overflow
-                   height="350"
+                   height="200"
                    size="mini"
                    :header-cell-style="headerCellStyle"
                    :row-config="{height: 20,isCurrent: true, isHover: true}"
@@ -627,7 +628,7 @@
     <div style="margin-top:20px">
         <vxe-table border
                    show-overflow
-                   height="150"
+                   height="100"
                    size="mini"
                    :header-cell-style="headerCellStyle"
                    :row-config="{height: 20}"
@@ -941,6 +942,50 @@
         </template>
     </vxe-modal>
 
+    <!--彈窗處理項目修改-->
+    <vxe-modal ref="xModalEditItem" v-model="showEditItem" title="項目修改" width="600" height="370" resize destroy-on-close>
+
+        <template #default>
+            <vxe-form :data="formData" title-align="right" title-width="100" custom-layout>
+                <vxe-form-item title="名稱" field="it_customer_name" :item-render="{}" span="24" style="margin-top:-20px" class="vxe-form-item-customize">
+                    <template #default="{ data }">
+                        <vxe-input v-model="data.it_customer_name" readonly class="input-customize"></vxe-input>
+                    </template>
+                </vxe-form-item>
+                <vxe-form-item title="區域" field="area" :item-render="{}" span="12" class="vxe-form-item-customize11">
+                    <template #default="{ data }">
+                        <vxe-select v-model="data.area" size="mini">
+                            <vxe-option v-for="item in AreaList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                        </vxe-select>
+                    </template>
+                </vxe-form-item>
+                <vxe-form-item title="送貨地址" field="address" :item-render="{}" span="24" style="margin-top:-20px">
+                    <template #default="{ data }">
+                        <vxe-textarea v-model="data.address" rows="4" size="mini" class="input-customize111"></vxe-textarea>
+                    </template>
+                </vxe-form-item>
+                <vxe-form-item title="票据地址" field="bill_address" :item-render="{}" span="24" style="margin-top:-15px">
+                    <template #default="{ data }">
+                        <vxe-textarea v-model="data.bill_address" rows="4" class="input-customize"></vxe-textarea>
+                    </template>
+                </vxe-form-item>
+                <vxe-form-item title="最終客戶名稱" field="finally_buyer_name" :item-render="{}" span="24" class="vxe-form-item-customize" style="margin-top:-20px">
+                    <template #default="{ data }">
+                        <vxe-input v-model="data.finally_buyer_name" readonly class="input-customize"></vxe-input>
+                    </template>
+                </vxe-form-item>
+                <vxe-form-item align="center" span="24" style="margin-top:20px;height:20px">
+                    <template #default>
+                        @*<vxe-button type="text" @@click="confirmSent()" status="primary">確定</vxe-button>*@
+                        @*<vxe-button size="medium" @@click="confirmSent()" content="批準"></vxe-button>*@
+                        <vxe-button size="medium" @@click="$refs.xModalEditItem.close()" content="關閉"></vxe-button>
+                        @*<vxe-button type="text" icon="fa fa-undo" @@click="$refs.xModalSent.close()">取消</vxe-button>*@
+                    </template>
+                </vxe-form-item>
+           </vxe-form>
+        </template>
+    </vxe-modal>
+
     <!--列印-->
     <vxe-modal ref="xModalPrint" v-model="showPrint" title="報表選擇" width="500" height="300" resize destroy-on-close>
         <vxe-toolbar perfect size="small" style="height:35px;margin-bottom:5px">
@@ -977,4 +1022,5 @@
     <script src="~/Areas/Sale/js/Invoice.js?v=@Guid.NewGuid().ToString()"></script>
 @*<script src="~/Areas/Sale/js/demo1.js?v=@Guid.NewGuid().ToString()"></script>*@
      @*<link rel="stylesheet" href="~/Content/main_inv.css">*@ 
+
 }

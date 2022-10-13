@@ -22,6 +22,7 @@ namespace CF2025.Sale.Contract
         public string separate { get; set; }
         public string Shop_no { get; set; }
         public string it_customer { get; set; }
+        public string it_customer_name { get; set; }
         public string phone { get; set; }
         public string fax { get; set; }
         public string payment_date { get; set; }
@@ -67,6 +68,7 @@ namespace CF2025.Sale.Contract
         public string ap_id { get; set; }
         public string tranship_port { get; set; }
         public string finally_buyer { get; set; }
+        public string finally_buyer_name { get; set; }
         public string mo_group { get; set; }
         public string packinglistno { get; set; }
         public int box_no { get; set; }
@@ -85,11 +87,19 @@ namespace CF2025.Sale.Contract
         public string fake_name { get; set; }
         public string fake_bill_address { get; set; }
         public string fake_address { get; set; }
-        public string name { get; set; }
         public string address { get; set; }
         
     }
- 
+    public class so_invoice_mostly_oc: so_invoice_mostly
+    {
+        public string fake_s_address { get; set; }
+        public string fake_e_address { get; set; }
+        public string comments { get; set; }
+        public string s_address { get; set; }
+        public string e_address { get; set; }
+    }
+
+
     public class so_invoice_details : InvoiceModel
     {
         public string sequence_id { get; set; }

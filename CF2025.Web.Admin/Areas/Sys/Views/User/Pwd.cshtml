@@ -12,12 +12,12 @@
                 </vxe-form-item>
                 <vxe-form-item title="密碼" field="Pwd" :item-render="{}" span="24" class="vxe-form-item-group">
                     <template #default="{ data }">
-                        <vxe-input v-model="data.Pwd" class="input-customize"></vxe-input>
+                        <vxe-input v-model="data.Pwd"  type="password" class="input-customize"></vxe-input>
                     </template>
                 </vxe-form-item>
                 <vxe-form-item title="確認密碼" field="ConfPwd" :item-render="{}" span="24" class="vxe-form-item-group">
                     <template #default="{ data }">
-                        <vxe-input v-model="data.ConfPwd" class="input-customize"></vxe-input>
+                        <vxe-input v-model="data.ConfPwd"  type="password" class="input-customize"></vxe-input>
                     </template>
                 </vxe-form-item>
             <vxe-form-item align="center" span="24" style="margin-top:20px">

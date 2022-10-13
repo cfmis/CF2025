@@ -61,10 +61,10 @@ namespace CF2025.Web.Admin.Areas.Sale.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
-        public JsonResult GetInvoiceByID(string ID)
+        public JsonResult GetInvoiceByID(string ID,string flag)
         {
             //PlanDAL clsPlanDAL = new PlanDAL();
-            var result = InvoiceDAL.GetInvoiceByID(ID);
+            var result = InvoiceDAL.GetInvoiceByID(ID, flag);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
         //[HttpPost]

@@ -75,17 +75,21 @@ namespace CF2025.Sale.DAL
         }
         public static so_invoice_mostly GetMostlyFromOc(string mo_id)
         {
-            so_invoice_mostly mdjOc = new so_invoice_mostly();
+            so_invoice_mostly_oc mdjOc = new so_invoice_mostly_oc();
             string strSql = "";
             strSql += " Select a.it_customer,a.seller_id,a.linkman,a.l_phone,a.fax,a.email,a.merchandiser,a.merchandiser_phone " +
                 ",a.merchandiser_email,a.m_id,a.exchange_rate,a.port_id,a.ap_id,a.contract_id,a.p_id,a.pc_id,a.sm_id" +
                 ",a.transport_rate,a.disc_rate,a.disc_amt,a.disc_spare,a.insurance_rate,a.other_fare,a.tax_ticket" +
                 ",a.tax_sum,a.ship_mark,a.remark,a.area,a.m_rate" +
+                ",c.name AS it_customer_name,c.fake_name,c.fake_s_address,c.fake_e_address" +
+                ",d.comments,d.s_address,d.e_address" +
                 " From so_order_manage a " +
                 " Inner Join so_order_details b On a.within_code=b.within_code And a.id=b.id And a.ver=b.ver " +
+                " Left  Join it_customer c On a.within_code=c.within_code And a.it_customer=c.id" +
+                " Left  Join it_shipment_address d On a.within_code=d.within_code And a.it_customer=d.id" +
                 " Where b.within_code='" + within_code + "' And b.mo_id='" + mo_id + "'";
             DataTable dtMostly = sh.ExecuteSqlReturnDataTable(strSql);
-            mdjOc = ConvertHelper.DataTableToModel<so_invoice_mostly>(dtMostly);
+            mdjOc = ConvertHelper.DataTableToModel<so_invoice_mostly_oc>(dtMostly);
             return mdjOc;
         }
 
@@ -93,7 +97,7 @@ namespace CF2025.Sale.DAL
         {
             so_order_details objInv = new so_order_details();
             string strSql = "";
-            strSql += " Select b.id AS order_id,b.ver AS so_ver,b.sequence_id AS so_sequence_id,a.it_customer,b.mo_id,b.goods_id" +
+            strSql += " Select Top 1 b.id AS order_id,b.ver AS so_ver,b.sequence_id AS so_sequence_id,a.it_customer,b.mo_id,b.goods_id" +
                 ",b.table_head,b.customer_goods,b.customer_color_id,b.order_qty AS u_invoice_qty " +
                 ",b.goods_unit,b.unit_price AS invoice_price,b.p_unit,b.disc_rate,c.name As goods_name,c.english_name As goods_ename" +
                 ",d.name As color,b.contract_cid,e.name As big_class " +
@@ -390,7 +394,6 @@ namespace CF2025.Sale.DAL
             string fake_address = "";
             string bill_address = "";
             string cd_disc = "1";
-            string flag = "0";
             string servername = "dgserver.cferp.dbo";
             string confirm_status = "0";
             strSql += string.Format(@" SET XACT_ABORT  ON ");
@@ -408,19 +411,20 @@ namespace CF2025.Sale.DAL
                     Ver = 0;
                     DataTable dtCust = GetCustData(InvMostly.it_customer);
                     DataRow drCust = dtCust.Rows[0];
-                    cust_name= drCust["name"] != null ? drCust["name"].ToString().Trim() : "";
-                    cust_name = cust_name.Contains("'") ? cust_name.Replace("'", "''") : cust_name;
-                    fake_bill_address = " " + (drCust["fake_s_address"] != null ? drCust["fake_s_address"].ToString().Trim() : "")
-                        + (InvMostly.linkman != null ? " ATTN:" + InvMostly.linkman : "")
-                        + (InvMostly.l_phone != null ? " TEL:" + InvMostly.l_phone : "")
-                        + (InvMostly.fax != null ? " FAX:" + InvMostly.fax : "")
-                        + (InvMostly.email != null ? " EMAIL:" + InvMostly.email : "");
-                    fake_bill_address = fake_bill_address.Contains("'") ? fake_bill_address.Replace("'", "''") : fake_bill_address;
-                    cust_address = cust_name + fake_bill_address;
-                    fake_name = drCust["fake_name"] != null ? drCust["fake_name"].ToString().Trim() : "";
-                    fake_name = fake_name.Contains("'") ? fake_name.Replace("'", "''") : fake_name;
-                    fake_address = fake_name + fake_bill_address;
-                    bill_address = cust_address;
+                    //cust_name= drCust["name"] != null ? drCust["name"].ToString().Trim() : "";
+                    InvMostly.it_customer_name = InvMostly.it_customer_name.Contains("'") ? InvMostly.it_customer_name.Replace("'", "''") : InvMostly.it_customer_name;
+                    //fake_bill_address = " " + (drCust["fake_s_address"] != null ? drCust["fake_s_address"].ToString().Trim() : "")
+                    //    + (InvMostly.linkman != null ? " ATTN:" + InvMostly.linkman : "")
+                    //    + (InvMostly.l_phone != null ? " TEL:" + InvMostly.l_phone : "")
+                    //    + (InvMostly.fax != null ? " FAX:" + InvMostly.fax : "")
+                    //    + (InvMostly.email != null ? " EMAIL:" + InvMostly.email : "");
+                    InvMostly.fake_bill_address = InvMostly.fake_bill_address.Contains("'") ? InvMostly.fake_bill_address.Replace("'", "''") : InvMostly.fake_bill_address;
+                    InvMostly.bill_address = InvMostly.bill_address.Contains("'") ? InvMostly.bill_address.Replace("'", "''") : InvMostly.bill_address;
+                    //cust_address = cust_name + fake_bill_address;
+                    //fake_name = drCust["fake_name"] != null ? drCust["fake_name"].ToString().Trim() : "";
+                    InvMostly.fake_name = InvMostly.fake_name.Contains("'") ? InvMostly.fake_name.Replace("'", "''") : InvMostly.fake_name;
+                    //fake_address = fake_name + fake_bill_address;
+                    //bill_address = InvMostly.bill_address;
                     strSql1 += " Insert Into so_invoice_mostly (" +
                         " within_code,id,Ver,oi_date,separate,Shop_no,it_customer,phone,fax" +
                         ",linkman,l_phone,department_id,email,issues_wh,bill_type_no,merchandiser,merchandiser_phone,po_no,shipping_methods" +
@@ -499,8 +503,8 @@ namespace CF2025.Sale.DAL
                     , InvMostly.tax_sum, InvMostly.amount, InvMostly.other_fee, InvMostly.total_package_num, InvMostly.total_weight, InvMostly.remark2, InvMostly.ship_remark, InvMostly.ship_remark2, InvMostly.ship_remark3, InvMostly.remark
                     , InvMostly.p_id, InvMostly.pc_id, InvMostly.sm_id, InvMostly.accounts, InvMostly.per, InvMostly.final_destination, InvMostly.issues_state, InvMostly.transport_style, InvMostly.loading_port
                     , InvMostly.ap_id, InvMostly.tranship_port, InvMostly.finally_buyer, InvMostly.mo_group, InvMostly.packinglistno, InvMostly.box_no, InvMostly.create_by, InvMostly.update_by, InvMostly.state
-                    , cust_name, cust_address, fake_name, fake_bill_address, bill_address, fake_address
-                    , cd_disc, flag, servername, InvMostly.area, InvMostly.m_rate, confirm_status
+                    , InvMostly.it_customer_name, InvMostly.address, InvMostly.fake_name, InvMostly.fake_bill_address, InvMostly.bill_address, InvMostly.fake_address
+                    , cd_disc, InvMostly.flag, servername, InvMostly.area, InvMostly.m_rate, confirm_status
                     , payment_date, ship_date, create_date, update_date, check_date
                     );
             }
@@ -649,19 +653,20 @@ namespace CF2025.Sale.DAL
         }
 
         //public static List<viewOc> GetInvoiceByID(string ID)
-        public static viewInv GetInvoiceByID(string ID)
+        public static viewInv GetInvoiceByID(string ID,string flag)
         {
             //List<viewOc> lsInv= new List<viewOc>();
             string strSql = "";
-            strSql = "Select a.id,a.Ver,a.oi_date,a.separate,a.Shop_no,a.it_customer,a.phone,a.fax,a.payment_date,a.linkman" +
+            strSql = "Select a.id,a.Ver,a.oi_date,a.separate,a.Shop_no,a.it_customer,g.name AS it_customer_name,a.phone,a.fax,a.payment_date,a.linkman" +
                 ",a.l_phone,a.department_id,a.email,a.issues_wh,a.bill_type_no,a.merchandiser,a.merchandiser_phone,a.po_no" +
                 ",a.shipping_methods,a.seller_id,a.m_id,a.exchange_rate,a.goods_sum,a.other_fare,a.disc_rate,a.disc_amt" +
                 ",a.disc_spare,a.total_sum,a.tax_ticket,a.tax_sum,a.amount,a.other_fee,a.total_package_num,a.total_weight" +
                 ",a.total_package_num,a.total_weight,a.remark2,a.ship_remark,a.ship_remark2,a.ship_remark3,a.remark,a.p_id" +
                 ",a.pc_id,a.sm_id,a.accounts,a.per,a.final_destination,a.issues_state,a.transport_style,a.ship_date" +
-                ",a.loading_port,a.ap_id,a.tranship_port,a.finally_buyer,a.mo_group,a.packinglistno,a.box_no,a.create_by" +
+                ",a.loading_port,a.ap_id,a.tranship_port,a.finally_buyer,h.name AS finally_buyer_name,a.mo_group,a.packinglistno,a.box_no,a.create_by" +
                 ",a.create_date,a.update_by,a.update_date,a.state,f.matter,a.check_date" +
                 ",a.m_rate,a.flag,a.as_id,a.area,a.confirm_status" +
+                ",a.address,a.bill_address" +
 
                 ",b.sequence_id,b.mo_id,shipment_suit,b.goods_id,b.table_head,b.goods_name,b.u_invoice_qty" +
                 ",b.goods_unit,b.sec_qty,b.sec_unit,b.invoice_price,b.p_unit,b.disc_rate AS disc_rate_d,b.disc_price" +
@@ -677,7 +682,13 @@ namespace CF2025.Sale.DAL
                 " Inner Join cd_color d On c.within_code=d.within_code And c.color=d.id " +
                 " Inner Join cd_goods_class e On c.within_code=e.within_code And c.big_class=e.id " +
                 " Left  Join sy_bill_state f On a.within_code=f.within_code And a.state=f.id" +
+                " Left  Join it_customer g On a.within_code=g.within_code And a.it_customer=g.id" +
+                " Left  Join it_customer h On a.within_code=h.within_code And a.finally_buyer=h.id" +
                 " Where a.within_code='" + within_code + "' And a.id='" + ID + "' And f.language_id='" + language_id + "'";
+            if (flag == "0") 
+                 strSql += " And (a.flag='0' Or a.flag='1' And a.confirm_status='1' )";
+            else
+                strSql += " And a.flag='1'";
             strSql += " Order By b.sequence_id ";
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);//
             viewInv lsInv = new viewInv();
