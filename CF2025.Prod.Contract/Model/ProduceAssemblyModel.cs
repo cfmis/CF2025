@@ -52,6 +52,7 @@ namespace CF2025.Prod.Contract
         public int prd_id { get; set; }
         public string jo_id { get; set; }
         public string jo_sequence_id { get; set; }
+        public decimal qc_qty { get; set; }
         public string row_status { get; set; }
     }
 
