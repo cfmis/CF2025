@@ -22,6 +22,12 @@ namespace CF2025.Base.DAL
             string LanguageID = sh.ConvertLanguage(language_id);
             switch (SourceType)
             {
+                case "AreaList"://地區
+                    strSql += "SELECT id,id +'--'+name AS name FROM cd_zone WHERE within_code='0000' Order By id";
+                    break;
+                case "BillOrigin"://開單來源,單據種類等
+                    strSql += string.Format("SELECT id,name FROM sys_bill_origin WHERE function_id='JO06' AND [language]='{0}' AND [state]='0'", LanguageID);
+                    break;
                 case "QtyUnitList"://數量單位
                     strSql += "SELECT id,name,english_name FROM cd_units WHERE kind='05' Order By id";
                     break;
