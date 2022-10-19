@@ -165,7 +165,7 @@ body{
 }
 .leftbar{
 	float:left;
-	background:#EEF1F8;
+	background:#ebf5f8;/* #EEF1F8; */
 	border-right:1px solid #c1d1dc;
 	min-height: 837px;
 	padding-top:10px;

@@ -5,7 +5,7 @@
 }
 
 <div id="app">
-    <vxe-toolbar perfect size="medium" style="height:35px" class="tools-menus" >
+    <vxe-toolbar perfect size="medium" class="tools-menus" > @*style="height:35px;background-color:lightsteelblue"*@
         <template #buttons>
         @{
             if (ViewBag.DocType == "0")
@@ -43,8 +43,8 @@
         </template>
     </vxe-toolbar>
     <!--表頭記錄-->
-    <div>
-        <vxe-form :data="formData" size="mini"  title-align="right" style="min-width: 1024px;max-width:1600px" title-width="100px" prevent-submit title-colon custom-layout>@**@
+    <div> @*style="background-color:#ebf5f8"*@@*min-width: 1024px;max-width:1600px;*@
+        <vxe-form :data="formData" size="mini"  title-align="right" title-width="100px" style="background-color:#ebf5f8" prevent-submit title-colon custom-layout>@**@
                 <vxe-form-item title="編號" field="ID" :item-render="{}" span="6" class="vxe-form-item-group">
                     <template #default="{ data }">
                         <vxe-input v-model="data.ID" class="input-customize" style="width:74%" @@blur="getInvoiceByID(data.ID)"></vxe-input>
@@ -383,7 +383,7 @@
     </div>
 
     <!--明細表記錄-->
-    <div style="margin-top:20px">
+    <div style="margin-top:20px;">
         <vxe-table border
                    show-overflow
                    height="200"
