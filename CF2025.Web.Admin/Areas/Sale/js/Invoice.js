@@ -901,10 +901,10 @@ var Main = {
             this.showEdit = true;
         },
         saveEvent() {
-            // if (!this.validData())
-			// {
-				// return false;
-			// }
+            if (!this.validData())
+			{
+				return false;
+			}
 			this.formData.flag=this.$refs.input1.value;
             let InvMostly = this.formData;
             let InvDetails = this.tableDetails;
@@ -928,7 +928,7 @@ var Main = {
 			});
         },
        validData() {
-			if(this.formData.ID=='')
+			if(this.formData.ID==='')
 				return false;
 			let valid_flag=true;
 			let edit_flag=false;
@@ -1156,6 +1156,7 @@ var Main = {
 			this.showSent=true;
 		},
 		//發貨確認
+		//flag 入口參數： 0--發票；1--東莞D送貨單
 		confirmSent() {
 			if(this.formData.ID=='')
 				return;
@@ -1163,21 +1164,31 @@ var Main = {
 			{
 				return false;
 			} */
+			//flag 入口參數： 0--發票；1--東莞D送貨單
+			let flag=this.$refs.input1.value;
+			var issues_state='';
+			if(flag=='0')
+			{
 			if(this.issues_state==="")
 			{
 				this.$XModal.alert("發貨狀態不能為空!");
 				return;
 			}
-			let issues_state=this.issues_state;
+			issues_state=this.issues_state;
+			}
+			
             let InvDetails = this.tableDetails;
-            axios.post("ConfirmSent", { InvDetails,issues_state }).then(
+            axios.post("ConfirmSent", { InvDetails,flag,issues_state }).then(
             (response) => {
 				if(response.data.Status=="0")
 				{
 					this.formData.ID=response.data.ReturnValue;
 					// this.$XModal.alert(response.data.Msg);
 					this.getInvoiceByID(this.formData.ID);
-					this.$refs.xModalSent.close();
+					if(flag==="0")
+						this.$refs.xModalSent.close();
+					else
+						this.$XModal.alert(response.data.Msg);
 				}
 				else
 					this.$XModal.alert(response.data.Msg);
@@ -1190,6 +1201,7 @@ var Main = {
 			});
         },
 		//取消發貨
+		//flag 入口參數： 0--發票；1--東莞D送貨單
 		cancelSent() {
 			if(this.formData.ID=='')
 				return;
@@ -1197,19 +1209,27 @@ var Main = {
 			{
 				return false;
 			} */
+			let flag=this.$refs.input1.value;
+			if(flag=="0")
+			{
 			if(this.formData.state!="7")
 			{
 				this.$XModal.alert("只有已做發貨確認的發票才可進行取消發貨操作!");
 				return;
 			}
+			}
             let InvDetails = this.tableDetails;
-            axios.post("CancelSent", { InvDetails }).then(
+            axios.post("CancelSent", { InvDetails,flag }).then(
             (response) => {
 				if(response.data.Status=="0")
 				{
 					this.formData.ID=response.data.ReturnValue;
-					// this.$XModal.alert(response.data.Msg);
+					// 
 					this.getInvoiceByID(this.formData.ID);
+					if(flag==="0")
+						this.getInvoiceByID(this.formData.ID);
+					else
+						this.$XModal.alert(response.data.Msg);
 				}
 				else
 					this.$XModal.alert(response.data.Msg);
@@ -1258,6 +1278,52 @@ var Main = {
 			}
 			this.showEditItem=true;
 		},
+        additionSaveEvent() {
+			if (!this.validData())
+			{
+				return false;
+			}
+			this.formData.flag=this.$refs.input1.value;
+            let InvMostly = this.formData;
+            axios.post("AdditionSaveInvoice", { InvMostly }).then(
+            (response) => {
+				if(response.data.Status=="0")
+				{
+					this.formData.ID=response.data.ReturnValue;
+					this.$XModal.alert(response.data.Msg);
+					this.getInvoiceByID(this.formData.ID);
+				}
+				else
+					this.$XModal.alert(response.data.Msg);
+            },
+            (response) => {
+                alert(response.status);
+            }
+			).catch(function (response) {
+				alert(response);
+			});
+        },
+		convertToInvoice() {
+			this.formData.flag=this.$refs.input1.value;
+            let InvMostly = this.formData;
+            axios.post("ConfirmSent", { InvMostly }).then(
+            (response) => {
+				if(response.data.Status=="0")
+				{
+					this.formData.ID=response.data.ReturnValue;
+					this.$XModal.alert(response.data.Msg);
+					this.getInvoiceByID(this.formData.ID);
+				}
+				else
+					this.$XModal.alert(response.data.Msg);
+            },
+            (response) => {
+                alert(response.status);
+            }
+			).catch(function (response) {
+				alert(response);
+			});
+        },
 		formatterRowAmount ({ cellValue }) {
               return XEUtils.commafy(XEUtils.toNumber(cellValue), { digits: 2 })
             },

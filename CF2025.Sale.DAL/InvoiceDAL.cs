@@ -387,12 +387,6 @@ namespace CF2025.Sale.DAL
             int Ver = InvMostly.Ver;
             string strSql = "";
             string strSql1 = "",strSql2="";
-            string cust_name = "";
-            string fake_bill_address = "";
-            string cust_address = "";
-            string fake_name = "";
-            string fake_address = "";
-            string bill_address = "";
             string cd_disc = "1";
             string servername = "dgserver.cferp.dbo";
             string confirm_status = "0";
@@ -405,24 +399,27 @@ namespace CF2025.Sale.DAL
             string check_date = Converter.ConvertFieldToCnDateTimeString(InvMostly.check_date);
             if (InvMostly.EditFlag==1)
             {
+                InvMostly.it_customer_name = InvMostly.it_customer_name.Contains("'") ? InvMostly.it_customer_name.Replace("'", "''") : InvMostly.it_customer_name;
+                InvMostly.address = InvMostly.address.Contains("'") ? InvMostly.address.Replace("'", "''") : InvMostly.address;
+                //fake_bill_address = " " + (drCust["fake_s_address"] != null ? drCust["fake_s_address"].ToString().Trim() : "")
+                //    + (InvMostly.linkman != null ? " ATTN:" + InvMostly.linkman : "")
+                //    + (InvMostly.l_phone != null ? " TEL:" + InvMostly.l_phone : "")
+                //    + (InvMostly.fax != null ? " FAX:" + InvMostly.fax : "")
+                //    + (InvMostly.email != null ? " EMAIL:" + InvMostly.email : "");
+                InvMostly.fake_bill_address = InvMostly.fake_bill_address != null ? InvMostly.fake_bill_address.Contains("'") ? InvMostly.fake_bill_address.Replace("'", "''") : InvMostly.fake_bill_address : "";
+                InvMostly.bill_address = InvMostly.bill_address != null ? InvMostly.bill_address.Contains("'") ? InvMostly.bill_address.Replace("'", "''") : InvMostly.bill_address : "";
+                //cust_address = cust_name + fake_bill_address;
+                //fake_name = drCust["fake_name"] != null ? drCust["fake_name"].ToString().Trim() : "";
+                InvMostly.fake_name = InvMostly.fake_name != null ? InvMostly.fake_name.Contains("'") ? InvMostly.fake_name.Replace("'", "''") : InvMostly.fake_name : "";
+                InvMostly.fake_address = InvMostly.fake_address != null ? InvMostly.fake_address.Contains("'") ? InvMostly.fake_address.Replace("'", "''") : InvMostly.fake_address : "";
                 if (dtMostly.Rows.Count==0)
                 {
                     ID = InvoiceBase.GenDocNumber("SI01", InvMostly.issues_wh, InvMostly.bill_type_no, InvMostly.oi_date);
                     Ver = 0;
-                    DataTable dtCust = GetCustData(InvMostly.it_customer);
-                    DataRow drCust = dtCust.Rows[0];
+                    //DataTable dtCust = GetCustData(InvMostly.it_customer);
+                    //DataRow drCust = dtCust.Rows[0];
                     //cust_name= drCust["name"] != null ? drCust["name"].ToString().Trim() : "";
-                    InvMostly.it_customer_name = InvMostly.it_customer_name.Contains("'") ? InvMostly.it_customer_name.Replace("'", "''") : InvMostly.it_customer_name;
-                    //fake_bill_address = " " + (drCust["fake_s_address"] != null ? drCust["fake_s_address"].ToString().Trim() : "")
-                    //    + (InvMostly.linkman != null ? " ATTN:" + InvMostly.linkman : "")
-                    //    + (InvMostly.l_phone != null ? " TEL:" + InvMostly.l_phone : "")
-                    //    + (InvMostly.fax != null ? " FAX:" + InvMostly.fax : "")
-                    //    + (InvMostly.email != null ? " EMAIL:" + InvMostly.email : "");
-                    InvMostly.fake_bill_address = InvMostly.fake_bill_address.Contains("'") ? InvMostly.fake_bill_address.Replace("'", "''") : InvMostly.fake_bill_address;
-                    InvMostly.bill_address = InvMostly.bill_address.Contains("'") ? InvMostly.bill_address.Replace("'", "''") : InvMostly.bill_address;
-                    //cust_address = cust_name + fake_bill_address;
-                    //fake_name = drCust["fake_name"] != null ? drCust["fake_name"].ToString().Trim() : "";
-                    InvMostly.fake_name = InvMostly.fake_name.Contains("'") ? InvMostly.fake_name.Replace("'", "''") : InvMostly.fake_name;
+                    
                     //fake_address = fake_name + fake_bill_address;
                     //bill_address = InvMostly.bill_address;
                     strSql1 += " Insert Into so_invoice_mostly (" +
@@ -481,9 +478,10 @@ namespace CF2025.Sale.DAL
                         ",tax_sum='{29}',amount='{30}',other_fee='{31}',total_package_num='{32}',total_weight='{33}',remark2='{34}',ship_remark='{35}',ship_remark2='{36}',ship_remark3='{37}',remark='{38}'" +
                         ",p_id='{39}',pc_id='{40}',sm_id='{41}',accounts='{42}',per='{43}',final_destination='{44}',issues_state='{45}',transport_style='{46}',loading_port='{47}'" +
                         ",ap_id='{48}',tranship_port='{49}',finally_buyer='{50}',mo_group='{51}',packinglistno='{52}',box_no='{53}',update_by='{55}'" +
+                        ",name='{57}',address='{58}',fake_name='{59}',fake_bill_address='{60}',bill_address='{61}',fake_address='{62}'" +
                         ",area='{66}',m_rate='{67}'";
                     //,state='{56}',create_by='{54}',cd_disc='{62}',flag='{63}',servername='{64}'
-                    //更新狀態，不再更新這些字段：,name='{57}',address='{58}',fake_bill_address='{59}',bill_address='{60}',fake_address='{61}'
+                    //更新狀態，不再更新這些字段：
                     if (payment_date != "")
                         strSql1 += ",payment_date='{69}'";
                     if (ship_date != "")
@@ -623,7 +621,8 @@ namespace CF2025.Sale.DAL
         }
         private static DataTable CehckInvMostlyExist(string ID)
         {
-            string strSql = "Select id,ver,state FROM so_invoice_mostly Where within_code='" + within_code + "' And id='" + ID + "'";
+            string strSql = "Select id,ver,state,confirm_status,flag "+
+                " FROM so_invoice_mostly Where within_code='" + within_code + "' And id='" + ID + "'";
             DataTable dtInv = sh.ExecuteSqlReturnDataTable(strSql);
             return dtInv;
         }
@@ -685,9 +684,9 @@ namespace CF2025.Sale.DAL
                 " Left  Join it_customer g On a.within_code=g.within_code And a.it_customer=g.id" +
                 " Left  Join it_customer h On a.within_code=h.within_code And a.finally_buyer=h.id" +
                 " Where a.within_code='" + within_code + "' And a.id='" + ID + "' And f.language_id='" + language_id + "'";
-            if (flag == "0") 
+            if (flag == "0") //發票
                  strSql += " And (a.flag='0' Or a.flag='1' And a.confirm_status='1' )";
-            else
+            else  //東莞D送貨單
                 strSql += " And a.flag='1'";
             strSql += " Order By b.sequence_id ";
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);//
@@ -696,10 +695,10 @@ namespace CF2025.Sale.DAL
             var mdjDetails = ConvertHelper.DataTableToList<so_invoice_details>(dt);
             lsInv.ocMostly = mdjMostly;
             lsInv.ocDetails = mdjDetails;
-            lsInv.ocOtherFare = GetFareDataByID(ID);
+            lsInv.ocOtherFare = GetFareDataByID(ID,flag);
             return lsInv;
         }
-        public static List<so_other_fare> GetFareDataByID(string ID)
+        public static List<so_other_fare> GetFareDataByID(string ID,string flag)
         {
             List<so_other_fare> lsInvFare = new List<so_other_fare>();
             string strSql = "";
@@ -708,6 +707,10 @@ namespace CF2025.Sale.DAL
                 " FROM so_invoice_mostly a" +
                 " Inner Join so_invoice_other_fare b On a.within_code=b.within_code And a.id=b.id And a.Ver=b.Ver" +
                 " Where a.within_code='" + within_code + "' And a.id='" + ID + "'";
+            if (flag == "0") //發票
+                strSql += " And (a.flag='0' Or a.flag='1' And a.confirm_status='1' )";
+            else  //東莞D送貨單
+                strSql += " And a.flag='1'";
             strSql += " Order By b.sequence_id ";
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             lsInvFare = ConvertHelper.DataTableToList<so_other_fare>(dt);
@@ -1073,20 +1076,43 @@ namespace CF2025.Sale.DAL
         }
 
         //發貨確認
-        public static UpdateStatusModel ConfirmSent(List<so_invoice_details> InvDetails,string issues_state)
+        //入口參數：flag： 0--發貨；1--東莞D送貨單
+        //flag=0 從發票界面中點擊發貨確認
+        //flag=1 從東莞D界面中點擊轉換成發票
+        public static UpdateStatusModel ConfirmSent(List<so_invoice_details> InvDetails,string flag,string issues_state)
         {
             UpdateStatusModel mdj = new UpdateStatusModel();
             string ID = InvDetails[0].ID;
             DataTable dtMostly = CehckInvMostlyExist(ID);
+            string state = "7";
+            if (flag == "1")
+                state = "H";
             if (dtMostly.Rows.Count > 0)
             {
                 if (dtMostly.Rows[0]["state"].ToString().Trim() != "1")
                 {
                     mdj.ReturnValue = ID;
                     mdj.Status = "1";
-                    mdj.Msg = "只有已做批準的發票才可以執行發貨確認!";
+                    mdj.Msg = "未批準的記錄不能進行此操作!";
                     return mdj;
                 }
+                if (flag == "1")
+                {
+                    if (dtMostly.Rows[0]["confirm_status"].ToString().Trim() == "1")
+                    {
+                        mdj.ReturnValue = ID;
+                        mdj.Status = "1";
+                        mdj.Msg = "此送貨單已轉換成發票，不能再進行此操作!";
+                        return mdj;
+                    }
+                }
+            }
+            else
+            {
+                mdj.ReturnValue = ID;
+                mdj.Status = "1";
+                mdj.Msg = "沒有待確認的記錄!";
+                return mdj;
             }
             int Ver = InvDetails[0].Ver;
             string strSql = "";
@@ -1128,9 +1154,15 @@ namespace CF2025.Sale.DAL
 
             }
             //更新發票表頭的狀態
-            strSql += string.Format(@" Update so_invoice_mostly Set state='{3}',issues_state='{4}',consignment_date='{5}'" +
+            if (flag == "0")
+                strSql += string.Format(@" Update so_invoice_mostly Set state='{3}',issues_state='{4}',consignment_date='{5}'" +
+                    " Where within_code='{0}' And id='{1}' And ver='{2}'"
+                     , within_code, ID, Ver, state, issues_state, check_date
+                 );
+            else
+                strSql += string.Format(@" Update so_invoice_mostly Set state='{3}',confirm_status='{4}'" +
                 " Where within_code='{0}' And id='{1}' And ver='{2}'"
-                 , within_code, ID, Ver, "7", issues_state, check_date
+                 , within_code, ID, Ver, state, "1"
                  );
             strSql += string.Format(@" COMMIT TRANSACTION ");
             string result = sh.ExecuteSqlUpdate(strSql);
@@ -1138,7 +1170,10 @@ namespace CF2025.Sale.DAL
             if (result == "")
             {
                 mdj.Status = "0";
-                mdj.Msg = "發貨批準成功!";
+                if (flag == "0")
+                    mdj.Msg = "發貨批準成功!";
+                else
+                    mdj.Msg = "送貨單轉換發票成功!";
             }
             else
             {
@@ -1148,20 +1183,50 @@ namespace CF2025.Sale.DAL
             return mdj;
         }
         //取消發貨
-        public static UpdateStatusModel CancelSent(List<so_invoice_details> InvDetails)
+        //入口參數：flag： 0--發貨；1--東莞D送貨單
+        //flag=0 從發票界面中點擊發貨確認
+        //flag=1 從東莞D界面中點擊轉換成發票
+        public static UpdateStatusModel CancelSent(List<so_invoice_details> InvDetails, string flag)
         {
             UpdateStatusModel mdj = new UpdateStatusModel();
             string ID = InvDetails[0].ID;
             DataTable dtMostly = CehckInvMostlyExist(ID);
             if (dtMostly.Rows.Count > 0)
             {
-                if (dtMostly.Rows[0]["state"].ToString().Trim() != "7")
+                if (flag == "0")
                 {
-                    mdj.ReturnValue = ID;
-                    mdj.Status = "1";
-                    mdj.Msg = "只有已做發貨確認的發票才可執行取消發貨!";
-                    return mdj;
+                    if (dtMostly.Rows[0]["state"].ToString().Trim() != "7")
+                    {
+                        mdj.ReturnValue = ID;
+                        mdj.Status = "1";
+                        mdj.Msg = "只有已做發貨確認的發票才可執行取消發貨!";
+                        return mdj;
+                    }
                 }
+                else
+                {
+                    if (dtMostly.Rows[0]["confirm_status"].ToString().Trim() != "1")
+                    {
+                        mdj.ReturnValue = ID;
+                        mdj.Status = "1";
+                        mdj.Msg = "此單不是已轉換發票狀態，不能進行此操作!";
+                        return mdj;
+                    }
+                    if (dtMostly.Rows[0]["state"].ToString().Trim() != "H")
+                    {
+                        mdj.ReturnValue = ID;
+                        mdj.Status = "1";
+                        mdj.Msg = "此單不是開票狀態，不能進行此操作!";
+                        return mdj;
+                    }
+                }
+            }
+            else
+            {
+                mdj.ReturnValue = ID;
+                mdj.Status = "1";
+                mdj.Msg = "沒有待取消確認的記錄!";
+                return mdj;
             }
             int Ver = InvDetails[0].Ver;
             
@@ -1238,9 +1303,15 @@ namespace CF2025.Sale.DAL
                 }
             }
             //更新發票為已批準的狀態
-            strSql += string.Format(@" Update so_invoice_mostly Set state='{3}',issues_state='',consignment_date=null" +
+            if (flag == "0")
+                strSql += string.Format(@" Update so_invoice_mostly Set state='{3}',issues_state='',consignment_date=null" +
+                    " Where within_code='{0}' And id='{1}' And ver='{2}'"
+                     , within_code, ID, Ver, "1"
+                     );
+            else
+                strSql += string.Format(@" Update so_invoice_mostly Set state='{3}',confirm_status='{4}'" +
                 " Where within_code='{0}' And id='{1}' And ver='{2}'"
-                 , within_code, ID, Ver, "1"
+                 , within_code, ID, Ver, "1", "0"
                  );
             strSql += string.Format(@" COMMIT TRANSACTION ");
             string result = sh.ExecuteSqlUpdate(strSql);
@@ -1248,7 +1319,10 @@ namespace CF2025.Sale.DAL
             if (result == "")
             {
                 mdj.Status = "0";
-                mdj.Msg = "發貨取消成功!";
+                if (flag == "0")
+                    mdj.Msg = "發貨取消成功!";
+                else
+                    mdj.Msg = "已取消發票轉換!";
             }
             else
             {
@@ -1471,6 +1545,107 @@ namespace CF2025.Sale.DAL
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             List<so_invoice_ship_remark> list = CommonDAL.DataTableToList<so_invoice_ship_remark>(dt);
             return list;
+        }
+
+
+        public static UpdateStatusModel AdditionSaveInvoice(so_invoice_mostly InvMostly)
+        {
+            string ID = InvMostly.ID == null ? "" : InvMostly.ID;
+            UpdateStatusModel mdj = new UpdateStatusModel();
+            DataTable dtMostly = CehckInvMostlyExist(ID);
+            if (dtMostly.Rows.Count > 0)
+            {
+                if (dtMostly.Rows[0]["state"].ToString().Trim() == "E")
+                {
+                    mdj.ReturnValue = ID;
+                    mdj.Status = "1";
+                    mdj.Msg = "該送貨單為已確認開票狀態，不能再修改!";
+                    return mdj;
+                }
+            }
+            else
+            {
+                mdj.ReturnValue = ID;
+                mdj.Status = "1";
+                mdj.Msg = "沒有要儲存的送貨單記錄!";
+                return mdj;
+            }
+            mdj = CheckCustStatus(ID, InvMostly.it_customer);
+            if (mdj.Status == "1")
+                return mdj;
+            int Ver = InvMostly.Ver;
+            string strSql = "";
+            string strSql1 = "";
+            string cd_disc = "1";
+            string servername = "dgserver.cferp.dbo";
+            string confirm_status = "0";
+            strSql += string.Format(@" SET XACT_ABORT  ON ");
+            strSql += string.Format(@" BEGIN TRANSACTION ");
+            string payment_date = Converter.ConvertFieldToCnDataString(InvMostly.payment_date);
+            string ship_date = Converter.ConvertFieldToCnDataString(InvMostly.ship_date);
+            string create_date = Converter.ConvertFieldToCnDateTimeString(InvMostly.create_date);
+            string update_date = Converter.ConvertFieldToCnDateTimeString(InvMostly.update_date);
+            string check_date = Converter.ConvertFieldToCnDateTimeString(InvMostly.check_date);
+            if (InvMostly.EditFlag == 1)
+            {
+                InvMostly.it_customer_name = InvMostly.it_customer_name.Contains("'") ? InvMostly.it_customer_name.Replace("'", "''") : InvMostly.it_customer_name;
+                InvMostly.address = InvMostly.address.Contains("'") ? InvMostly.address.Replace("'", "''") : InvMostly.address;
+                InvMostly.fake_bill_address = InvMostly.fake_bill_address != null ? InvMostly.fake_bill_address.Contains("'") ? InvMostly.fake_bill_address.Replace("'", "''") : InvMostly.fake_bill_address : "";
+                InvMostly.bill_address = InvMostly.bill_address != null ? InvMostly.bill_address.Contains("'") ? InvMostly.bill_address.Replace("'", "''") : InvMostly.bill_address : "";
+                InvMostly.fake_name = InvMostly.fake_name != null ? InvMostly.fake_name.Contains("'") ? InvMostly.fake_name.Replace("'", "''") : InvMostly.fake_name : "";
+                InvMostly.fake_address = InvMostly.fake_address != null ? InvMostly.fake_address.Contains("'") ? InvMostly.fake_address.Replace("'", "''") : InvMostly.fake_address : "";
+
+                strSql1 += " Update so_invoice_mostly Set " +
+                    " oi_date='{3}',separate='{4}',Shop_no='{5}',it_customer='{6}',phone='{7}',fax='{8}',linkman='{9}'" +
+                    ",l_phone='{10}',department_id='{11}',email='{12}',issues_wh='{13}',bill_type_no='{14}',merchandiser='{15}',merchandiser_phone='{16}',po_no='{17}',shipping_methods='{18}'" +
+                    ",seller_id='{19}',m_id='{20}',exchange_rate='{21}',goods_sum='{22}',other_fare='{23}',disc_rate='{24}',disc_amt='{25}',disc_spare='{26}',total_sum='{27}',tax_ticket='{28}'" +
+                    ",tax_sum='{29}',amount='{30}',other_fee='{31}',total_package_num='{32}',total_weight='{33}',remark2='{34}',ship_remark='{35}',ship_remark2='{36}',ship_remark3='{37}',remark='{38}'" +
+                    ",p_id='{39}',pc_id='{40}',sm_id='{41}',accounts='{42}',per='{43}',final_destination='{44}',issues_state='{45}',transport_style='{46}',loading_port='{47}'" +
+                    ",ap_id='{48}',tranship_port='{49}',finally_buyer='{50}',mo_group='{51}',packinglistno='{52}',box_no='{53}',update_by='{55}'" +
+                    ",name='{57}',address='{58}',fake_name='{59}',fake_bill_address='{60}',bill_address='{61}',fake_address='{62}'" +
+                    ",area='{66}',m_rate='{67}'";
+
+                //,state='{56}',create_by='{54}',cd_disc='{62}',flag='{63}',servername='{64}'
+                //更新狀態，不再更新這些字段：
+                if (payment_date != "")
+                    strSql1 += ",payment_date='{69}'";
+                if (ship_date != "")
+                    strSql1 += ",ship_date='{70}'";
+                if (create_date != "")
+                    strSql1 += ",create_date='{71}'";
+                update_date = Converter.ToCnDateTimeString(System.DateTime.Now);
+                strSql1 += ",update_date='{72}'";
+                if (check_date != "")
+                    strSql1 += ",check_date='{73}'";
+                strSql1 += " Where within_code='{0}' And id='{1}' And Ver='{2}' ";
+
+                strSql += string.Format(@strSql1
+                    , within_code, ID, Ver, InvMostly.oi_date, InvMostly.separate, InvMostly.Shop_no, InvMostly.it_customer, InvMostly.phone, InvMostly.fax
+                    , InvMostly.linkman, InvMostly.l_phone, InvMostly.department_id, InvMostly.email, InvMostly.issues_wh, InvMostly.bill_type_no, InvMostly.merchandiser, InvMostly.merchandiser_phone, InvMostly.po_no, InvMostly.shipping_methods
+                    , InvMostly.seller_id, InvMostly.m_id, InvMostly.exchange_rate, InvMostly.goods_sum, InvMostly.other_fare, InvMostly.disc_rate, InvMostly.disc_amt, InvMostly.disc_spare, InvMostly.total_sum, InvMostly.tax_ticket
+                    , InvMostly.tax_sum, InvMostly.amount, InvMostly.other_fee, InvMostly.total_package_num, InvMostly.total_weight, InvMostly.remark2, InvMostly.ship_remark, InvMostly.ship_remark2, InvMostly.ship_remark3, InvMostly.remark
+                    , InvMostly.p_id, InvMostly.pc_id, InvMostly.sm_id, InvMostly.accounts, InvMostly.per, InvMostly.final_destination, InvMostly.issues_state, InvMostly.transport_style, InvMostly.loading_port
+                    , InvMostly.ap_id, InvMostly.tranship_port, InvMostly.finally_buyer, InvMostly.mo_group, InvMostly.packinglistno, InvMostly.box_no, InvMostly.create_by, InvMostly.update_by, InvMostly.state
+                    , InvMostly.it_customer_name, InvMostly.address, InvMostly.fake_name, InvMostly.fake_bill_address, InvMostly.bill_address, InvMostly.fake_address
+                    , cd_disc, InvMostly.flag, servername, InvMostly.area, InvMostly.m_rate, confirm_status
+                    , payment_date, ship_date, create_date, update_date, check_date
+                    );
+            }
+
+            strSql += string.Format(@" COMMIT TRANSACTION ");
+            string result = sh.ExecuteSqlUpdate(strSql);
+            mdj.ReturnValue = ID;
+            if (result == "")
+            {
+                mdj.Status = "0";
+                mdj.Msg = "送貨單附加儲存成功!";
+            }
+            else
+            {
+                mdj.Status = "1";
+                mdj.Msg = result;
+            }
+            return mdj;
         }
     }
 }

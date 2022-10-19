@@ -1,26 +1,40 @@
 ﻿
 @{
-    //Layout = null;
-    ViewBag.Title = "Index";
+//Layout = null;
+//ViewBag.Title = "Index";
 }
 
 <div id="app">
     <vxe-toolbar perfect size="medium" style="height:35px" class="tools-menus" >
         <template #buttons>
-            <vxe-button type="text" icon="iconfont icon-file-add1" style="width:70px;margin-left:-10px;" content="新增" @@click="newDoc()"></vxe-button> @*icon="fa fa-plus" status="primary"*@
-            <vxe-button type="text" icon="iconfont icon-save1" style="width:70px;margin-left:-15px;" content="儲存" @@click="saveEvent()"></vxe-button>
-            <vxe-button type="text" icon="iconfont icon-zu10011" style="width:70px;margin-left:-15px;" content="批準" @@click="approveEvent()"></vxe-button>
-            <vxe-button type="text" icon="iconfont icon-add7" style="width:80px;margin-left:-15px;" content="新版本" @@click="newVersion()"></vxe-button>
-            <vxe-button type="text" icon="iconfont icon-tableaddrows" style="width:90px;margin-left:-15px;" @@click="addNewItem()" size="mini">項目新增</vxe-button>
-            <vxe-button type="text" icon="iconfont icon-tableaddrows" style="width:90px;margin-left:-15px;" @@click="showModalEditItem()" size="mini">項目修改</vxe-button>
-            <vxe-button type="text" icon="iconfont icon-tabledeleterows" style="width:90px;margin-left:-15px;" @@click="deleteTableItemEvent()" size="mini">項目刪除</vxe-button>
-            <vxe-button type="text" icon="iconfont icon-cancel7" style="width:70px;margin-left:-15px;" @@click="cancelDoc()" content="注銷"></vxe-button>
-            <vxe-button type="text" icon="iconfont icon-n_cost" style="width:100px;margin-left:-15px;" @@click="addNewFareItem()" size="mini">新增附加費</vxe-button>
-            <vxe-button type="text" icon="iconfont icon-Flight" style="width:90px;margin-left:-15px;" @@click="showModalSent()" size="mini">發貨確認</vxe-button>
-            <vxe-button type="text" icon="iconfont icon-flight_cancelled" style="width:90px;margin-left:-15px;" @@click="cancelSent()" size="mini">取消發貨</vxe-button>
-            @*<vxe-button type="text" icon="fa fa-pencil" class="thickbox" @@click="showWindow()" size="mini">查找</vxe-button>*@
+        @{
+            if (ViewBag.DocType == "0")
+            {
+                <vxe-button type="text" icon="iconfont icon-file-add1" style="width:70px;margin-left:-10px;" content="新增" @@click="newDoc()"></vxe-button> @*icon="fa fa-plus" status="primary"*@
+                <vxe-button type="text" icon="iconfont icon-save1" style="width:70px;margin-left:-15px;" content="儲存" @@click="saveEvent()"></vxe-button>
+                <vxe-button type="text" icon="iconfont icon-zu10011" style="width:70px;margin-left:-15px;" content="批準" @@click="approveEvent()"></vxe-button>
+                <vxe-button type="text" icon="iconfont icon-add7" style="width:80px;margin-left:-15px;" content="新版本" @@click="newVersion()"></vxe-button>
+                <vxe-button type="text" icon="iconfont icon-tableaddrows" style="width:90px;margin-left:-15px;" @@click="addNewItem()" size="mini">項目新增</vxe-button>
+                <vxe-button type="text" icon="iconfont icon-tabledeleterows" style="width:90px;margin-left:-15px;" @@click="deleteTableItemEvent()" size="mini">項目刪除</vxe-button>
+                <vxe-button type="text" icon="iconfont icon-cancel7" style="width:70px;margin-left:-15px;" @@click="cancelDoc()" content="注銷"></vxe-button>
+                <vxe-button type="text" icon="iconfont icon-n_cost" style="width:100px;margin-left:-15px;" @@click="addNewFareItem()" size="mini">新增附加費</vxe-button>
+                <vxe-button type="text" icon="iconfont icon-Flight" style="width:90px;margin-left:-15px;" @@click="showModalSent()" size="mini">發貨確認</vxe-button>
+                <vxe-button type="text" icon="iconfont icon-flight_cancelled" style="width:90px;margin-left:-15px;" @@click="cancelSent()" size="mini">取消發貨</vxe-button>
+            }
+        }
+            <vxe-button type="text" icon="iconfont icon-edit6" style="width:90px;margin-left:-15px;" @@click="showModalEditItem()" size="mini">項目修改</vxe-button>
             <vxe-button type="text" icon="iconfont icon-search1" style="width:70px;margin-left:-15px;" class="thickbox" @@click="showFindWindos()" size="mini">查找</vxe-button>
             <vxe-button type="text" icon="iconfont icon-print" style="width:70px;margin-left:-15px;" @@click="printEvent" size="mini">列印</vxe-button>
+    @{
+        if (ViewBag.DocType == "1")
+        {
+                <vxe-button type = "text" icon = "iconfont icon-save3" style = "width:90px;margin-left:-15px;" content = "附加儲存" @@click = "additionSaveEvent()" ></vxe-button >
+                <vxe-button type = "text" icon = "iconfont icon-un-confirm-bordero" style = "width:100px;margin-left:-15px;" @@click = "confirmSent" size = "mini" > 轉換成發票 </vxe-button >
+                <vxe-button type = "text" icon = "iconfont icon-cancel3" style = "width:120px;margin-left:-15px;" @@click = "cancelSent" size = "mini" > 取消發票轉換 </vxe-button >
+            }
+    }
+            @*<vxe-button type="text" icon="fa fa-pencil" class="thickbox" @@click="showWindow()" size="mini">查找</vxe-button>*@
+
             @*<vxe-input v-model="searchProductMo" class="my-search" placeholder="輸入制單編號" style="height:30px;margin:105px,0px;">
             <template #suffix>
                 <i class="fa fa-search" @@click="searchByProductMo(searchProductMo)"></i>
@@ -35,7 +49,7 @@
                     <template #default="{ data }">
                         <vxe-input v-model="data.ID" class="input-customize" style="width:74%" @@blur="getInvoiceByID(data.ID)"></vxe-input>
                         <vxe-input v-model="data.Ver" class="input-customize" style="width:20%"></vxe-input>
-                        <input type="text" value="0" style="width:10%;display:none" ref="input1">
+                        <input type="text" value=@ViewBag.DocType style="width:20%;display:none" ref="input1">
                     </template>
                 </vxe-form-item>
                 <vxe-form-item title="發票日期" field="oi_date" :item-render="{}" span="6" class="vxe-form-item-group">
@@ -933,7 +947,7 @@
                 <vxe-form-item align="center" span="24" style="margin-top:50px">
                     <template #default>
                         @*<vxe-button type="text" @@click="confirmSent()" status="primary">確定</vxe-button>*@
-                        <vxe-button size="medium" @@click="confirmSent()" content="批準"></vxe-button>
+                        <vxe-button size="medium" @@click="confirmSent" content="批準"></vxe-button>
                         <vxe-button size="medium" @@click="$refs.xModalSent.close()" content="關閉"></vxe-button>
                         @*<vxe-button type="text" icon="fa fa-undo" @@click="$refs.xModalSent.close()">取消</vxe-button>*@
                     </template>
