@@ -29,6 +29,7 @@
                 operators: [{ required: true, message: '請選擇操作符' }]                       
             },
             allTotal:0,
+            topResults:200,
         }
     },
     created() {
@@ -281,13 +282,25 @@
             var strSelect=""
             var joinArr=[];
             var fromArr=[];
-            var orderbyArr=[];
+            var orderbyArr=[];            
             for(var i=1;i<this.fieldNameList.length;i++){
                 //i=0是空格,所以循環從1開始.
-                if(i===1){
-                    strSelect += this.fieldNameList[i].table_name +"." + this.fieldNameList[i].value;
+                //if(i===1){
+                //    strSelect += this.fieldNameList[i].table_name +"." + this.fieldNameList[i].value;
+                //}else{
+                //    strSelect += "," + this.fieldNameList[i].table_name +"." + this.fieldNameList[i].value;
+                //}
+                if(this.fieldNameList[i].field_type==='D' || this.fieldNameList[i].field_type==='T'){
+                    if(this.fieldNameList[i].field_type==='D'){
+                        strSelect += "Convert(varchar(10)," + this.fieldNameList[i].table_name +"." + this.fieldNameList[i].value +",120) As " + this.fieldNameList[i].value;
+                    }else{
+                        strSelect += "Convert(varchar(19)," + this.fieldNameList[i].table_name +"." + this.fieldNameList[i].value +",120) As " + this.fieldNameList[i].value;
+                    }
                 }else{
-                    strSelect += "," + this.fieldNameList[i].table_name +"." + this.fieldNameList[i].value;
+                    strSelect += this.fieldNameList[i].table_name +"." + this.fieldNameList[i].value;
+                }
+                if(i < this.fieldNameList.length-1){
+                    strSelect +=",";//最后一個字段之后不用加","號
                 }
                 //構建FROM之后表名
                 if(this.fieldNameList[i].from_table !==""){
@@ -327,10 +340,19 @@
             var strOrderby="";
             if(orderbyArr.length>0){
                 strOrderby = orderbyArr[0];            
-            }            
+            }
             //構建完整的sql語句
-            //在strTable(table_from)中寫有inner join left join,strJoin(table_relation)就不用寫           
-            var strSql="SELECT TOP 5000 " + strSelect +" FROM "+ strTable +" WHERE "+ strJoin +" AND "+ strValue 
+            //在strTable(table_from)中寫有inner join left join,strJoin(table_relation)就不用寫            
+            var num = this.topResults;
+            if (num == "" || num.length ==0) { 
+                this.topResults = 200;
+            }else{            
+                if (!(/(^[1-9]\d*$)/.test(num))) {
+                    //输入的不是正整数 
+                    this.topResults = 200;
+                }
+            }
+            var strSql="SELECT TOP "+ this.topResults + strSelect +" FROM "+ strTable +" WHERE "+ strJoin +" AND "+ strValue 
             if(strOrderby !==""){
                 strSql +=" Order by "+ strOrderby;
             }            

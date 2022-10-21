@@ -1399,7 +1399,7 @@ var Main = {
             if(this.curReportRow){
                 console.log(this.curReportRow.reportid);
                 var url= "Print?ID=" + this.formData.ID + "&Ver=" + this.formData.Ver+"&report_id=" + this.curReportRow.reportid;
-                comm.showMessageDialog(url,'列印',1024,768,true);
+                comm.showMessageDialog(url,'列印',800,600,true);//1024,768
             }else{
                 this.$XModal.alert({ content: '請首先指定列印的報表類型!',mask: false });
             }

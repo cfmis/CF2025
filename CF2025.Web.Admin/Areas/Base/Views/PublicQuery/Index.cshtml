@@ -38,8 +38,10 @@
                 <vxe-button icon="iconfont icon-row-add" @@click="insertRowEvent()">項目增加</vxe-button>
                 <vxe-button icon="iconfont icon-row-del" @@click="delRowEvent()" style="margin-left: -2px">項目刪除</vxe-button>
                 <vxe-button icon="iconfont icon-save1 my-black" @@click="saveEvent()" style="margin-left: -2px">保存</vxe-button>
-                <vxe-button status="primary" icon="iconfont icon-search1" @@click="searchEvent()" style="margin-left: 50px">查詢</vxe-button>
-                <vxe-button status="success" icon="iconfont icon-confirm4" @@click="okEvent()" style="margin-left: 50px">確認</vxe-button>
+                <input v-model="topResults" maxlenth="10" placeholder="返回記錄數" style="outline-style:none;margin-left:15px;width:50px">
+                <vxe-button status="primary" icon="iconfont icon-search1" @@click="searchEvent()" style="margin-left: 15px">查詢</vxe-button>
+                <vxe-button status="success" icon="iconfont icon-confirm4" @@click="okEvent()" style="margin-left: 10px">確認</vxe-button>
+                
             </template>
         </vxe-toolbar>
         <vxe-table border
@@ -47,7 +49,7 @@
                     show-overflow
                     :data="tableCondition"
                     ref="tableConditionRef"
-                    height="180"                   
+                    height="150"
                     @*max-height="180"*@
                     highlight-hover-row
                     highlight-current-row
@@ -128,7 +130,7 @@
             stripe
             ref="tableResultRef"
             size="mini"           
-            height="290"
+            height="310"
             @*max-height="290"*@
             show-header-overflow
             highlight-hover-row

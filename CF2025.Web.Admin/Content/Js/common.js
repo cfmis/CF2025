@@ -1,11 +1,11 @@
 var comm= {
     openWindos:function(id){
         var url = "/Base/PublicQuery?window_id=" + id;//對應Controller
-        this.showMessageDialog(url, "查詢", 1024, 600, true); 
+        this.showMessageDialog(url, "查詢", 800, 600, true); //1024 600
     }, 
     openFindItem:function(id){
         var url = "/Base/PublicItemQuery" ;
-        this.showMessageDialog(url, "查詢", 1024, 600, true); 
+        this.showMessageDialog(url, "查詢", 800, 600, true); //1024 600
     }, 
     openPassword: function(user_id){
         var url = "/Base/Common/PasswordConfirm?user_id=" + user_id;
