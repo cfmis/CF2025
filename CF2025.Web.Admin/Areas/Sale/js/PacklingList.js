@@ -11,10 +11,8 @@ var Main = {
             selectRow: null,
             curReportRow:null,
             tableDetails: [],
-            tableFareDetails:[],
             tableReport:[],
             editDetails: {},
-			editFareDetails:{},
             preveditDetails:{},
             searchProductMo: '',
             loading3: false,
@@ -22,29 +20,13 @@ var Main = {
 			selectedFareRowIndex:-1,
 			showSent:false,
             showPrint:false,
-			issues_state:'',
+			showEditItem:false,
 			newDocFlag:0,
-            // formData:{
-				// it_customer:'',
-				// merchandiser: '',
-				// oi_date: comm.getCurrentDate(),
-				// Ver: 0,
-				// separate:'01',
-				// create_date:comm.getCurrentTime(),
-				// create_by: 'admin',
-				// update_date:comm.getCurrentTime(),
-				// update_by: 'admin',
-				// state:'0',
-				// state_name:'未批準',
-			// },
+
 			formData:{},
             prevForm: {},
             editFormChanged: false, // 是否修改标识
-            sexList: [
-            { label: '', value: '' },
-            { label: '女', value: '0' },
-            { label: '男', value: '1' }
-            ],
+
 			DocSourceTypeList:[],
             SalesmanList:[],
 			CurrList:[],
@@ -61,6 +43,7 @@ var Main = {
 			GetQtyUnitRateList:[],
 			TackFareList:[],
 			issues_state_list:[],
+			AreaList:[],
             tableData: [
             // { id: 10001, name: 'Test1', role: 'Develop', sex: 'Man', age: 28, address: 'test abc',sex:'1' },
             // { id: 10002, name: 'Test2', role: 'Test', sex: 'Women', age: 22, address: 'Guangzhou',sex:'0' },
@@ -72,34 +55,30 @@ var Main = {
             // { id: 10008, name: 'Test8', role: 'Develop', sex: 'Man', age: 35, address: 'test abc',sex:'1' },
           
 			],
-            name: '',
-            sex: 1,
-            date:'',
     }
     },
     created() {
-		// this.getSalesman();
-        // this.getCurr();
+
 		this.initMostlyValue();
 		this.initDetailsValue();
-		this.initFareDetailsValue();
-		this.getComboxList("DocSourceTypeList");
-		this.getComboxList("SalesmanList");
-		this.getComboxList("CurrList");
-		this.getComboxList("OutStoreList");
-		this.getComboxList("InvSourceTypeList");
-		this.getComboxList("PaymentTypeList");
-		this.getComboxList("PriceCondList");
-		this.getComboxList("ShipModeList");
-		this.getComboxList("AccountList");
-		this.getComboxList("ShipWayList");
+		// this.initFareDetailsValue();
+		this.getComboxList("PL01");//單據來源
+		// this.getComboxList("SalesmanList");
+		// this.getComboxList("CurrList");
+		// this.getComboxList("OutStoreList");
+		// this.getComboxList("InvSourceTypeList");
+		// this.getComboxList("PaymentTypeList");
+		// this.getComboxList("PriceCondList");
+		// this.getComboxList("ShipModeList");
+		// this.getComboxList("AccountList");
+		// this.getComboxList("ShipWayList");
 		this.getComboxList("ShipPortList");
-		this.getComboxList("MoGroupList");
+		// this.getComboxList("MoGroupList");
 		
 		this.getComboxList("QtyUnitList");
-		this.getComboxList("QtyUnitRateList");
-		this.getComboxList("TackFareList");
-		// this.getComboxList("issues_state_list");
+		// this.getComboxList("QtyUnitRateList");
+		// this.getComboxList("TackFareList");
+
 		this.newDoc();
     },
     methods: {
@@ -160,72 +139,41 @@ var Main = {
             EditFlag:1,
 			ID:'',
             mo_id: '',
-            oi_date: comm.getCurrentDate(),
-            Ver: 0,
-			separate:'1',
-			Shop_no:'',
+            packing_date: comm.getCurrentDate(),
+			origin_id:'',
+			invoice_id:'',
+			state:'0',
             it_customer: '',
-            phone: '',
-            fax: '',
-            payment_date: '',
-            linkman: '',
-            l_phone: '',
-            department_id: '',
-            email: '',
-            issues_wh: '',
-            bill_type_no: '',
-            merchandiser: '',
-            merchandiser_phone: '',
-            po_no:'',
-            shipping_methods:'',
-			seller_id:'',
-            m_id: '',
-			m_rate:0.000,
-            exchange_rate: 0.000,
-            goods_sum: 0.00,
-            other_fare: 0.00,
-            disc_rate: 0.00,
-            disc_amt: 0.00,
-            disc_spare: 0.00,
-            total_sum: 0.00,
-            tax_ticket: '',
-            tax_sum: 0.00,
-            amount: '',
-            other_fee: 0.00,
-            total_package_num:0,
-            total_weight: '',
-            remark2: '',
-            ship_remark: '',
-            ship_remark2: '',
-            ship_remark3:'',
-            remark:'',
-			p_id:'',
-            pc_id: '',
-            sm_id: '',
-            accounts: '',
-            per: '',
-            final_destination: '',
-            issues_state: '',
-            transport_style: '',
-            ship_date: '',
-            loading_port: '',
-            ap_id: '',
-            tranship_port: '',
-            finally_buyer: '',
-            mo_group:'',
-            packinglistno: '',
-            box_no: '',
-            create_by: 'admin',
+			it_customer_name:'',
+			sailing_date:comm.getCurrentDate(),
+			shipping_tool:'',
+			linkman: '',
+			phone: '',
+			registration_mark:'',
+			packing_list:'',
+			packing_list2:'',
+			packing_list3:'',
+			destination:'',
+			port_id:'',
+			ap_id:'',
+            contrainer_no:'',
+			seal_no:'',
+			messrs:'',
+			proceduce_area:'',
+			shippedby:'',
+			perss:'',
+			total_box_qty:0,
+			per:'',
+			remark:'',
+			create_by: 'admin',
             create_date: nowDateTime,
             update_by:'admin',
             update_date:nowDateTime,
-			state:'0',
+			
 			matter:'未批準',
 			flag:'',
-			area:'',
-			state_name:'未批準',
-            check_date: '',
 			};
+			
 		},
 		addNewItem(){
 			this.initDetailsValue();
@@ -243,15 +191,30 @@ var Main = {
             // this.selectRow = null;
 			this.tableFareDetails.push(this.editFareDetails);
 		},
+		getDataDetails(mo_id){
+			let row=null;
+			this.getDataFromOC(row);
+		},
+		mo_idRowEvent(row)
+		{
+			if(row.EditFlag==0)
+				return;
+			this.getDataFromOC(row);
+		},
 		getDataFromOC(row){
-			if(row.mo_id=='')
+			let mo_id='';
+			if(row==null)
+				mo_id=this.editDetails.mo_id;
+			else
+				mo_id=row.mo_id;
+			if(mo_id=='')
 				return;
 			if(this.newDocFlag==1 && this.tableDetails.length==1)
 			{
-				this.getMostlyFromOc(row.mo_id);
+				this.getMostlyFromOc(mo_id);
 			}
 			
-			this.getDetailsFromOc(row);
+			this.getDetailsFromOc(row,mo_id);
 
 			// debugger;
 		},
@@ -263,7 +226,8 @@ var Main = {
 				{
 				var retData=response.data;
                 this.formData.it_customer = retData.it_customer;
-				this.formData.finally_buyer = retData.finally_buyer;
+				this.formData.finally_buyer = retData.it_customer;
+				this.formData.finally_buyer_name = retData.it_customer_name;
 				this.formData.seller_id = retData.seller_id;
 				this.formData.po_no = retData.po_no;
 				this.formData.phone = retData.phone;
@@ -283,6 +247,51 @@ var Main = {
 				this.formData.area = retData.area;
 				this.formData.m_rate = retData.m_rate;
 				this.formData.remark = retData.remark;
+				this.formData.it_customer_name=" ";
+				if(retData.it_customer_name!=null)
+					this.formData.it_customer_name +=retData.it_customer_name;
+				this.formData.fake_bill_address=" ";
+				if(retData.fake_s_address!=null)
+					this.formData.fake_bill_address +=retData.fake_s_address;
+				this.formData.address=" ";
+				this.formData.bill_address=" ";
+				if(retData.comments!=null)
+				{
+					this.formData.address=retData.comments;
+					this.formData.bill_address=retData.comments;
+				}
+				if(retData.s_address!=null)
+					this.formData.address +="\r\n" + retData.s_address;
+				if(retData.fake_e_address!=null)
+					this.formData.address +=retData.fake_e_address;
+				if(retData.e_address!=null)
+					this.formData.bill_address +="\r\n" + retData.e_address;
+				if(retData.linkman!=null)
+				{
+					this.formData.address +="\r\n"+ "ATTN:" + retData.linkman;
+					this.formData.bill_address +="\r\n"+ "ATTN:" + retData.linkman;
+					this.formData.fake_bill_address +="\r\n"+" ATTN:"+ this.formData.linkman;
+				}
+				if(retData.l_phone!=null)
+				{
+					this.formData.address += " TEL:"+retData.l_phone;
+					this.formData.bill_address += " TEL:"+retData.l_phone;
+					this.formData.fake_bill_address +=" TEL:"+retData.l_phone;
+				}
+				if(this.formData.fax!=null)
+				{
+					this.formData.fake_bill_address +="\r\n"+" FAX:"+this.formData.fax;
+					this.formData.bill_address +="\r\n"+" FAX:"+this.formData.fax;
+				}
+				if(this.formData.email!=null)
+				{
+					this.formData.fake_bill_address +=" EMAIL:"+this.formData.email;
+					this.formData.bill_address +=" EMAIL:"+this.formData.email;
+				}
+				this.formData.fake_name=" ";
+				if(retData.fake_name!=null)
+					this.formData.fake_name+=retData.fake_name;
+				this.formData.fake_address=this.formData.fake_name + "\r\n" + this.formData.fake_bill_address;
 				// this.formData=response.data;
 
                 //深度複製一個對象，用來判斷數據是否有修改
@@ -297,6 +306,7 @@ var Main = {
             alert(response);
         });
         },
+		////產生發票編號類型
 		getBillTypeNo(it_customer,m_id)
 		{
 			let cust_type=it_customer.substr(0,2);
@@ -315,9 +325,9 @@ var Main = {
 				bill_type_no='R';
 			return bill_type_no;
 		},
-        getDetailsFromOc(row) {
+        getDetailsFromOc(row,mo_id) {
             //axios.get("GetGoodsDetails", { params: { goods_id: _id, } })//也可以將參數寫在這裡
-			var mo_id=row.mo_id;
+			//var mo_id=row.mo_id;
             axios.post("GetDetailsFromOc", { mo_id }).then(
             (response) => {
 				var ocData=response.data;
@@ -330,6 +340,35 @@ var Main = {
 				}
 				else
 				{
+					if(row==null)
+					{
+						this.editDetails.goods_id=ocData.goods_id;
+						this.editDetails.goods_id = ocData.goods_id;
+					this.editDetails.goods_name = ocData.goods_name;
+					this.editDetails.customer_goods = ocData.customer_goods;
+					this.editDetails.customer_color_id = ocData.customer_color_id;
+					this.editDetails.u_invoice_qty = ocData.u_invoice_qty;
+					this.editDetails.goods_unit = ocData.goods_unit;
+					this.editDetails.invoice_price = ocData.invoice_price;
+					this.editDetails.p_unit = ocData.p_unit;
+					this.editDetails.color = ocData.color;
+					this.editDetails.contract_cid = ocData.contract_cid;
+					this.editDetails.order_id = ocData.order_id;
+					this.editDetails.disc_rate = ocData.disc_rate;
+					this.editDetails.location_id = ocData.location_id;
+					this.editDetails.big_class = ocData.big_class;
+					this.editDetails.is_free = ocData.is_free;
+					this.editDetails.is_print = ocData.is_print;
+					this.editDetails.table_head = ocData.table_head;
+					this.editDetails.remark = ocData.remark;
+					this.editDetails.customer_test_id = ocData.customer_test_id;
+					this.editDetails.so_ver = ocData.so_ver;
+					this.editDetails.so_sequence_id = ocData.so_sequence_id;
+					this.editDetails.ncv = '0';
+					this.editDetails.shipment_suit='1';
+					this.editDetails.state='0';
+					}
+					else{
 					//////在表格中插入行的方法有兩種：
 					//////第一種方法，替換當前行的值
 					row.goods_id = ocData.goods_id;
@@ -359,14 +398,16 @@ var Main = {
 					//////第二種方法，刪除當前行，再插入新的行，但這種方法插入後，單元格會失去焦點，要重新點擊以獲取焦點
 					// this.tableDetails.splice(this.selectedRowIndex,1);
 					// this.tableDetails.push(ocData.ocDetails);
-					if(row.location_id.substr(0,1)=='Y')
+					}
+					
+					if(ocData.location_id.substr(0,1)=='Y')
 						this.formData.issues_wh='H';
 					else
 						this.formData.issues_wh='D';
-					const find_mo_id=this.tableFareDetails.find(fare_mo_id=>fare_mo_id.mo_id===row.mo_id);
+					const find_mo_id=this.tableFareDetails.find(fare_mo_id=>fare_mo_id.mo_id===mo_id);//row.mo_id
 					if(find_mo_id==undefined)
 					{
-					if(ocData.ocOtherFare[0].mo_id!='')
+					if(ocData.ocOtherFare[0].mo_id!=null)
 					{
 					for (var i = 0; i < ocData.ocOtherFare.length; i++) {
 						var ocOtherFare=ocData.ocOtherFare[i];
@@ -381,7 +422,6 @@ var Main = {
 					}
 					this.getGoodsWegFromStore(row);
 					this.sumGoodsAmt(row);
-					
 				}
             },
             (response) => {
@@ -402,19 +442,44 @@ var Main = {
 		},
 		sumGoodsAmt(row)
 		{
-			// this.checkGoodsQty(row);
 			let total_sum=0;
-			let u_invoice_qty=row.u_invoice_qty;
-			let invoice_price=row.invoice_price;
-			let disc_rate=row.disc_rate;
+			let u_invoice_qty=0;
+			let invoice_price=0;
+			let disc_rate=0;
 			let disc_amt=0;
+			let goods_unit_rate=0;
+			let p_unit_rate=1; 
+			if(row==null)
+			{
+			u_invoice_qty=this.editDetails.u_invoice_qty;
+			invoice_price=this.editDetails.invoice_price;
+			disc_rate=this.editDetails.disc_rate;
+			disc_amt=0;
+			this.editDetails.disc_price = Number((invoice_price - (invoice_price * (disc_rate/100))).toFixed(2));//折扣後單價
+			if(this.editDetails.goods_unit==this.editDetails.p_unit)
+				total_sum=u_invoice_qty * invoice_price;
+			else
+			{
+				const Unit=this.QtyUnitRateList.find(Unit=>Unit.value===this.editDetails.goods_unit);
+				goods_unit_rate=Unit.rate;
+				p_unit_rate=this.QtyUnitRateList.find(Unit=>Unit.value===this.editDetails.p_unit).rate;
+				total_sum=((u_invoice_qty * goods_unit_rate ) / p_unit_rate) * invoice_price
+			}
+			disc_amt=Number((total_sum * (disc_rate/100)).toFixed(2));//折扣額
+			this.editDetails.disc_amt=disc_amt;
+			this.editDetails.total_sum=Number(total_sum - disc_amt).toFixed(2);
+			}
+			else
+			{
+			u_invoice_qty=row.u_invoice_qty;
+			invoice_price=row.invoice_price;
+			disc_rate=row.disc_rate;
+			disc_amt=0;
 			row.disc_price = Number((invoice_price - (invoice_price * (disc_rate/100))).toFixed(2));//折扣後單價
 			if(row.goods_unit==row.p_unit)
 				total_sum=u_invoice_qty * invoice_price;
 			else
 			{
-				let goods_unit_rate=0;
-				let p_unit_rate=1;
 				const Unit=this.QtyUnitRateList.find(Unit=>Unit.value===row.goods_unit);
 				goods_unit_rate=Unit.rate;
 				p_unit_rate=this.QtyUnitRateList.find(Unit=>Unit.value===row.p_unit).rate;
@@ -423,6 +488,7 @@ var Main = {
 			disc_amt=Number((total_sum * (disc_rate/100)).toFixed(2));//折扣額
 			row.disc_amt=disc_amt;
 			row.total_sum=Number(total_sum - disc_amt).toFixed(2);
+			}
 			this.sumInvAmt();
 		},
 		sumOtherFareAmt(row)
@@ -451,14 +517,33 @@ var Main = {
 			// this.formData.total_sum=this.formatterAmount(this.formData.total_sum);
 		},
 		getGoodsWegFromStore(row){
-			let mo_id=row.mo_id;
-			let goods_id=row.goods_id;
-			let location_id=row.location_id;
-			let u_invoice_qty=row.u_invoice_qty;
-			let goods_unit=row.goods_unit;
+			let mo_id='';
+			let goods_id='';
+			let location_id='';
+			let u_invoice_qty='';
+			let goods_unit='';
+			if(row==null)
+			{
+				mo_id=this.editDetails.mo_id;
+				goods_id=this.editDetails.goods_id;
+				location_id=this.editDetails.location_id;
+				u_invoice_qty=this.editDetails.u_invoice_qty;
+				goods_unit=this.editDetails.goods_unit;
+			}
+			else
+			{
+				mo_id=row.mo_id;
+				goods_id=row.goods_id;
+				location_id=row.location_id;
+				u_invoice_qty=row.u_invoice_qty;
+				goods_unit=row.goods_unit;
+			}
 			axios.post("GetGoodsWegFromStore", {mo_id,goods_id,location_id,u_invoice_qty,goods_unit }).then(
             (response) => {
-				row.sec_qty=response.data;
+				if(row==null)
+					this.editDetails.sec_qty=response.data;
+				else
+					row.sec_qty=response.data;
             },
             (response) => {
                 alert(response.status);
@@ -486,47 +571,31 @@ var Main = {
                 EditFlag: 1,
 				ID:this.formData.ID,
 				sequence_id:'',
+				po_no:'',
+				order_id:'',
                 mo_id: '',
 				shipment_suit:'',
-                goods_id: '',
-                table_head: '',
-                goods_name: '',
-                u_invoice_qty: 0,
-                goods_unit: '',
-                sec_qty: 0.00,
-                sec_unit: 'KG',
-				invoice_price: 0.000,
-				p_unit: '',
-                disc_rate: 0.00,
-                disc_price: 0.000,
-                total_sum: 0.00,
-                disc_amt: 0.00,
-                buy_id: '',
-                order_id: '',
-                issues_id: '',
-				ref1: '',
-                ref2: '',
-                ncv: '0',
-                apprise_id: '',
-                is_free: '',
-				is_print:'',
-                corresponding_code: '',
-                nwt: 0.00,
-                gross_wt: 0.00,
-				package_num: '',
-                box_no: '',
-                color: '',
-                spec: '',
-                subject_id: '',
-                contract_cid: '',
-                Delivery_Require: '',
-                location_id: '',
-				brand_category: '',
-                customer_test_id: '',
-                customer_goods: '',
-                customer_color_id: '',
-                remark: '',
-				state:'0',
+                item_no: '',
+				descript:'',
+				english_goods_name:'',
+				color:'',
+				box_no: '',
+				pcs_qty:0,
+				unit_code:'',
+				sec_unit:'',
+				symbol:'',
+				cube_ctn:0,
+				box_qty:0,
+				carton_size:'',
+				cube_ctn:0.00,
+				total_cube:0.00,
+				nw_each:0.00,
+				gw_each:0.00,
+				tal_nw:0.00,
+				tal_gw:0.00,
+				ref_id:'',
+				remark:'',
+				tr_id:'',
             };
 		},
 		//初始化發票附加費記錄
@@ -551,14 +620,17 @@ var Main = {
 		async getComboxList(SourceType) {
             var _self = this;///Base/BaseData///, { params: { ProductMo: this.editDetails.GoodsID } }
 			var url="GetComboxList";
-			if(SourceType=="QtyUnitList" || SourceType=="MoGroupList" || SourceType=="SalesmanList" || SourceType=="CurrList" || SourceType=="TackFareList" || SourceType=="issues_state_list")
+			if(SourceType=="QtyUnitList" || SourceType=="MoGroupList" || SourceType=="SalesmanList" || SourceType=="CurrList"
+				|| SourceType=="TackFareList" || SourceType=="issues_state_list" || SourceType=="AreaList" || SourceType=="PL01")
 				url="/Base/DataComboxList/GetComboxList";
 			else if(SourceType=="QtyUnitRateList")
 				url="/Base/DataComboxList/GetQtyUnitRateList";
+			else if(SourceType=="ShipPortList")
+				url="/Sale/Invoice/GetComboxList";
 			url+="?SourceType="+SourceType;
             await axios.get(url).then(
                 (response) => {
-					if(SourceType=="DocSourceTypeList")
+					if(SourceType=="PL01")
 						this.DocSourceTypeList = response.data;
 					else if(SourceType=="SalesmanList")
 						this.SalesmanList = response.data;
@@ -590,6 +662,8 @@ var Main = {
 						this.TackFareList = response.data;
 					else if(SourceType=="issues_state_list")
 						this.issues_state_list = response.data;
+					else if(SourceType=="AreaList")
+						this.AreaList = response.data;
                 },
                 (response) => {
                     alert(response.status);
@@ -599,20 +673,30 @@ var Main = {
             });
         },
 		async getInvoiceByID(ID){
-			if(this.formData.ID=='')
+			if(ID=='')
 				return;
 			this.initMostlyValue();
 			this.initDetailsValue();
 			this.initFareDetailsValue();
-            await axios.post("GetInvoiceByID", {ID }).then(
+			let flag='';
+            await axios.post("/Sale/Invoice/GetInvoiceByID", {ID,flag }).then(
             (response) => {
-				// this.initMostlyValue();
-				// let ocMostly=response.data[0].ocMostly;
-				// this.formData.ID=ocMostly.ID;
-                // this.formData.it_customer=ocMostly.it_customer;
-				// if(response.data.length>0)
-				// {
-				this.formData=response.data.ocMostly;
+				// this.formData=response.data.ocMostly;
+				var ivMostly=response.data.ocMostly;
+				this.formData.ID='';
+				this.formData.invoice_id=ID;
+				this.formData.matter='未批準';
+				this.formData.state='0';
+				this.formData.it_customer=ivMostly.it_customer;
+				this.formData.linkman=ivMostly.linkman;
+				this.formData.phone=ivMostly.phone;
+				this.formData.per=ivMostly.per;
+				this.formData.remark=ivMostly.remark;
+				this.formData.packing_list=ivMostly.ship_remark;
+				this.formData.packing_list2=ivMostly.ship_remark2;
+				this.formData.packing_list3=ivMostly.ship_remark3;
+				this.formData.port_id=ivMostly.loading_port;
+				this.formData.ap_id=ivMostly.ap_id;
 				this.prevForm = JSON.parse(JSON.stringify(this.formData));
 				this.tableDetails = undefined;
 				this.tableDetails = new Array();
@@ -622,10 +706,37 @@ var Main = {
                     // this.tableDetails.push(response.data.ocDetails[i]);
                 // }
 				////2--直接賦值
-				this.tableDetails=response.data.ocDetails;
-				this.tableFareDetails = undefined;
-				this.tableFareDetails = new Array();
-				this.tableFareDetails=response.data.ocOtherFare;
+				// this.tableDetails=response.data.ocDetails;
+				
+				////3--循環逐行賦值插入
+				for (var i = 0; i < response.data.ocDetails.length; i++) {
+					var ivDetails=response.data.ocDetails[i];
+					var tempEditDetails={
+						po_no:ivDetails.contract_cid,
+						order_id:ivDetails.order_id,
+						mo_id:ivDetails.mo_id,
+						item_no:ivDetails.goods_id,
+						shipment_suit:ivDetails.shipment_suit,
+						descript:ivDetails.goods_name,
+						english_goods_name:ivDetails.goods_name,
+						pcs_qty:ivDetails.u_invoice_qty,
+						unit_code:ivDetails.goods_unit,
+						sec_unit:ivDetails.sec_unit,
+						color:ivDetails.color,
+						box_no:ivDetails.box_no,
+						symbol:'@',
+						ref_id:ivDetails.ID,
+					};
+					// this.editDetails.po_no=ivDetails.order_id;
+					// this.editDetails.po_no=ivDetails.order_id;
+					// this.editDetails.po_no=ivDetails.order_id;
+					// this.editDetails.po_no=ivDetails.order_id;
+					// this.editDetails.po_no=ivDetails.order_id;
+					// this.editDetails.po_no=ivDetails.order_id;
+					// this.editDetails.po_no=ivDetails.order_id;
+					this.tableDetails.push(tempEditDetails);
+                }
+
 				// }
             },
             (response) => {
@@ -707,25 +818,60 @@ var Main = {
 			// alert("1");
 		},
         editRowEvent (row) {
-            this.editDetails = {
-                EditFlag: 0,
-                GoodsID: row.GoodsID,
-                GoodsCname: row.GoodsCname,
-                RequestQty: row.RequestQty,
-                RequestDate:row.RequestDate,
-                WipID: row.WipID,
-                NextWipID: row.NextWipID
-            }
+            // this.editDetails = {
+                // EditFlag: 0,
+				// mo_id:row.mo_id,
+				// shipment_suit:row.shipment_suit,
+                // goods_id: row.goods_id,
+                // table_head: row.table_head,
+                // goods_name: row.goods_name,
+                // u_invoice_qty:row.u_invoice_qty,
+                // goods_unit: row.goods_unit,
+                // sec_qty: row.sec_qty,
+				// sec_unit:row.sec_unit,
+				// invoice_price:row.invoice_price,
+                // disc_rate: row.disc_rate,
+                // disc_price: row.disc_price,
+                // total_sum: row.total_sum,
+                // disc_amt:row.disc_amt,
+                // buy_id: row.buy_id,
+                // order_id: row.order_id,
+				// issues_id:row.issues_id,
+				// ref1:row.ref1,
+                // ref2: row.ref2,
+                // ncv: row.ncv,
+                // apprise_id: row.apprise_id,
+                // is_free:row.is_free,
+                // corresponding_code: row.corresponding_code,
+                // nwt: row.nwt,
+				// gross_wt:row.gross_wt,
+				// package_num:row.package_num,
+                // box_no: row.box_no,
+                // color: row.color,
+                // spec: row.spec,
+                // subject_id:row.subject_id,
+                // contract_cid: row.contract_cid,
+                // Delivery_Require: row.Delivery_Require,
+				// location_id:row.location_id,
+				// brand_category:row.brand_category,
+                // customer_test_id: row.customer_test_id,
+                // customer_goods: row.customer_goods,
+                // customer_color_id: row.customer_color_id,
+                // remark:row.remark
+            // }
+			
             //深度複製一個對象，用來判斷數據是否有修改
             this.preveditDetails = JSON.parse(JSON.stringify(this.editDetails));
-            this.selectRow = row
-            this.showEdit = true
+            this.selectRow = row;
+			Object.assign(this.editDetails,this.selectRow );
+            this.showEdit = true;
         },
         saveEvent() {
             if (!this.validData())
 			{
 				return false;
 			}
+			this.formData.flag=this.$refs.input1.value;
             let InvMostly = this.formData;
             let InvDetails = this.tableDetails;
 			let InvOtherFare=this.tableFareDetails;
@@ -748,7 +894,7 @@ var Main = {
 			});
         },
        validData() {
-			if(this.formData.ID=='')
+			if(this.formData.ID==='')
 				return false;
 			let valid_flag=true;
 			let edit_flag=false;
@@ -976,6 +1122,7 @@ var Main = {
 			this.showSent=true;
 		},
 		//發貨確認
+		//flag 入口參數： 0--發票；1--東莞D送貨單
 		confirmSent() {
 			if(this.formData.ID=='')
 				return;
@@ -983,21 +1130,31 @@ var Main = {
 			{
 				return false;
 			} */
+			//flag 入口參數： 0--發票；1--東莞D送貨單
+			let flag=this.$refs.input1.value;
+			var issues_state='';
+			if(flag=='0')
+			{
 			if(this.issues_state==="")
 			{
 				this.$XModal.alert("發貨狀態不能為空!");
 				return;
 			}
-			let issues_state=this.issues_state;
+			issues_state=this.issues_state;
+			}
+			
             let InvDetails = this.tableDetails;
-            axios.post("ConfirmSent", { InvDetails,issues_state }).then(
+            axios.post("ConfirmSent", { InvDetails,flag,issues_state }).then(
             (response) => {
 				if(response.data.Status=="0")
 				{
 					this.formData.ID=response.data.ReturnValue;
 					// this.$XModal.alert(response.data.Msg);
 					this.getInvoiceByID(this.formData.ID);
-					this.$refs.xModalSent.close();
+					if(flag==="0")
+						this.$refs.xModalSent.close();
+					else
+						this.$XModal.alert(response.data.Msg);
 				}
 				else
 					this.$XModal.alert(response.data.Msg);
@@ -1010,6 +1167,7 @@ var Main = {
 			});
         },
 		//取消發貨
+		//flag 入口參數： 0--發票；1--東莞D送貨單
 		cancelSent() {
 			if(this.formData.ID=='')
 				return;
@@ -1017,19 +1175,27 @@ var Main = {
 			{
 				return false;
 			} */
+			let flag=this.$refs.input1.value;
+			if(flag=="0")
+			{
 			if(this.formData.state!="7")
 			{
 				this.$XModal.alert("只有已做發貨確認的發票才可進行取消發貨操作!");
 				return;
 			}
+			}
             let InvDetails = this.tableDetails;
-            axios.post("CancelSent", { InvDetails }).then(
+            axios.post("CancelSent", { InvDetails,flag }).then(
             (response) => {
 				if(response.data.Status=="0")
 				{
 					this.formData.ID=response.data.ReturnValue;
-					// this.$XModal.alert(response.data.Msg);
+					// 
 					this.getInvoiceByID(this.formData.ID);
+					if(flag==="0")
+						this.getInvoiceByID(this.formData.ID);
+					else
+						this.$XModal.alert(response.data.Msg);
 				}
 				else
 					this.$XModal.alert(response.data.Msg);
@@ -1057,6 +1223,65 @@ var Main = {
 				else
 					this.$XModal.alert(response.data.Msg);
 				this.getInvoiceByID(ID);
+            },
+            (response) => {
+                alert(response.status);
+            }
+			).catch(function (response) {
+				alert(response);
+			});
+        },
+		//項目修改
+		showModalEditItem(){
+			// if(this.formData.state!="0")
+			// {
+				// this.$XModal.alert("非編輯狀態，不能再進行修改!");
+				// return;
+			// }
+			if(this.AreaList.length===0)
+			{
+				this.getComboxList("AreaList");
+			}
+			this.showEditItem=true;
+		},
+        additionSaveEvent() {
+			if (!this.validData())
+			{
+				return false;
+			}
+			this.formData.flag=this.$refs.input1.value;
+            let InvMostly = this.formData;
+            axios.post("AdditionSaveInvoice", { InvMostly }).then(
+            (response) => {
+				if(response.data.Status=="0")
+				{
+					this.formData.ID=response.data.ReturnValue;
+					this.$XModal.alert(response.data.Msg);
+					this.getInvoiceByID(this.formData.ID);
+				}
+				else
+					this.$XModal.alert(response.data.Msg);
+            },
+            (response) => {
+                alert(response.status);
+            }
+			).catch(function (response) {
+				alert(response);
+			});
+        },
+		convertToInvoice() {
+			this.formData.flag=this.$refs.input1.value;
+            let InvMostly = this.formData;
+            axios.post("ConfirmSent", { InvMostly }).then(
+            (response) => {
+				if(response.data.Status=="0")
+				{
+					this.formData.ID=response.data.ReturnValue;
+					this.$XModal.alert(response.data.Msg);
+					this.getInvoiceByID(this.formData.ID);
+				}
+				else
+					this.$XModal.alert(response.data.Msg);
             },
             (response) => {
                 alert(response.status);
@@ -1138,7 +1363,7 @@ var Main = {
         },
         printReport(){
             if(this.curReportRow){
-                this.showPrint = false;
+                console.log(this.curReportRow.reportid);
                 var url= "Print?ID=" + this.formData.ID + "&Ver=" + this.formData.Ver+"&report_id=" + this.curReportRow.reportid;
                 comm.showMessageDialog(url,'列印',1024,768,true);
             }else{
@@ -1160,9 +1385,12 @@ var Main = {
                        // }
                    // }
                    // console.log(this.editFormChanged);
-				   this.formData.it_customer=this.formData.it_customer.toUpperCase();
-				   this.formData.phone=this.formData.phone.toUpperCase();
-				   this.formData.fax=this.formData.fax.toUpperCase();
+				    if(this.formData.it_customer!=null)
+						this.formData.it_customer=this.formData.it_customer.toUpperCase();
+				    if(this.formData.phone!=null)
+						this.formData.phone=this.formData.phone.toUpperCase();
+					if(this.formData.fax!=null)
+						this.formData.fax=this.formData.fax.toUpperCase();
                },
                deep: true
             },
