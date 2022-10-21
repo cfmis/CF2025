@@ -25,9 +25,6 @@ namespace CF2025.Sale.DAL
             string strSql = "";
             switch (SourceType)
             {
-                case "DocSourceTypeList"://單據來源
-                    strSql += "Select substring(id,2,1) As id,name,name As english_name From sys_bill_origin Where function_id='SO01' AND language='3' Order By id";
-                    break;
                 case "OutStoreList"://發貨倉位
                     strSql += "Select id,name,english_name From cd_mo_type Where within_code='" + within_code + "' And mo_type='7' Order By id";
                     break;
@@ -684,10 +681,13 @@ namespace CF2025.Sale.DAL
                 " Left  Join it_customer g On a.within_code=g.within_code And a.it_customer=g.id" +
                 " Left  Join it_customer h On a.within_code=h.within_code And a.finally_buyer=h.id" +
                 " Where a.within_code='" + within_code + "' And a.id='" + ID + "' And f.language_id='" + language_id + "'";
-            if (flag == "0") //發票
-                 strSql += " And (a.flag='0' Or a.flag='1' And a.confirm_status='1' )";
-            else  //東莞D送貨單
-                strSql += " And a.flag='1'";
+            if (flag != "")
+            {
+                if (flag == "0") //發票
+                    strSql += " And (a.flag='0' Or a.flag='1' And a.confirm_status='1' )";
+                else  //東莞D送貨單
+                    strSql += " And a.flag='1'";
+            }
             strSql += " Order By b.sequence_id ";
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);//
             viewInv lsInv = new viewInv();
@@ -707,10 +707,13 @@ namespace CF2025.Sale.DAL
                 " FROM so_invoice_mostly a" +
                 " Inner Join so_invoice_other_fare b On a.within_code=b.within_code And a.id=b.id And a.Ver=b.Ver" +
                 " Where a.within_code='" + within_code + "' And a.id='" + ID + "'";
-            if (flag == "0") //發票
-                strSql += " And (a.flag='0' Or a.flag='1' And a.confirm_status='1' )";
-            else  //東莞D送貨單
-                strSql += " And a.flag='1'";
+            if (flag != "")
+            {
+                if (flag == "0") //發票
+                    strSql += " And (a.flag='0' Or a.flag='1' And a.confirm_status='1' )";
+                else  //東莞D送貨單
+                    strSql += " And a.flag='1'";
+            }
             strSql += " Order By b.sequence_id ";
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             lsInvFare = ConvertHelper.DataTableToList<so_other_fare>(dt);

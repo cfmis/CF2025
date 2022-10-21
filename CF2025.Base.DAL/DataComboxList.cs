@@ -22,6 +22,12 @@ namespace CF2025.Base.DAL
             string LanguageID = sh.ConvertLanguage(language_id);
             switch (SourceType)
             {
+                case "SO01"://單據來源
+                    strSql += "Select substring(id,2,1) As id,name,name As english_name From sys_bill_origin Where function_id='SO01' AND language='3' AND state='0' Order By id";
+                    break;
+                case "PL01"://單據來源
+                    strSql += "Select id,id+'--'+name AS name,name As english_name From sys_bill_origin Where function_id='PL01' AND language='3' AND state='0' Order By id";
+                    break;
                 case "AreaList"://地區
                     strSql += "SELECT id,id +'--'+name AS name FROM cd_zone WHERE within_code='0000' Order By id";
                     break;

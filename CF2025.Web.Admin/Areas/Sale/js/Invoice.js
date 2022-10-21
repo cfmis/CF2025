@@ -82,7 +82,7 @@ var Main = {
 		this.initMostlyValue();
 		this.initDetailsValue();
 		this.initFareDetailsValue();
-		this.getComboxList("DocSourceTypeList");
+		this.getComboxList("SO01");
 		this.getComboxList("SalesmanList");
 		this.getComboxList("CurrList");
 		this.getComboxList("OutStoreList");
@@ -693,15 +693,18 @@ var Main = {
             var _self = this;///Base/BaseData///, { params: { ProductMo: this.editDetails.GoodsID } }
 			var url="GetComboxList";
 			if(SourceType=="QtyUnitList" || SourceType=="MoGroupList" || SourceType=="SalesmanList" || SourceType=="CurrList"
-				|| SourceType=="TackFareList" || SourceType=="issues_state_list" || SourceType=="AreaList")
+				|| SourceType=="TackFareList" || SourceType=="issues_state_list" || SourceType=="AreaList" || SourceType=="SO01")
 				url="/Base/DataComboxList/GetComboxList";
 			else if(SourceType=="QtyUnitRateList")
 				url="/Base/DataComboxList/GetQtyUnitRateList";
 			url+="?SourceType="+SourceType;
             await axios.get(url).then(
                 (response) => {
-					if(SourceType=="DocSourceTypeList")
+					if(SourceType=="SO01")
+					{
+						debugger;
 						this.DocSourceTypeList = response.data;
+					}
 					else if(SourceType=="SalesmanList")
 						this.SalesmanList = response.data;
 					else if(SourceType=="CurrList")
