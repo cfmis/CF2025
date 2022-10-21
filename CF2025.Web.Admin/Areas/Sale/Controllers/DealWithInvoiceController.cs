@@ -41,7 +41,7 @@ namespace CF2025.Web.Admin.Areas.Sale.Controllers
             for (int i = 0; i < InvoiceModel.Count; i++)
             {
                 var so_invoice_details = DealWithInvoiceDAL.GetInvoiceByID(InvoiceModel[i].ID);
-                result = InvoiceDAL.ConfirmSent(so_invoice_details, issues_state);
+                result = InvoiceDAL.ConfirmSent(so_invoice_details, "0", issues_state);
                 if (result.Status == "1")
                     break;
             }

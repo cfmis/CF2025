@@ -14,9 +14,10 @@ namespace CF2025.Web.Admin.Areas.Sale.Controllers
     public class InvoiceController : AdminControllerBase//: Controller//: Controller
     {
         // GET: Sale/Invoice
-        public ActionResult Index()
+        public ActionResult Index(string DocType)
         {
             ViewBag.Title = "銷售發票";
+            ViewBag.DocType = DocType;
             return View();
         }
         public ActionResult Create()
@@ -61,10 +62,10 @@ namespace CF2025.Web.Admin.Areas.Sale.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
-        public JsonResult GetInvoiceByID(string ID)
+        public JsonResult GetInvoiceByID(string ID,string flag)
         {
             //PlanDAL clsPlanDAL = new PlanDAL();
-            var result = InvoiceDAL.GetInvoiceByID(ID);
+            var result = InvoiceDAL.GetInvoiceByID(ID, flag);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
         //[HttpPost]
@@ -109,19 +110,19 @@ namespace CF2025.Web.Admin.Areas.Sale.Controllers
 
         //發貨確認
         [HttpPost]
-        public JsonResult ConfirmSent(List<so_invoice_details> InvDetails,string issues_state)
+        public JsonResult ConfirmSent(List<so_invoice_details> InvDetails,string flag,string issues_state)
         {
             //PlanDAL clsPlanDAL = new PlanDAL();
-            var result = InvoiceDAL.ConfirmSent(InvDetails, issues_state);
+            var result = InvoiceDAL.ConfirmSent(InvDetails, flag, issues_state);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
         //取消發貨
         [HttpPost]
-        public JsonResult CancelSent(List<so_invoice_details> InvDetails)
+        public JsonResult CancelSent(List<so_invoice_details> InvDetails,string flag)
         {
             //PlanDAL clsPlanDAL = new PlanDAL();
-            var result = InvoiceDAL.CancelSent(InvDetails);
+            var result = InvoiceDAL.CancelSent(InvDetails, flag);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
@@ -224,5 +225,14 @@ namespace CF2025.Web.Admin.Areas.Sale.Controllers
         //    var result = InvoiceDAL.DataTableReturnList();
         //    return Json(result, JsonRequestBehavior.AllowGet);
         //}
+
+        [HttpPost]
+        public JsonResult AdditionSaveInvoice(so_invoice_mostly InvMostly)
+        {
+            //PlanDAL clsPlanDAL = new PlanDAL();
+            var result = InvoiceDAL.AdditionSaveInvoice(InvMostly);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }

@@ -196,7 +196,7 @@ namespace CF.Framework.Utility
                             try
                             {
                                 if (dr[tempName].GetType().Name == "DateTime")
-                                    pi.SetValue(t, Converter.ConvertFieldToCnDataString(dr[tempName].ToString()), null);
+                                    pi.SetValue(t, Converter.ConvertFieldToCnDateTimeString(dr[tempName].ToString()), null);
                                 else
                                     pi.SetValue(t, value, null);
                             }

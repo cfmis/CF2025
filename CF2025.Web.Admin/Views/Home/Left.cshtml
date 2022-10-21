@@ -15,7 +15,8 @@
     <style type="text/css">
         body {
             margin: 0px;
-            padding: 0px;            
+            padding: 0px;
+            /*background-color:#ebf5f8;*/
         }
         .leftbar{
             /*覆蓋stylesheet.leftbar min-height預設的高度才起作用*/
@@ -28,7 +29,7 @@
 <body>
     @foreach (var group1 in Model)
     {
-        <div class="leftbar" id=@group1.DivId>
+        <div class="leftbar" id=@group1.DivId> @*style="background-color:#ebf5f8;"*@
             @foreach (var group2 in group1.AdminMenuGroup)
             {
                 <dl>
