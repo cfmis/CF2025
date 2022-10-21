@@ -37,7 +37,7 @@
         this.window_id = document.getElementById("window_id").value;        
         this.initData();
     },
-    methods: {        
+    methods: {
         //格式化欄位標簽翻譯
         formatFieldName(val) {
             var result = "";
@@ -344,9 +344,9 @@
             //構建完整的sql語句
             //在strTable(table_from)中寫有inner join left join,strJoin(table_relation)就不用寫            
             var num = this.topResults;
-            if (num == "" || num.length ==0) { 
+            if (num == "" || num.length ==0) {
                 this.topResults = 200;
-            }else{            
+            }else{
                 if (!(/(^[1-9]\d*$)/.test(num))) {
                     //输入的不是正整数 
                     this.topResults = 200;
