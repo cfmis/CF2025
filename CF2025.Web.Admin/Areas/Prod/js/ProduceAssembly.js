@@ -321,7 +321,7 @@
             this.$set(this.headData, "create_date", dateTime);
             this.$set(this.headData, "bill_origin", '2');  
             this.$set(this.headData, "head_status", this.headEditFlag);  
-            
+            this.selectTab= "tab1";
         },
         delHeadEvent() {          
             if ((this.headData.id != "") && (this.tableData1.length > 0)) {
@@ -363,6 +363,7 @@
             this.headData = JSON.parse(JSON.stringify(this.tempHeadData));//還原主表
             this.tableData1 = JSON.parse(JSON.stringify(this.tempTableData1));//還原明細 
             this.originData2 = JSON.parse(JSON.stringify(this.tempTableData2));//還原明細
+            this.tableData2 =[];//2022/10/14
             this.delData1=[];
             this.delData2=[];
             this.Rows = JSON.parse(JSON.stringify(this.tableData1));
@@ -429,7 +430,7 @@
         clearRowDataEdit(){
             this.rowDataEdit = {id: '', mo_id: '', goods_id: '', goods_name: '',con_qty: 0,  unit_code: 'PCS', sec_qty: 0.00,sec_unit: 'KG',
                 lot_no:'', package_num: '0',color_name: '', four_color: '', app_supply_side: '', remark: '', return_qty_nonce: '',sequence_id: '',
-                location: '',carton_code:'', prd_id: 0,  jo_id:'',jo_sequence_id:'',row_status:''
+                location: '',carton_code:'', prd_id: 0,  jo_id:'',jo_sequence_id:'',qc_qty:0,row_status:''
             }
         },
         clearAssembly(){
@@ -696,7 +697,7 @@
                     mst_is_approve +="【批準】";
                 }
                 if(val==='0'){                    
-                    //反批准
+                    //進行反批准
                     //進行當前反批準操作前再次檢查后端是否已被別的用戶反批準.
                     if(status==="0"){
                         //后臺數據已為批準狀態,已被別的用戶批準
@@ -723,7 +724,8 @@
                         this.headData.check_by = this.userId;
                         var head = JSON.parse(JSON.stringify(this.headData));//深拷貝轉成JSON數據格式
                         var approve_type = val;
-                        axios.post("/ProduceAssembly/Approve",{head,approve_type}).then(
+                        var user_id = this.userId;
+                        axios.post("/ProduceAssembly/Approve",{head,user_id,approve_type}).then(
                             (response) => {
                                 if(response.data[0].approve_status==="OK"){
                                     response.data[0].ProductMo
@@ -1242,9 +1244,8 @@
                 //各项檢查通不過
                 return;
             }
-
             //檢查成份庫存是否夠扣減
-            //傳給后端的存儲過程的表數據類型參數結構
+            //傳給后端存儲過程的表數據類型參數結構
             this.partData = [];
             for(let i in this.originData2){
                 this.partData.push(
@@ -1319,7 +1320,7 @@
         },
         //--start保存前檢查
         checkPreUpdate:async function(){
-            let li_rtn,li_rc,li_row,li_prd_id,li_count,li_row_no;
+            let li_rtn,li_rc,li_prd_id,li_count,li_row_no;
             let	ls_op_dept='',ls_assembly_dept='',ls_sequence_id='',ls_lot_no='',ls_materiel_id='',ls_message='',ls_materiel_mo_id='',ls_parameter='';          
             let	ls_mo_id='',ls_goods_id='',ls_id='',ls_in_dept='',ls_id_tmp='';
             let	lb_pope = false,lb_prompt = false;           
@@ -1404,12 +1405,13 @@
                         ldc_qc_qty = parseFloat(response.data);
                 })
                 //如果没有输入收货部门就不需要自动生成移交单,所以不需要进行QC流程的判断,2022/04/26 增加是否先交P10生產部的檢查  
+               
                 if(ldc_qc_qty > 0 && ls_in_dept != '') {                  
                     await this.$XModal.confirm(`第${li_row_no}行【頁數:${ls_mo_id}--${ls_goods_id}】有未完成移交QC的流程,請確認當前組裝數量中已經包含有交QC的數量!`).then(type => {
                         if (type === 'cancel') {
                             this.preUpdateFlag = false;
                         }
-                    })
+                    })                    
                     if(!this.preUpdateFlag){
                         break;
                     }
@@ -1420,21 +1422,28 @@
                         ldc_sec_qty = ldc_sec_qty - ldc_qc_sec_qty;
                         if(ldc_sec_qty <0.01){
                             ldc_sec_qty = 0.01;  //默认最小重量
-                        }
-                        Object.assign(this.tableData1[li_row].qc_qty, ldc_qc_qty);//記錄QC數量,以便于更新移交單
-                        Object.assign(this.tmp_turn_over[li_row].con_qty, ldc_assembly_qty); //如果要生成交QC移交單,需修改原來非交QC移交單的數量
-                        Object.assign(this.tmp_turn_over[li_row].sec_qty, ldc_sec_qty); //如果要生成交QC移交單,需修改原來非交QC移交單的重量
-                        //插入一行交QC的移交單數據
+                        }  
+                        this.$set(this.tableData1[li_row],'qc_qty',ldc_qc_qty);
+                        this.$set(this.tmp_turn_over[li_row],'con_qty',ldc_assembly_qty);
+                        this.$set(this.tmp_turn_over[li_row],'sec_qty',ldc_sec_qty);
+
+                        //Object.assign(this.tableData1[li_row].qc_qty, ldc_qc_qty);//記錄QC數量,以便于更新移交單
+                        //Object.assign(this.tmp_turn_over[li_row].con_qty, ldc_assembly_qty); //如果要生成交QC移交單,需修改原來非交QC移交單的數量
+                        //Object.assign(this.tmp_turn_over[li_row].sec_qty, ldc_sec_qty); //如果要生成交QC移交單,需修改原來非交QC移交單的重量
+
+                        //插入一行交QC的移交單數據,不一定是一條組裝記錄就有一條QC記錄,要考慮數組下標問題
                         this.tmp_turn_over_qc.push(JSON.parse(JSON.stringify(this.tableData1[li_row]))); //將當前數據Copy到移交單數據中
-                        Object.assign(this.tmp_turn_over_qc[li_row_qc].con_qty, ldc_qc_qty); //QC數量
-                        Object.assign(this.tmp_turn_over_qc[li_row_qc].sec_qty, ldc_qc_sec_qty); //QC數量
+                        var li_row_qc = this.tmp_turn_over_qc.length - 1;
+                        //Object.assign(this.tmp_turn_over_qc[li_row_qc].con_qty, ldc_qc_qty); //QC數量
+                        //Object.assign(this.tmp_turn_over_qc[li_row_qc].sec_qty, ldc_qc_sec_qty); //QC數量
+                        this.$set(this.tmp_turn_over_qc[li_row_qc],'con_qty', ldc_qc_qty); //QC數量
+                        this.$set(this.tmp_turn_over_qc[li_row_qc],'sec_qty', ldc_qc_sec_qty); //QC數量
+                        this.$set(this.tmp_turn_over_qc[li_row_qc],'qc_qty',0);
+                        this.$set(this.tmp_turn_over_qc[li_row_qc],'package_num',0);
                     }else{
-                        this.tmp_turn_over_qc.push(JSON.parse(JSON.stringify(this.tableData1[li_row]))); //仅QC移交單數據
+                        //this.tmp_turn_over_qc.push(JSON.parse(JSON.stringify(this.tableData1[li_row]))); //仅QC移交單數據
                     }
-                    //var li_row_qc =0;
-                    //li_row_qc = this.tmp_turn_over_qc.length;
-                    //Object.assign(this.tmp_turn_over_qc[li_row_qc].location, '702');
-                    //Object.assign(this.tmp_turn_over_qc[li_row_qc].carton_code, '702');
+                    
                 }
                 //--判断組裝数量是否大于生產計劃單中的數量
                 ldc_qty_other = 0;
@@ -1459,7 +1468,7 @@
                 }                
                 //--ls_parameter:检查是否允許超过生产数量移交,0為不允許,但可通過密碼確認放行
                 if(ls_parameter === '0' && lb_prompt === false){
-                    if(ldc_assembly_qty + ldc_qty_other>ldc_prod_qty){
+                    if((ldc_assembly_qty+ldc_qty_other)>ldc_prod_qty){
                       await this.$XModal.confirm(`第${li_row_no}行:【${ls_mo_id}--${ls_goods_id}】\n移交数已超過生產數，如要繼續保存，請選擇【确定】\n并在彈出窗口中輸入有權限的用户和密碼!`).then(type => {
                            if (type === 'cancel') {
                                this.preUpdateFlag = false;
@@ -1468,7 +1477,7 @@
                       if(!this.preUpdateFlag){
                           break;
                       }
-                      //**************打開密碼確認窗口***************
+                        //**************打開密碼確認窗口************Passwor start
                       //要等此窗口做完所有的事情才執后面的語句,否則就處于等待狀態   
                       await this.$prompt(`當前用戶: ${this.userId}`,"請輸入密碼",{
                           confirmButtonText: '确定',
@@ -1520,7 +1529,7 @@
                       }).catch((err) => {
                           console.log(err);
                       }); 
-                      //************
+                        //************Passwor End
                       
                       if(this.valid_user_id ===false){ //this.valid_user_id為密碼確認窗口檢查通過時/this.valid_user_id=true,不通過this.valid_user_id=false                         
                           this.preUpdateFlag = false; //保存前檢查通不過,退出循環

@@ -101,8 +101,8 @@ namespace CF2025.Prod.DAL
         {                 
             string strSql = string.Format(
                 @"SELECT A.id,A.upper_sequence,A.sequence_id,A.mo_id,A.goods_id,B.name AS goods_name,A.con_qty,A.unit_code
-                ,A.sec_qty,A.sec_unit,A.package_num,A.bom_qty,A.base_qty,isnull(A.lot_no,'') as lot_no
-                FROM dbo.jo_assembly_details_part A
+                ,A.sec_qty,A.sec_unit,A.package_num,A.bom_qty,A.base_qty,Isnull(A.lot_no,'') As lot_no
+                FROM dbo.jo_assembly_details_part A with(nolock)
                 INNER JOIN it_goods B ON A.within_code=B.within_code AND A.goods_id=B.id
                 Where A.within_code='{0}' AND A.id='{1}' Order by A.sequence_id", within_code, id);
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
@@ -182,6 +182,7 @@ namespace CF2025.Prod.DAL
                 mdjDetail.sequence_id = dt.Rows[i]["sequence_id"].ToString();
                 mdjDetail.bom_qty = decimal.Parse(dt.Rows[i]["bom_qty"].ToString());
                 mdjDetail.base_qty = decimal.Parse(dt.Rows[i]["base_qty"].ToString());
+                mdjDetail.lot_no = "";
                 lstDetail.Add(mdjDetail);
             }
             return lstDetail;
@@ -253,14 +254,15 @@ namespace CF2025.Prod.DAL
                                   List<jo_assembly_details> lstTurnOver, List<jo_assembly_details> lstTurnOverQc )
         {
             string str = "", lot_no = "";
-            StringBuilder strSql = new StringBuilder(" SET XACT_ABORT ON ");
-            strSql.Append(" BEGIN TRANSACTION ");            
+            StringBuilder sbSql = new StringBuilder(" SET XACT_ABORT ON ");
+            sbSql.Append(" BEGIN TRANSACTION ");
             string id = headData.id;
             string head_insert_status = headData.head_status;
             string sql_lot_no = string.Format(
-                    @"DECLARE @lot_no nvarchar(20) 
-                      EXEC usp_create_lot_no '{0}','{1}','{2}',@lot_no OUTPUT 
-                      SELECT @lot_no AS lot_no", within_code, headData.out_dept, headData.out_dept);
+            @" DECLARE @lot_no nvarchar(20) 
+               EXEC usp_create_lot_no '{0}','{1}','{2}',@lot_no OUTPUT 
+               SELECT @lot_no AS lot_no", 
+            within_code, headData.out_dept, headData.out_dept);
             DataTable dtLotNo = new DataTable();
 
             if (head_insert_status == "NEW")//全新的單據
@@ -276,7 +278,7 @@ namespace CF2025.Prod.DAL
                 string bill_code = "";  //model.id.Substring(1, 13);DC105220800001
                 year_month = headData.id.Substring(5, 4);   //2201
                 bill_code = headData.id.Substring(1, 13);   //C105220800001
-                string sql_sys_update1 = "";
+                string sql_sys_update1 = "";               
                 string sql_sys_id_insert = string.Format(
                     @" INSERT INTO sys_bill_max_separate(within_code,bill_code,bill_id,year_month,bill_text2,bill_text1,bill_text3,bill_text4,bill_text5) 
                     VALUES('0000','{0}','{1}','{2}','{3}','','','','')",
@@ -284,17 +286,17 @@ namespace CF2025.Prod.DAL
                 string sql_sys_id_udate = string.Format(
                     @" UPDATE sys_bill_max_separate SET bill_code='{0}' WHERE within_code='0000' AND bill_id='{1}' AND year_month='{2}' and bill_text2='{3}'",
                     bill_code, "JO19", year_month, dept_id);
-                if (bill_code.Substring(7, 5) != "00001")
+                if (bill_code.Substring(8, 5) != "00001")
                     sql_sys_update1 = sql_sys_id_udate;
                 else
                     sql_sys_update1 = sql_sys_id_insert;
                
                 //更新系統表移交單最大單號
                 //取移交單最大單號
-                string sql_max_id = string.Format(@"SELECT dbo.fn_zz_sys_bill_max_jo07('{0}','{1}','{2}') as id", headData.out_dept, headData.in_dept, "T");
-                DataTable dt = sh.ExecuteSqlReturnDataTable(sql_max_id);
-                string max_id = dt.Rows[0]["id"].ToString(); //max_id value is DT10560134510
-                string billCode = max_id.Substring(1, 12);   //biiCode value is T10560134510
+                string sql_f = string.Format(@"SELECT dbo.fn_zz_sys_bill_max_jo07('{0}','{1}','{2}') as id", headData.out_dept, headData.in_dept, "T");
+                DataTable dt = sh.ExecuteSqlReturnDataTable(sql_f);
+                string max_handover_id = dt.Rows[0]["id"].ToString(); //max_handover_id value is DT10560134510
+                string billCode = max_handover_id.Substring(1, 12);   //biiCode value is T10560134510
                 string strSql_i = string.Format(
                 @" INSERT INTO sys_bill_max_jo07(within_code,bill_id,year_month,bill_code,bill_text1,bill_text2,bill_text3,bill_text4,bill_text5) 
                 VALUES('0000','JO07','','{0}','T','{1}','{2}','','')",billCode, headData.out_dept, headData.in_dept);
@@ -302,35 +304,34 @@ namespace CF2025.Prod.DAL
                 @" UPDATE sys_bill_max_jo07 SET bill_code='{0}' WHERE within_code='0000' AND bill_id='JO07' AND bill_text1='T' AND bill_text2='{1}' and bill_text3='{2}'",
                 billCode, headData.out_dept, headData.in_dept);
                 string sql_sys_update2 = "";
-                if (billCode.Substring(6,5) !="00001")
+                if (billCode.Substring(7,5) !="00001")//**
                     sql_sys_update2 = strSql_u;
                 else
                     sql_sys_update2 = strSql_i;
 
                 str = sql_sys_update1 + sql_sys_update2;
-                strSql.Append(str);
+                sbSql.Append(str);
                 //***end save form max id to system tabe 
                 
                 //插入主表
-                if (!string.IsNullOrEmpty(headData.in_dept))
-                {
-                    headData.handover_id = max_id;
-                }
+                //if (!string.IsNullOrEmpty(headData.in_dept))
+                //{
+                //  headData.handover_id = max_handover_id;
+                //}
                 str = string.Format(
-                  @" Insert Into jo_assembly_mostly(within_code,id,con_date,handler,update_count,transfers_state,remark,state,create_by,create_date,bill_type,
-                  out_dept,in_dept,con_type,stock_type,bill_origin,handover_id,servername) 
-                  Values ('{0}','{1}','{2}','{3}','0','0','{4}','0','{5}',getdate(),'C',   '{6}','{7}','0','0','2','{8}','hkserver.cferp.dbo')",
-                  within_code, headData.id, headData.con_date, headData.handler, headData.remark, headData.create_by, headData.out_dept, headData.in_dept, headData.handover_id);
-                strSql.Append(str);
+                  @" Insert Into jo_assembly_mostly(within_code,id,con_date,handler,update_count,transfers_state,remark,state,create_by,create_date,bill_type_no,
+                  out_dept,in_dept,con_type,stock_type,bill_origin,handover_id,servername,update_date,update_by) 
+                  Values ('{0}','{1}','{2}','{3}','1','0','{4}','0','{5}',getdate(),'C','{6}','{7}','0','0','2','{8}','hkserver.cferp.dbo',getdate(),'{9}')",
+                  within_code, headData.id, headData.con_date, headData.handler, headData.remark, headData.create_by, headData.out_dept, headData.in_dept, 
+                  headData.handover_id, headData.create_by);
+                sbSql.Append(str);
                 //插入明細表一
                 foreach (var item in lstDetailData1)
                 {
-                    //獲取批號
-                    dtLotNo = sh.ExecuteSqlReturnDataTable(sql_lot_no);
+                    dtLotNo = sh.ExecuteSqlReturnDataTable(sql_lot_no); //自動生成批號
                     lot_no = dtLotNo.Rows[0]["lot_no"].ToString();
-
                     //改变list中某个元素值 (例子: var model = list.Where(c => c.ID == ).FirstOrDefault(); model.Value1 = ;)
-                    //更改移交單的批號與組裝單的批號一致
+                    //历遍移交單臨時數組,更改批號與組裝單批號一致
                     lstTurnOver.ForEach(i =>
                     {
                         if (i.id == item.id && i.sequence_id == item.sequence_id)
@@ -338,7 +339,7 @@ namespace CF2025.Prod.DAL
                             i.lot_no = lot_no;
                         }
                     });
-                    //更改QC移交單的批號與組裝單的批號一致
+                    //历遍QC移交單臨時數組,更改批號與組裝單批號一致
                     lstTurnOverQc.ForEach(i =>
                     {
                         if (i.id == item.id && i.sequence_id == item.sequence_id)
@@ -352,21 +353,21 @@ namespace CF2025.Prod.DAL
                     ('{0}','{1}','{2}','{3}','{4}','{5}',{6},'{7}',{8},'{9}','{10}','{11}',1,'{12}','{13}','{14}',getdate(),'{15}',{16},{17})",
                     within_code,headData.id,item.sequence_id,item.jo_id,item.jo_sequence_id,item.goods_id,item.con_qty,item.unit_code,item.sec_qty,item.sec_unit,
                     item.mo_id,item.package_num,headData.out_dept,headData.out_dept,headData.create_by,lot_no,item.prd_id,item.qc_qty);
-                    strSql.Append(str);
+                    sbSql.Append(str);
                 }
                 //插入明細表二
                 foreach (var item in lstDetailData2)
                 {                    
                     str = string.Format(
                     @" Insert Into jo_assembly_details_part(within_code,id,upper_sequence,sequence_id,mo_id,goods_id,con_qty,unit_code,sec_qty,sec_unit,
-                    package_num,remark,bom_qty,base_qty,lot_no) Values ('{0}','{1}','{2}','{3}','{4}','{5}',{6},'{7}',{8},'{9}',{10},{11},{12},'{13}')",
+                    package_num,remark,bom_qty,base_qty,lot_no) Values ('{0}','{1}','{2}','{3}','{4}','{5}',{6},'{7}',{8},'{9}',{10},'{11}',{12},{13},'{14}')",
                     within_code, headData.id,item.upper_sequence,item.sequence_id,item.mo_id,item.goods_id,item.con_qty,item.unit_code,item.sec_qty,
                     item.sec_unit,item.package_num,item.remark,item.bom_qty,item.base_qty,item.lot_no);
-                    strSql.Append(str);
+                    sbSql.Append(str);
                 }
                 //生成移交單
                 GenNumberDAL objNum = new GenNumberDAL();
-                string update_count = "0", transfers_state = "0", bill_type_no = "T", con_type = "0", stock_type = "0", bill_origin = "2";
+                string update_count = "1", transfers_state = "0", bill_type_no = "T", con_type = "0", stock_type = "0", bill_origin = "2";
                 string sequence_id = "", aim_jo_id = "", aim_jo_sequence = "";
                 decimal jo_qty = 0, c_qty = 0, package_num = 0;
                 int index ;
@@ -375,11 +376,11 @@ namespace CF2025.Prod.DAL
                     //移交單表頭                    
                     str = string.Format(
                     @" Insert Into jo_materiel_con_mostly(within_code,id,con_date,handler, update_count,transfers_state,remark,state,bill_type_no,out_dept,in_dept,
-                    con_type,stock_type,bill_origin,create_by,create_date,servername) VALUES
-                    ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}',getdate(),'hkserver.cferp.dbo')",
-                    within_code, headData.handover_id, headData.con_date, headData.handler, update_count,transfers_state, headData.remark, headData.state, 
-                    bill_type_no, headData.out_dept,headData.in_dept, con_type, stock_type, bill_origin,headData.create_by);
-                    strSql.Append(str);
+                    con_type,stock_type,bill_origin,create_by,create_date,servername,update_date,update_by) VALUES
+                    ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}',getdate(),'hkserver.cferp.dbo',getdate(),'{15}')",
+                    within_code, max_handover_id, headData.con_date, headData.handler, update_count,transfers_state, headData.remark, headData.state, 
+                    bill_type_no, headData.out_dept,headData.in_dept, con_type, stock_type, bill_origin,headData.create_by, headData.create_by);
+                    sbSql.Append(str);
                     //移交單明細
                     index = 0;
                     foreach (var item in lstTurnOver)
@@ -393,35 +394,37 @@ namespace CF2025.Prod.DAL
                         (within_code,id,sequence_id,jo_id,jo_sequence_id,goods_id,jo_qty,c_qty,con_qty,unit_code,sec_qty,sec_unit,remark,mo_id,package_num,
                         location,carton_code,lot_no,aim_jo_id,aim_jo_sequence) Values
                         ('{0}','{1}','{2}','{3}','{4}','{5}',{6},{7},{8},'{9}',{10},'{11}','{12}','{13}',{14},'{15}','{16}','{17}','{18}','{19}')",
-                        within_code,headData.handover_id, sequence_id,item.jo_id,item.jo_sequence_id,item.goods_id,jo_qty,c_qty,item.con_qty,item.unit_code,
-                        item.sec_qty,item.sec_unit,item.remark,item.mo_id,package_num,item.location,item.carton_code,item.lot_no,aim_jo_id,aim_jo_sequence);
-                        strSql.Append(str);
+                        within_code,max_handover_id, sequence_id,item.jo_id,item.jo_sequence_id,item.goods_id,jo_qty,c_qty,item.con_qty,item.unit_code,
+                        item.sec_qty,item.sec_unit,item.remark,item.mo_id,package_num, headData.out_dept, headData.out_dept, item.lot_no,aim_jo_id,aim_jo_sequence);
+                        sbSql.Append(str);
                     }
                 }
                 //生成QC移交單
+                string max_handover_id_qc = "";
                 if (lstTurnOverQc.Count > 0)
                 {
                     string in_dept = "702";
-                    sql_max_id = string.Format(@"SELECT dbo.fn_zz_sys_bill_max_jo07('{0}','{1}','{2}') as id", headData.out_dept, in_dept, "T");
-                    DataTable dtQc = sh.ExecuteSqlReturnDataTable(sql_max_id);
-                    max_id = dtQc.Rows[0]["id"].ToString(); //max_id value is DT10570234510
-                    billCode = max_id.Substring(1, 12);//biiCode value is T10570234510
+                    sql_f = string.Format(@"SELECT dbo.fn_zz_sys_bill_max_jo07('{0}','{1}','{2}') as id", headData.out_dept, in_dept, "T");
+                    DataTable dtQc = sh.ExecuteSqlReturnDataTable(sql_f);
+                    max_handover_id_qc = dtQc.Rows[0]["id"].ToString(); //max_handover_id_qc value is DT10570234510
+                    billCode = max_handover_id_qc.Substring(1, 12); //biiCode value is T10570234510
                     strSql_i = string.Format(
-                    @" INSERT INTO sys_bill_max_jo07(within_code,bill_id,year_month,bill_code,bill_text1,bill_text2,bill_text3,bill_text4,bill_text5) 
-                    VALUES('0000','JO07','','{0}','T','{1}','{2}','','')", billCode, headData.out_dept, in_dept);
+                        @" INSERT INTO sys_bill_max_jo07(within_code,bill_id,year_month,bill_code,bill_text1,bill_text2,bill_text3,bill_text4,bill_text5) 
+                        VALUES('0000','JO07','','{0}','T','{1}','{2}','','')", billCode, headData.out_dept, in_dept);
+                    //更新系統表最大單據號
                     strSql_u = string.Format(
-                    @" UPDATE sys_bill_max_jo07 SET bill_code='{0}'
-                    WHERE within_code='0000' AND bill_id='JO07' AND bill_text1='T' AND bill_text2='{1}' and bill_text3='{2}'",billCode,headData.out_dept,in_dept);
-                    sql_sys_update2 = billCode.Substring(6, 5) != "00001" ? strSql_u : strSql_i;                    
-                    strSql.Append(sql_sys_update2);
-                    //QC移交單表頭
+                        @" UPDATE sys_bill_max_jo07 SET bill_code='{0}'
+                        WHERE within_code='0000' AND bill_id='JO07' AND bill_text1='T' AND bill_text2='{1}' and bill_text3='{2}'",billCode,headData.out_dept,in_dept);
+                    sql_sys_update2 = billCode.Substring(7, 5) != "00001" ? strSql_u : strSql_i;                    
+                    sbSql.Append(sql_sys_update2);
+                    //生成QC移交單表頭
                     str = string.Format(
                     @" Insert Into jo_materiel_con_mostly(within_code,id,con_date,handler, update_count,transfers_state,remark,state,bill_type_no,out_dept,in_dept,
-                    con_type,stock_type,bill_origin,create_by,create_date,servername)
-                    VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}',getdate(),'hkserver.cferp.dbo')",
-                    within_code, max_id, headData.con_date, headData.handler, update_count, transfers_state, headData.remark, headData.state,
-                    bill_type_no, headData.out_dept, in_dept, con_type, stock_type, bill_origin, headData.create_by);
-                    strSql.Append(str);
+                    con_type,stock_type,bill_origin,create_by,create_date,servername,update_date,update_by)
+                    VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}',getdate(),'hkserver.cferp.dbo',getdate(),'{15}')",
+                    within_code, max_handover_id_qc, headData.con_date, headData.handler, update_count, transfers_state, headData.remark, headData.state,
+                    bill_type_no, headData.out_dept, in_dept, con_type, stock_type, bill_origin, headData.create_by, headData.create_by);
+                    sbSql.Append(str);
                     //QC移交單明細
                     index = 0;
                     foreach (var item in lstTurnOverQc)
@@ -435,9 +438,9 @@ namespace CF2025.Prod.DAL
                         (within_code,id,sequence_id,jo_id,jo_sequence_id,goods_id,jo_qty,c_qty,con_qty,unit_code,sec_qty,sec_unit,remark,mo_id,package_num,
                         location,carton_code,lot_no,aim_jo_id,aim_jo_sequence) Values
                         ('{0}','{1}','{2}','{3}','{4}','{5}',{6},{7},{8},'{9}',{10},'{11}','{12}','{13}',{14},'{15}','{16}','{17}','{18}','{19}')",
-                        within_code, max_id, sequence_id, item.jo_id, item.jo_sequence_id, item.goods_id, jo_qty, c_qty, item.con_qty, item.unit_code,
-                        item.sec_qty, item.sec_unit, item.remark, item.mo_id, package_num, item.location, item.carton_code, item.lot_no, aim_jo_id, aim_jo_sequence);
-                        strSql.Append(str);
+                        within_code, max_handover_id_qc, sequence_id, item.jo_id, item.jo_sequence_id, item.goods_id, jo_qty, c_qty, item.con_qty, item.unit_code,
+                        item.sec_qty, item.sec_unit, item.remark, item.mo_id, package_num, headData.out_dept, headData.out_dept, item.lot_no, aim_jo_id, aim_jo_sequence);
+                        sbSql.Append(str);
                     }
                 }
             }
@@ -451,14 +454,14 @@ namespace CF2025.Prod.DAL
                     foreach (var item in lstDelData1)
                     {
                         str = string.Format(@" DELETE FROM jo_assembly_details with(ROWLOCK) Where within_code='0000' AND id='{0}' AND sequence_id='{1}'", item.id, item.sequence_id);
-                        strSql.Append(str);
+                        sbSql.Append(str);
                         //刪除對應的移交單(包括QC移交單)
                         assembly_id = item.id;
                         assembly_seq_id = item.sequence_id;
                         str = string.Format(
                         @" DELETE FROM jo_materiel_con_details Where mo_id='{0}' And goods_id='{1}' And aim_jo_id='{2}' And aim_jo_sequence='{3}'", 
                         item.mo_id, item.goods_id, assembly_id, assembly_seq_id);
-                        strSql.Append(str);
+                        sbSql.Append(str);
                     }
                 }
                 //首先處理刪除(表格二)
@@ -469,21 +472,23 @@ namespace CF2025.Prod.DAL
                         str = string.Format(
                         @" DELETE FROM jo_assembly_details_part with(ROWLOCK) WHERE within_code='0000' AND id='{0}' AND upper_sequence='{1}' AND sequence_id='{2}'",
                         item.id, item.upper_sequence, item.sequence_id);
-                        strSql.Append(str);
+                        sbSql.Append(str);
                     }
                 }                
                 //更新組裝轉換表頭
                 str = string.Format(
-                @" UPDATE jo_assembly_mostly with(Rowlock) SET con_date='{2}',handler='{3}',remark='{4}',update_by='{5}',update_date=getdate(),out_dept='{6}',in_dept='{7}' 
+                @" UPDATE jo_assembly_mostly with(ROWLOCK) SET con_date='{2}',handler='{3}',remark='{4}',update_by='{5}',update_date=getdate(),out_dept='{6}',in_dept='{7}',
+                    update_count= Convert(nvarchar(5),Convert(int,update_count)+1)
                 WHERE within_code='{0}' AND id='{1}'", within_code,headData.id,headData.con_date,headData.handler,headData.remark,headData.update_by,headData.out_dept,headData.in_dept);
-                strSql.Append(str);
+                sbSql.Append(str);
                 //更新明細表一
                 decimal ldc_con_qty = 0, ldc_sec_qty = 0;
                 string strQcID = "";
                 foreach (var item in lstDetailData1)
                 {
-                    if (!string.IsNullOrEmpty(item.row_status))//item.row_status不為空,測數據有新增或修改
+                    if (!string.IsNullOrEmpty(item.row_status))
                     {
+                        //item.row_status非空,數據有新增或修改
                         if (item.qc_qty > 0 && item.con_qty > item.qc_qty)
                         {
                             ldc_con_qty = item.con_qty - item.qc_qty;
@@ -494,7 +499,6 @@ namespace CF2025.Prod.DAL
                             ldc_con_qty = item.con_qty;
                             ldc_sec_qty = item.sec_qty;
                         }
-
                         if (item.row_status == "EDIT")
                         {
                             lot_no = item.lot_no; //編輯時原記錄已有批號
@@ -511,10 +515,11 @@ namespace CF2025.Prod.DAL
                             WHERE within_code='{0}' AND id='{1}' AND sequence_id='{2}'",
                             within_code, headData.id, item.sequence_id, item.jo_id, item.jo_sequence_id, item.goods_id, item.con_qty, item.unit_code, item.sec_qty, item.sec_unit, 
                             item.mo_id, item.package_num, item.location, item.carton_code, lot_no, item.prd_id,item.qc_qty);                           
-                            strSql.Append(str);
+                            sbSql.Append(str);
                             //更新移交單明細                                                        
                             if (!string.IsNullOrEmpty(headData.handover_id))
                             {
+                                //已考慮扣減交QC部分
                                 str = string.Format(
                                 @" UPDATE jo_materiel_con_details 
                                 SET jo_id='{6}',jo_sequence_id='{7}',con_qty={8},unit_code='{9}',sec_qty={10},sec_unit='{11}',remark='{12}',
@@ -523,12 +528,12 @@ namespace CF2025.Prod.DAL
                                 item.mo_id, item.goods_id, within_code, headData.handover_id,item.id,item.sequence_id,
                                 item.jo_id,item.jo_sequence_id,ldc_con_qty,item.unit_code,ldc_sec_qty,item.sec_unit,item.remark,
                                 item.package_num, item.location,item.carton_code,lot_no);
-                                strSql.Append(str);
+                                sbSql.Append(str);
                             }
                         }
                         else //INSERT ITEM//有項目新增
                         {
-                            //組裝轉換插入新的明細記錄
+                            //組裝轉換明細,插入新增的記錄
                             dtLotNo = sh.ExecuteSqlReturnDataTable(sql_lot_no);//生成批號
                             lot_no = dtLotNo.Rows[0]["lot_no"].ToString();
                             str = string.Format(
@@ -537,23 +542,24 @@ namespace CF2025.Prod.DAL
                             Values('{0}','{1}','{2}','{3}','{4}','{5}',{6},'{7}',{8},'{9}','{10}',{11},'{12}','{13}','{14}','{15}')",
                             within_code, headData.id, item.sequence_id, item.jo_id,item.jo_sequence_id,item.goods_id,item.con_qty,item.unit_code,item.sec_qty,item.sec_unit, 
                             item.mo_id,item.package_num, headData.out_dept, headData.out_dept, lot_no,item.prd_id);
-                            strSql.Append(str);
+                            sbSql.Append(str);
                             decimal jo_qty = 0, c_qty = 0;
                             string aim_jo_id = "", aim_jo_sequence="";
                             if (!string.IsNullOrEmpty(headData.handover_id))//已保存有移交單號
                             {                                
                                 //新增的記錄插入已存在的移交單中
                                 aim_jo_id = item.id;//組裝單號
-                                aim_jo_sequence = item.sequence_id;//組裝轉換單序號
+                                aim_jo_sequence = item.sequence_id;//組裝轉換單的序號
                                 str = string.Format(
                                 @" Insert Into jo_materiel_con_details
                                 (within_code,id,sequence_id,jo_id,jo_sequence_id,goods_id,jo_qty,c_qty,con_qty,unit_code,sec_qty,sec_unit,remark,mo_id,package_num,
                                 location,carton_code,lot_no,aim_jo_id,aim_jo_sequence) Values
                                 ('{0}','{1}','{2}','{3}','{4}','{5}',{6},{7},{8},'{9}',{10},'{11}','{12}','{13}',{14},'{15}','{16}','{17}','{18}','{19}')",
                                 within_code, headData.handover_id,item.sequence_id,item.jo_id,item.jo_sequence_id,item.goods_id,jo_qty,c_qty,ldc_con_qty,item.unit_code,
-                                ldc_sec_qty, item.sec_unit, item.remark, item.mo_id, item.package_num, item.location, item.carton_code, item.lot_no, aim_jo_id, aim_jo_sequence);
-                                strSql.Append(str);                                
-                                if (item.qc_qty > 0 && headData.in_dept!="702")/*&& item.con_qty > item.qc_qty*/
+                                ldc_sec_qty, item.sec_unit, item.remark, item.mo_id, item.package_num, headData.out_dept, headData.out_dept, item.lot_no, aim_jo_id, aim_jo_sequence);
+                                sbSql.Append(str);
+                                //判斷是否有交QC移交單數據?
+                                if (item.qc_qty > 0 && headData.in_dept !="702") //*&& item.con_qty > item.qc_qty*/
                                 {
                                     //查找此組裝單號有沒生成QC的移交單,有就利用原有的移交單
                                     if (strQcID == "")
@@ -565,7 +571,7 @@ namespace CF2025.Prod.DAL
                                         dt = sh.ExecuteSqlReturnDataTable(str_f);
                                         if (dt.Rows.Count > 0)
                                         {
-                                            //已有交QC的原始數據,在原有移交單上插入記錄
+                                            //已保存有移交QC的原始數據,在原有QC移交單上插入記錄
                                             strQcID = dt.Rows[0]["id"].ToString();
                                             str = string.Format(
                                             @" Insert Into jo_materiel_con_details 
@@ -573,34 +579,34 @@ namespace CF2025.Prod.DAL
                                             location,carton_code,lot_no,aim_jo_id,aim_jo_sequence) Values
                                             ('{0}','{1}','{2}','{3}','{4}','{5}',{6},{7},{8},'{9}',{10},'{11}','{12}','{13}',{14},'{15}','{16}','{17}','{18}','{19}')",
                                             within_code,strQcID,item.sequence_id,item.jo_id,item.jo_sequence_id,item.goods_id,jo_qty,c_qty,item.qc_qty,item.unit_code,
-                                            0.01, item.sec_unit,item.remark, item.mo_id, 0, item.location, item.carton_code, lot_no, aim_jo_id, aim_jo_sequence);
-                                            strSql.Append(str);
+                                            0.01, item.sec_unit,item.remark, item.mo_id, 0, headData.out_dept, headData.out_dept, lot_no, aim_jo_id, aim_jo_sequence);
+                                            sbSql.Append(str);
                                         }
                                         else
                                         {
-                                            //重新生成QC移
-                                            //更新系統表  
-                                            string in_dept="702", update_count = "0", transfers_state = "0", bill_type_no = "T", con_type = "0", stock_type = "0", bill_origin = "2";                                            
-                                            strQcID = string.Format(@"SELECT dbo.fn_zz_sys_bill_max_jo07('{0}','{1}','{2}') as id", headData.out_dept, in_dept, "T");
+                                            //重新生成QC移交單
+                                            //更新系統表最大單據編號  
+                                            string in_dept="702", update_count = "1", transfers_state = "0", bill_type_no = "T", con_type = "0", stock_type = "0", bill_origin = "2";                                            
+                                            strQcID = string.Format(@"SELECT dbo.fn_zz_sys_bill_max_jo07('{0}','{1}','{2}') AS id", headData.out_dept, in_dept, "T");
                                             DataTable dtQc = sh.ExecuteSqlReturnDataTable(strQcID);
-                                            strQcID = dtQc.Rows[0]["id"].ToString(); //max_id value is DT10570234510
-                                            string billCode = strQcID.Substring(1, 12);//biiCode value is T10570234510
+                                            strQcID = dtQc.Rows[0]["id"].ToString();    //max_id value is DT10570234510
+                                            string billCode = strQcID.Substring(1, 12); //biiCode value is T10570234510
                                             string strSql_i = string.Format(
                                             @" INSERT INTO sys_bill_max_jo07(within_code,bill_id,year_month,bill_code,bill_text1,bill_text2,bill_text3,bill_text4,bill_text5) 
                                             VALUES('0000','JO07','','{0}','T','{1}','{2}','','')", billCode, headData.out_dept, in_dept);
                                             string strSql_u = string.Format(
                                             @" UPDATE sys_bill_max_jo07 SET bill_code='{0}' 
                                             WHERE within_code='0000' AND bill_id='JO07' AND bill_text1='T' AND bill_text2='{1}' and bill_text3='{2}'", billCode, headData.out_dept, in_dept);
-                                            str = billCode.Substring(6, 5) != "00001" ? strSql_u : strSql_i;
-                                            strSql.Append(str);
+                                            str = billCode.Substring(7, 5) != "00001" ? strSql_u : strSql_i;
+                                            sbSql.Append(str);
                                             //QC移交單表頭
                                             str = string.Format(
-                                            @" Insert Into jo_materiel_con_mostly(within_code,id,con_date,handler, update_count,transfers_state,remark,state,bill_type_no,out_dept,in_dept,
-                                            con_type,stock_type,bill_origin,create_by,create_date,servername)
-                                            VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}',getdate(),'hkserver.cferp.dbo')",
+                                            @" Insert Into jo_materiel_con_mostly(within_code,id,con_date,handler,update_count,transfers_state,remark,state,bill_type_no,out_dept,in_dept,
+                                            con_type,stock_type,bill_origin,create_by,create_date,servername,update_date,update_by)
+                                            VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}',getdate(),'hkserver.cferp.dbo',getdate(),'{15}')",
                                             within_code, strQcID, headData.con_date, headData.handler, update_count, transfers_state, headData.remark, headData.state,
-                                            bill_type_no, headData.out_dept, in_dept, con_type, stock_type, bill_origin, headData.create_by);
-                                            strSql.Append(str);
+                                            bill_type_no, headData.out_dept, in_dept, con_type, stock_type, bill_origin, headData.create_by, headData.create_by);
+                                            sbSql.Append(str);
                                             //QC移交單明細 
                                             aim_jo_id = item.id;//組裝單號
                                             aim_jo_sequence = item.sequence_id;//組裝單序號
@@ -610,8 +616,8 @@ namespace CF2025.Prod.DAL
                                             location,carton_code,lot_no,aim_jo_id,aim_jo_sequence) Values
                                             ('{0}','{1}','{2}','{3}','{4}','{5}',{6},{7},{8},'{9}',{10},'{11}','{12}','{13}',{14},'{15}','{16}','{17}','{18}','{19}')",
                                             within_code,strQcID,item.sequence_id,item.jo_id,item.jo_sequence_id,item.goods_id,jo_qty,c_qty,item.qc_qty,item.unit_code,0.01,
-                                            item.sec_unit, item.remark, item.mo_id, 0, item.location, item.carton_code, lot_no, aim_jo_id, aim_jo_sequence); 
-                                            strSql.Append(str);                                            
+                                            item.sec_unit, item.remark, item.mo_id, 0, headData.out_dept, headData.out_dept, lot_no, aim_jo_id, aim_jo_sequence); 
+                                            sbSql.Append(str);                                            
                                         }
                                     }
                                     else //strQcID不為空情況
@@ -623,8 +629,8 @@ namespace CF2025.Prod.DAL
                                         location,carton_code,lot_no,aim_jo_id,aim_jo_sequence) Values
                                         ('{0}','{1}','{2}','{3}','{4}','{5}',{6},{7},{8},'{9}',{10},'{11}','{12}','{13}',{14},'{15}','{16}','{17}','{18}','{19}')",
                                         within_code,strQcID,item.sequence_id,item.jo_id,item.jo_sequence_id,item.goods_id,jo_qty,c_qty,item.qc_qty,item.unit_code,0.01,
-                                        item.sec_unit, item.remark, item.mo_id, 0, item.location, item.carton_code, lot_no, aim_jo_id, aim_jo_sequence);
-                                        strSql.Append(str);
+                                        item.sec_unit, item.remark, item.mo_id, 0, headData.out_dept, headData.out_dept, lot_no, aim_jo_id, aim_jo_sequence);
+                                        sbSql.Append(str);
                                     }
                                 }   //end of QC                            
                             } //end of is have a delivery ID No.
@@ -654,12 +660,49 @@ namespace CF2025.Prod.DAL
                              within_code, headData.id, item.upper_sequence, item.sequence_id,item.mo_id,item.goods_id,item.con_qty, item.unit_code,item.sec_qty,item.sec_unit, 
                              item.package_num, item.remark,item.bom_qty, item.base_qty, item.lot_no);
                         }
-                        strSql.Append(str);
+                        sbSql.Append(str);
                     }
                 }
+            }            
+            sbSql.Append(@" COMMIT TRANSACTION ");
+            string result = sh.ExecuteSqlUpdate(sbSql.ToString());
+            sbSql.Clear();
+
+            //批準
+            if (result == "")
+            {
+                //--start更新PAD生產嗙貨給組裝轉換已入單數據標識
+                string sql = string.Format(
+                @"Select Count(1) As counts 
+                From jo_assembly_mostly A WITH(NOLOCK),jo_assembly_details B WITH(NOLOCK),product_records C WITH(NOLOCK)
+                Where A.within_code=B.within_code And A.id=B.id And B.prd_id=C.prd_id And Isnull(C.imput_flag,'')='' And
+                      A.within_code='{0}' And A.id='{1}'", within_code, headData.id);
+                DataTable dt = sh.ExecuteSqlReturnDataTable(sql);
+                if (dt.Rows.Count > 0)
+                {
+                    if (int.Parse(dt.Rows[0]["counts"].ToString()) > 0)
+                    {
+                        sbSql.Clear();
+                        sbSql.Append(@" SET XACT_ABORT ON ");
+                        sbSql.Append(@" BEGIN TRANSACTION ");
+                        // = new StringBuilder(" SET XACT_ABORT ON ");                        
+                        sql = string.Format(
+                        @" Update C WITH(ROWLOCK) Set C.imput_flag ='Y',C.imput_time=GetDate()        
+                        From jo_assembly_mostly A,jo_assembly_details B,product_records C        
+                        Where A.within_code = B.within_code And A.id = B.id And B.prd_id = C.prd_id        
+                                And Isnull(C.imput_flag,'')='' And A.within_code='{0}' And A.id ='{1}'", within_code, headData.id);
+                        sbSql.Append(sql);
+                        sbSql.Append(@" COMMIT TRANSACTION ");
+                        sh.ExecuteSqlUpdate(sbSql.ToString());
+                        sbSql.Clear();
+                    }
+                }
+                //--end
+                //如果保存成功,后臺進行批準動作
+                var dept_id = headData.in_dept;
+                var status = head_insert_status;    //  status:"NEW" 更新組裝單主表的[移交單]字段,批準人,批準日期
+
             }
-            strSql.Append(@" COMMIT TRANSACTION ");
-            string result = sh.ExecuteSqlUpdate(strSql.ToString());
             return result;
         }
 
@@ -735,7 +778,7 @@ namespace CF2025.Prod.DAL
         {
             int result = 0;
             string strSql = string.Format(
-                @"Select Count(1) as rs From jo_bill_mostly A with(nolock),jo_bill_goods_details B with(nolock)
+                @"Select Count(1) As rs From jo_bill_mostly A with(nolock),jo_bill_goods_details B with(nolock)
 			    Where A.within_code = B.within_code And A.id = B.id And A.ver = B.ver And A.state Not In('0','2','V')
 				And A.within_code='0000' And A.mo_id='{0}' And B.goods_id='{1}' And B.wp_id='{2}' And B.next_wp_id='{3}'",
                 mo_id, goods_id,wp_id,next_wp_id);
@@ -753,9 +796,9 @@ namespace CF2025.Prod.DAL
         //ls_mo_id = dw_detail.GetItemString(row,'mo_id')
         //ls_goods_id = dw_detail.GetItemString(row,'goods_id')
         //如果有完成数量都不需要考虑QC流程了,当作已经做完了QC的移交单
-        public static int GetQcQty(string mo_id, string goods_id, string wp_id)
+        public static decimal GetQcQty(string mo_id, string goods_id, string wp_id)
         {
-            int result = 0;
+            decimal result = 0;
             string strSql = string.Format(
             @"Select B.prod_qty From jo_bill_mostly A with(nolock),jo_bill_goods_details B with(nolock)
             Where A.within_code=B.within_code And A.id=B.id And A.ver=B.ver And A.state Not In('2','V')
@@ -765,7 +808,7 @@ namespace CF2025.Prod.DAL
             dt = sh.ExecuteSqlReturnDataTable(strSql);
             if (dt.Rows.Count > 0)
             {
-                result = int.Parse(dt.Rows[0]["prod_qty"].ToString());
+                result = decimal.Parse(dt.Rows[0]["prod_qty"].ToString());
             }            
             return result;
         }
@@ -773,7 +816,8 @@ namespace CF2025.Prod.DAL
         public static List<assembly_qty> GetAssemblyQty(string id,string mo_id, string goods_id, string out_dept) 
         {
             string strSql = string.Format(
-                @"Select Sum(D.con_qty) as con_qty,Sum(D.sec_qty) as sec_qty From jo_assembly_mostly M with(nolock),jo_assembly_details D with(nolock)
+                @"Select Isnull(Sum(D.con_qty),0) As con_qty,Isnull(Sum(D.sec_qty),0) As sec_qty 
+                From jo_assembly_mostly M with(nolock),jo_assembly_details D with(nolock)
 		        Where M.within_code=D.within_code And M.id=D.id And M.state Not In('2','V') And D.within_code='{0}'
 				And D.id <>'{1}' And D.mo_id='{2}' And D.goods_id='{3}' And M.out_dept='{4}'",
                 within_code,id,mo_id,goods_id,out_dept);
@@ -782,13 +826,10 @@ namespace CF2025.Prod.DAL
             List<assembly_qty> lstDetail = new List<assembly_qty>();
             if (dt.Rows.Count > 0)
             {
-                for (int i = 0; i < dt.Rows.Count; i++)
-                {
-                    assembly_qty lst = new assembly_qty();
-                    lst.con_qty = decimal.Parse(dt.Rows[i]["con_qty"].ToString());
-                    lst.sec_qty = decimal.Parse(dt.Rows[i]["sec_qty"].ToString());
-                    lstDetail.Add(lst);
-                }
+                assembly_qty lst = new assembly_qty();
+                lst.con_qty = decimal.Parse(dt.Rows[0]["con_qty"].ToString());
+                lst.sec_qty = decimal.Parse(dt.Rows[0]["sec_qty"].ToString());
+                lstDetail.Add(lst);
             }else
             {
                 assembly_qty lst = new assembly_qty();
@@ -815,7 +856,6 @@ namespace CF2025.Prod.DAL
             }
             return result;
         }
-
         //是否有移交特批权限
         public static string GetUserPope(string user_id)
         {
@@ -846,6 +886,19 @@ namespace CF2025.Prod.DAL
             }
             return result;
         }
-
+        //批準/反批準,approve_type:1--批準;0--反批準
+        public static string Approve(string id, string handover_id,string user_id, string approve_type)
+        {
+            string result = "0";
+            SqlParameter[] paras = new SqlParameter[]{
+                new SqlParameter("@id", id),
+                new SqlParameter("@handover_id", handover_id),
+                new SqlParameter("@user_id",user_id),
+                new SqlParameter("@approve_type", approve_type)
+            };
+            DataTable dt = new DataTable();
+            dt = sh.ExecuteProcedureRetrunDataTable("strProcName", paras);
+            return result;
+        }
     }
 }

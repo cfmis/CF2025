@@ -90,10 +90,10 @@ namespace CF2025.Web.Admin.Areas.Produce.Controllers
 
         //批準,反準
         [HttpPost]
-        public JsonResult Approve(jo_assembly_mostly head, string approve_type)
+        public JsonResult Approve(jo_assembly_mostly head,string user_id, string approve_type)
         {
-            var result = "";//待完善代碼 ProduceAssemblyDAL.Approve(head, approve_type);
-            return Json(result, JsonRequestBehavior.AllowGet);           
+            var result = ProduceAssemblyDAL.Approve(head.id,head.handover_id,user_id, approve_type);
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
 
         //保存
