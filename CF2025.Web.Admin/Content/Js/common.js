@@ -192,8 +192,7 @@ var comm= {
         await axios.get("GetWipID").then(
             (response) => {
 				// return 'abc';
-                // return(response.data);
-				debugger;
+                // return(response.data);				
 				result=response.data;
 				var dd='111';
 				return(result);

@@ -272,8 +272,7 @@ var Main = {
 			}
 			
 			this.getDetailsFromOc(row,mo_id);
-
-			// debugger;
+			
 		},
         getMostlyFromOc(mo_id) {
             //axios.get("GetGoodsDetails", { params: { goods_id: _id, } })//也可以將參數寫在這裡
@@ -702,8 +701,7 @@ var Main = {
             await axios.get(url).then(
                 (response) => {
 					if(SourceType=="SO01")
-					{
-						debugger;
+					{						
 						this.DocSourceTypeList = response.data;
 					}
 					else if(SourceType=="SalesmanList")
@@ -1362,8 +1360,7 @@ var Main = {
 		},
         //顯示通用查詢頁面
         
-        showFindWindos(doc_type){
-            debugger;
+        showFindWindos(doc_type){            
             this.docType=doc_type;
 		    comm.openWindos('Invoice');
 		},
