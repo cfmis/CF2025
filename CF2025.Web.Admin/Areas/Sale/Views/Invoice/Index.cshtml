@@ -23,7 +23,7 @@
             }
         }
             <vxe-button type="text" icon="iconfont icon-edit6" style="width:90px;margin-left:-15px;" @@click="showModalEditItem()" size="mini">項目修改</vxe-button>
-            <vxe-button type="text" icon="iconfont icon-search1" style="width:70px;margin-left:-15px;" class="thickbox" @@click="showFindWindos()" size="mini">查找</vxe-button>
+            <vxe-button type="text" icon="iconfont icon-search1" style="width:70px;margin-left:-15px;" class="thickbox" @@click="showFindWindos(@ViewBag.DocType)" size="mini">查找</vxe-button>
             <vxe-button type="text" icon="iconfont icon-print" style="width:70px;margin-left:-15px;" @@click="printEvent" size="mini">列印</vxe-button>
     @{
         if (ViewBag.DocType == "1")

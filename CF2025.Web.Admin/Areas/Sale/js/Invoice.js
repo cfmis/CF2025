@@ -73,7 +73,8 @@ var Main = {
             // { id: 10007, name: 'Test7', role: 'Test', sex: 'Man', age: 29, address: 'test abc',sex:'1' },
             // { id: 10008, name: 'Test8', role: 'Develop', sex: 'Man', age: 35, address: 'test abc',sex:'1' },
           
-			],
+            ],
+            docType:0,
     }
     },
     created() {
@@ -400,60 +401,60 @@ var Main = {
 					{
 						this.editDetails.goods_id=ocData.goods_id;
 						this.editDetails.goods_id = ocData.goods_id;
-					this.editDetails.goods_name = ocData.goods_name;
-					this.editDetails.customer_goods = ocData.customer_goods;
-					this.editDetails.customer_color_id = ocData.customer_color_id;
-					this.editDetails.u_invoice_qty = ocData.u_invoice_qty;
-					this.editDetails.goods_unit = ocData.goods_unit;
-					this.editDetails.invoice_price = ocData.invoice_price;
-					this.editDetails.p_unit = ocData.p_unit;
-					this.editDetails.color = ocData.color;
-					this.editDetails.contract_cid = ocData.contract_cid;
-					this.editDetails.order_id = ocData.order_id;
-					this.editDetails.disc_rate = ocData.disc_rate;
-					this.editDetails.location_id = ocData.location_id;
-					this.editDetails.big_class = ocData.big_class;
-					this.editDetails.is_free = ocData.is_free;
-					this.editDetails.is_print = ocData.is_print;
-					this.editDetails.table_head = ocData.table_head;
-					this.editDetails.remark = ocData.remark;
-					this.editDetails.customer_test_id = ocData.customer_test_id;
-					this.editDetails.so_ver = ocData.so_ver;
-					this.editDetails.so_sequence_id = ocData.so_sequence_id;
-					this.editDetails.ncv = '0';
-					this.editDetails.shipment_suit='1';
-					this.editDetails.state='0';
+					    this.editDetails.goods_name = ocData.goods_name;
+					    this.editDetails.customer_goods = ocData.customer_goods;
+					    this.editDetails.customer_color_id = ocData.customer_color_id;
+					    this.editDetails.u_invoice_qty = ocData.u_invoice_qty;
+					    this.editDetails.goods_unit = ocData.goods_unit;
+					    this.editDetails.invoice_price = ocData.invoice_price;
+					    this.editDetails.p_unit = ocData.p_unit;
+					    this.editDetails.color = ocData.color;
+					    this.editDetails.contract_cid = ocData.contract_cid;
+					    this.editDetails.order_id = ocData.order_id;
+					    this.editDetails.disc_rate = ocData.disc_rate;
+					    this.editDetails.location_id = ocData.location_id;
+					    this.editDetails.big_class = ocData.big_class;
+					    this.editDetails.is_free = ocData.is_free;
+					    this.editDetails.is_print = ocData.is_print;
+					    this.editDetails.table_head = ocData.table_head;
+					    this.editDetails.remark = ocData.remark;
+					    this.editDetails.customer_test_id = ocData.customer_test_id;
+					    this.editDetails.so_ver = ocData.so_ver;
+					    this.editDetails.so_sequence_id = ocData.so_sequence_id;
+					    this.editDetails.ncv = '0';
+					    this.editDetails.shipment_suit='1';
+					    this.editDetails.state='0';
 					}
 					else{
-					//////在表格中插入行的方法有兩種：
-					//////第一種方法，替換當前行的值
-					row.goods_id = ocData.goods_id;
-					row.goods_name = ocData.goods_name;
-					row.customer_goods = ocData.customer_goods;
-					row.customer_color_id = ocData.customer_color_id;
-					row.u_invoice_qty = ocData.u_invoice_qty;
-					row.goods_unit = ocData.goods_unit;
-					row.invoice_price = ocData.invoice_price;
-					row.p_unit = ocData.p_unit;
-					row.color = ocData.color;
-					row.contract_cid = ocData.contract_cid;
-					row.order_id = ocData.order_id;
-					row.disc_rate = ocData.disc_rate;
-					row.location_id = ocData.location_id;
-					row.big_class = ocData.big_class;
-					row.is_free = ocData.is_free;
-					row.is_print = ocData.is_print;
-					row.table_head = ocData.table_head;
-					row.remark = ocData.remark;
-					row.customer_test_id = ocData.customer_test_id;
-					row.so_ver = ocData.so_ver;
-					row.so_sequence_id = ocData.so_sequence_id;
-					row.ncv = '0';
-					row.shipment_suit='1';
-					row.state='0';
-					//////第二種方法，刪除當前行，再插入新的行，但這種方法插入後，單元格會失去焦點，要重新點擊以獲取焦點
-					// this.tableDetails.splice(this.selectedRowIndex,1);
-					// this.tableDetails.push(ocData.ocDetails);
+					    //////在表格中插入行的方法有兩種：
+					    //////第一種方法，替換當前行的值
+					    row.goods_id = ocData.goods_id;
+					    row.goods_name = ocData.goods_name;
+					    row.customer_goods = ocData.customer_goods;
+					    row.customer_color_id = ocData.customer_color_id;
+					    row.u_invoice_qty = ocData.u_invoice_qty;
+					    row.goods_unit = ocData.goods_unit;
+					    row.invoice_price = ocData.invoice_price;
+					    row.p_unit = ocData.p_unit;
+					    row.color = ocData.color;
+					    row.contract_cid = ocData.contract_cid;
+					    row.order_id = ocData.order_id;
+					    row.disc_rate = ocData.disc_rate;
+					    row.location_id = ocData.location_id;
+					    row.big_class = ocData.big_class;
+					    row.is_free = ocData.is_free;
+					    row.is_print = ocData.is_print;
+					    row.table_head = ocData.table_head;
+					    row.remark = ocData.remark;
+					    row.customer_test_id = ocData.customer_test_id;
+					    row.so_ver = ocData.so_ver;
+					    row.so_sequence_id = ocData.so_sequence_id;
+					    row.ncv = '0';
+					    row.shipment_suit='1';
+					    row.state='0';
+					    //////第二種方法，刪除當前行，再插入新的行，但這種方法插入後，單元格會失去焦點，要重新點擊以獲取焦點
+					    // this.tableDetails.splice(this.selectedRowIndex,1);
+					    // this.tableDetails.push(ocData.ocDetails);
 					}
 					
 					if(ocData.location_id.substr(0,1)=='Y')
@@ -1360,7 +1361,10 @@ var Main = {
 			// });
 		},
         //顯示通用查詢頁面
-        showFindWindos(){
+        
+        showFindWindos(doc_type){
+            debugger;
+            this.docType=doc_type;
 		    comm.openWindos('Invoice');
 		},
         findByID() {

@@ -348,8 +348,18 @@
                 this.topResults = 200;
             }else{
                 if (!(/(^[1-9]\d*$)/.test(num))) {
-                    //输入的不是正整数 
+                    //输入的不是正整数
                     this.topResults = 200;
+                }
+            }
+            //發票特別處理
+            if(parent.app.docType != undefined){
+                if(parent.app.docType <1){
+                    //發票
+                    strValue +=" And so_invoice_mostly.flag='0'";
+                }else{
+                    //東莞D
+                    strValue +=" And so_invoice_mostly.flag='1'";
                 }
             }
             var strSql="SELECT TOP "+ this.topResults + strSelect +" FROM "+ strTable +" WHERE "+ strJoin +" AND "+ strValue 
