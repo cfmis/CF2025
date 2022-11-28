@@ -14,8 +14,8 @@
             <vxe-button type="text" status="danger" icon="iconfont icon-delete2" :disabled="isEditHead" @@click="delHeadEvent()" style="margin-left: -2px"content="注銷"></vxe-button>           
             <vxe-button type="text" icon="iconfont icon-save1" :disabled="!(isEditHead)" @@click="saveAllEvent()" style="margin-left: -2px"content="保存"></vxe-button>
             <vxe-button type="text" icon="iconfont icon-chexiaocancel" :disabled="!(isEditHead)" @@click="revertEvent()" content="取消"></vxe-button>
-            <vxe-button type="text" icon="iconfont icon-confirm4" v-if="headData.state==='0' && !(isEditHead)" @@click="approveEvent('1')"content="批準"></vxe-button>
-            <vxe-button type="text" icon="iconfont icon-cancel7" v-if="headData.state==='1' && !(isEditHead)" @@click="approveEvent('0')" style="margin-left: -2px"content="反批準"></vxe-button>
+            <vxe-button type="text" icon="iconfont icon-confirm4" v-if="headData.state==='0' && !(isEditHead) && ok_status ==='0'" @@click="approveEvent('1')"content="批準"></vxe-button>
+            <vxe-button type="text" icon="iconfont icon-cancel7" v-if="headData.state==='1' && !(isEditHead) && unok_status !='1'" @@click="approveEvent('0')" style="margin-left: -2px"content="反批準"></vxe-button>
             <vxe-button type="text" icon="iconfont icon-print" :disabled="isEditHead" @@click="printEvent"content="列印"></vxe-button>           
             <input v-model="searchID" maxlenth="13" @@keyup.enter="findByID()" placeholder="編號搜索" style="outline-style:none;margin-left:20px">
             <vxe-button type="text" icon="iconfont icon-search1" :disabled="isEditHead" @@click="showFindWindos()" style="margin-left: -2px"content="查找"></vxe-button>
@@ -46,8 +46,8 @@
                 </vxe-form-item>
 
                 <vxe-form-item title="組裝部門" :item-render="{}" span="6" class="vxe-form-item-group" style="color:blue">
-                    <el-select v-model="headData.out_dept" 
-                               @@change="getMaxID('JO19',headData.out_dept)" 
+                    <el-select v-model="headData.out_dept"
+                               @@change="getMaxID('JO19',headData.out_dept)"
                                filterable clearable style="width:100%" :disabled="isDisableGenNo">
                         <el-option v-for="item in deptList" :key="item.value" :value="item.value" :label="item.label" style="height:25px;font-size: 9px"/>
                     </el-select>
@@ -106,8 +106,8 @@
                 <vxe-button icon="iconfont icon-row-del" @@click="tempDelRowEvent()" style="margin-left: -2px" content="項目刪除"></vxe-button>
                 <vxe-button icon="iconfont icon-add7" @*@click="insertEvent()"*@content="批量增加"></vxe-button>
                 @*<vxe-button icon="iconfont icon-cancel" @click="revertDataAll()" style="color:orangered" content="取消" v-if="cancelButton"></vxe-button>*@
-                <vxe-button icon="iconfont icon-search2" @*@click="searchEvent()"*@ style="margin-left: -2px" content="库存查询"></vxe-button>
-                <vxe-button icon="iconfont icon-search2" @@click="test()" content="test"></vxe-button>    
+                @*<vxe-button icon="iconfont icon-search2"  style="margin-left: -2px" content="库存查询"></vxe-button>*@
+                @*<vxe-button icon="iconfont icon-search2" @click="test()" content="test"></vxe-button>*@
             </template>
         </vxe-toolbar>
         <div style="float:left;width:100%;">
@@ -208,7 +208,7 @@
             </vxe-table>
         </div>
         
-        <!--表格2-->
+        <!--表格2,成份-->
         <div style="float:left;width:100%;">
             <vxe-toolbar perfect size="small" style="height:35px;margin-bottom:0px;background:#F5F7FA">
                 <template #buttons style="height:35px;margin-bottom:10px">
@@ -262,7 +262,10 @@
                 </vxe-column>
                 <vxe-column field="con_qty" title="用量" width="100" :edit-render="{name:'input',autoselect:true}">
                     <template #edit="{ row }">
-                        <vxe-input v-model="row.con_qty" type="text" style="height:20px;" @@change="checkNumberDec2Part(row,'con_qty',row.con_qty)"></vxe-input>
+                        <vxe-input v-model="row.con_qty" type="text" style="height:20px;" 
+                                   @@change="checkNumberDec2Part(row,'con_qty',row.con_qty)"
+                                   @@blur="convertSecQtyByQty(row)">
+                        </vxe-input>
                     </template>
                 </vxe-column>
                 <vxe-column field="unit_code" title="單位" width="50"></vxe-column>

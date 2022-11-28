@@ -42,5 +42,26 @@ namespace CF2025.Web.Admin.Areas.Base.Controllers
             var result = CommonDAL.GetUserInfo(user_id, password);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+
+        //檢查是否可以反批準       
+        public JsonResult CheckCanApprove(string id,string window_id)
+        {
+            var result = CommonDAL.CheckCanApprove(id,window_id);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult QtyToSecQty(string within_code,string location_id,string goods_id,decimal qty)
+        {
+            var result = CommonDAL.QtyToSecQty(within_code, location_id, goods_id, qty);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        //檢查當前用戶部門的操作權限:0無權限,1有權限
+        public JsonResult CheckUserDeptRights(string user_id, string dept_id)
+        {           
+            var result = CommonDAL.CheckUserDeptRights(user_id, dept_id);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }

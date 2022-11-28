@@ -26,7 +26,7 @@ namespace CF2025.Web.Admin.Areas.Produce.Controllers
             ViewData["user_id"] = string.IsNullOrEmpty(user_id) ? "" : user_id;           
             return View();
         }
-
+        //[HttpPost]
         public JsonResult GetHeadByID(string id)
         {
             var DataHead = ProduceAssemblyDAL.GetHeadByID(id);
@@ -92,17 +92,32 @@ namespace CF2025.Web.Admin.Areas.Produce.Controllers
         [HttpPost]
         public JsonResult Approve(jo_assembly_mostly head,string user_id, string approve_type)
         {
-            var result = ProduceAssemblyDAL.Approve(head.id,head.handover_id,user_id, approve_type);
+            var result = "";
+            //批準
+            if(approve_type == "1")
+            {
+                result = ProduceAssemblyDAL.Approve(head, user_id, approve_type);
+            }
+            //反批準            
+            if (approve_type=="0")
+            {
+                result = ProduceAssemblyDAL.UnApprove(head, head.handover_id, user_id,head.check_date);
+            }
+            if (result.Substring(0, 2) == "00")
+            {
+                result = "OK";
+            }
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
         //保存
         [HttpPost]
         public JsonResult Save(jo_assembly_mostly headData, List<jo_assembly_details> lstDetailData1, List<jo_assembly_details_part> lstDetailData2, 
-            List<jo_assembly_details> lstDelData1, List<jo_assembly_details_part> lstDelData2, List<jo_assembly_details> lstTurnOver, List<jo_assembly_details> lstTurnOverQc)
+            List<jo_assembly_details> lstDelData1, List<jo_assembly_details_part> lstDelData2, List<jo_assembly_details> lstTurnOver, 
+            List<jo_assembly_details> lstTurnOverQc,string user_id)
         {
-            var result = ProduceAssemblyDAL.Save(headData, lstDetailData1, lstDetailData2, lstDelData1, lstDelData2, lstTurnOver, lstTurnOverQc);
-            if (result == "")
+            var result = ProduceAssemblyDAL.Save(headData, lstDetailData1, lstDetailData2, lstDelData1, lstDelData2, lstTurnOver, lstTurnOverQc, user_id);
+            if (result.Substring(0,2) == "00")
                 result = "OK";
             else
                 result = "Error";
@@ -171,6 +186,14 @@ namespace CF2025.Web.Admin.Areas.Produce.Controllers
             var result = ProduceAssemblyDAL.GetUserPope(user_id);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+
+        [HttpPost]
+        public JsonResult CheckRechangeStatus(string within_code, string handover_id, string con_date, string id, string state)
+        {
+            var result = ProduceAssemblyDAL.CheckRechangeStatus(within_code, handover_id, con_date, id, state);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
 
         //// GET: Produce/ProduceAssembly/Delete/5
         //public ActionResult Delete(int id)

@@ -282,7 +282,8 @@
             var strSelect=""
             var joinArr=[];
             var fromArr=[];
-            var orderbyArr=[];            
+            var orderbyArr=[];
+            var strField="";
             for(var i=1;i<this.fieldNameList.length;i++){
                 //i=0是空格,所以循環從1開始.
                 //if(i===1){
@@ -291,10 +292,13 @@
                 //    strSelect += "," + this.fieldNameList[i].table_name +"." + this.fieldNameList[i].value;
                 //}
                 if(this.fieldNameList[i].field_type==='D' || this.fieldNameList[i].field_type==='T'){
+                    strField = this.fieldNameList[i].table_name +"." + this.fieldNameList[i].value;
                     if(this.fieldNameList[i].field_type==='D'){
-                        strSelect += "Convert(varchar(10)," + this.fieldNameList[i].table_name +"." + this.fieldNameList[i].value +",120) As " + this.fieldNameList[i].value;
+                        //strSelect += "Convert(varchar(10)," + this.fieldNameList[i].table_name +"." + this.fieldNameList[i].value +",120) As " + this.fieldNameList[i].value;
+                        strSelect +="CASE WHEN "+ strField +" Is Null THEN Null ELSE Convert(varchar(10)," + strField +",121) END As " + this.fieldNameList[i].value;
                     }else{
-                        strSelect += "Convert(varchar(19)," + this.fieldNameList[i].table_name +"." + this.fieldNameList[i].value +",120) As " + this.fieldNameList[i].value;
+                        //strSelect += "Convert(varchar(19)," + this.fieldNameList[i].table_name +"." + this.fieldNameList[i].value +",120) As " + this.fieldNameList[i].value;
+                        strSelect +="CASE WHEN "+ strField +" Is Null THEN Null ELSE Convert(varchar(19)," + strField +",121) END As " + this.fieldNameList[i].value;
                     }
                 }else{
                     strSelect += this.fieldNameList[i].table_name +"." + this.fieldNameList[i].value;
@@ -365,7 +369,7 @@
             var strSql="SELECT TOP "+ this.topResults + strSelect +" FROM "+ strTable +" WHERE "+ strJoin +" AND "+ strValue 
             if(strOrderby !==""){
                 strSql +=" Order by "+ strOrderby;
-            }            
+            } 
             axios.get("/Base/PublicQuery/Query?sqlText=" + strSql).then(
                 (response) => {
                     if(response.data){
@@ -426,11 +430,19 @@
             })
         },
         formatDate({ cellValue }){ 
-           return comm.datetimeFormat(cellValue, 'yyyy-MM-dd');            
+            if(cellValue !== ''){
+                return comm.datetimeFormat(cellValue, 'yyyy-MM-dd');   
+            }else{
+                return '';
+            }
            //return XEUtils.toDateString(d, 'yyyy-MM-dd');
         },
-        formatDateTime({ cellValue }){
-            return comm.datetimeFormat(cellValue, 'yyyy-MM-dd hh:mm:ss');  
+        formatDateTime({ cellValue }){          
+            if(cellValue !== ''){
+                return comm.datetimeFormat(cellValue, 'yyyy-MM-dd hh:mm:ss');  
+            }else{                
+                return '';
+            }
            //return XEUtils.toDateString(cellValue, 'yyyy-MM-dd HH:mm:ss');
         },        
 

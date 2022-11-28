@@ -16,6 +16,7 @@ namespace CF2025.Base.DAL
     public class CommonDAL
     {
         private static SQLHelper sh = new SQLHelper(CachedConfigContext.Current.DaoConfig.OA);
+        private static PubFunDAL pubFunction = new PubFunDAL();
 
         public static string GeoEncrypt(string strEncrypt)
         {
@@ -349,7 +350,11 @@ namespace CF2025.Base.DAL
         {
             string strSql = string.Format("Select state From {0} WHERE within_code='0000' and id='{1}'", table_name, id);
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
-            string result = dt.Rows[0]["state"].ToString();
+            string result = "0";
+            if (dt.Rows.Count > 0)
+            {
+                dt.Rows[0]["state"].ToString();
+            }
             return result;
         }
 
@@ -389,7 +394,83 @@ namespace CF2025.Base.DAL
             return rtn;
         }
 
-       
+        public static string GetDbDateTime(string type)
+        {            
+            string strSql = "";
+            if (type == "S")
+            {
+                strSql = "SELECT CONVERT(varchar(10),GETDATE(),120) as dbdate";                
+            }else
+            {
+                strSql= "SELECT CONVERT(varchar(19),GETDATE(),120) as dbdate";
+            }
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            string result = dt.Rows[0]["dbdate"].ToString();
+            return result;
+        }
+
+        public static string CheckCanApprove(string id,string window_id)
+        {
+            string result = "";
+            int rtn = pubFunction.wf_check_inventory_date(id,window_id);
+            result = rtn.ToString();
+            return result;
+        }
+
+        public static decimal QtyToSecQty(string within_code, string location_id, string goods_id, decimal qty)
+        {
+            decimal sec_qty = 0;
+            string strSql = string.Format(@"Select dbo.fn_z_qty_to_sec_qty('{0}','{1}','{2}',{3}) As sec_qty", within_code, location_id, goods_id,qty);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            sec_qty = decimal.Parse(dt.Rows[0]["sec_qty"].ToString());           
+            return sec_qty;
+        }
+
+        //檢查當前用戶部門的操作權限:0無權限,1有權限
+        public static string CheckUserDeptRights(string user_id, string dept_id)
+        {
+            string result = "0";
+            if (user_id.ToUpper() == "ADMIN")
+            {
+                result = "1";
+                return result;
+            }
+            string strSql = string.Format(
+               @"SELECT '1' as result FROM cd_storehouse_popedom WHERE within_code='0000' AND user_id='{0}' and location_id='{1}'", user_id, dept_id);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            if (dt.Rows.Count > 0)
+            {
+                result = "1";
+            }
+            return result;
+        }
+
+        //public static decimal checkDecimal(string val)
+        //{
+        //    decimal result = 0;
+        //    if (!string.IsNullOrEmpty(val))
+        //    {
+        //        result = decimal.Parse(val);
+        //    }else
+        //    {
+        //        result = 0;
+        //    }
+        //    return result;
+        //}
+
+        //public static Int32 checkInt(string val)
+        //{
+        //    Int32 result = 0;
+        //    if (!string.IsNullOrEmpty(val))
+        //    {
+        //        result = Int32.Parse(val);
+        //    }
+        //    else
+        //    {
+        //        result = 0;
+        //    }
+        //    return result;
+        //}
 
     }
 }

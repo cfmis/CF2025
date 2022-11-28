@@ -447,78 +447,95 @@
             });
         },
         //批準&反批準 val: 1--批準,0--反批準
-        approveEvent (val) {
+        approveEvent:async function (val) {
             if ((this.headData.id != "") && (this.gridData.length > 0)) {
                 //批準,反批準都要檢查是否是註銷狀態
                 if(this.headData.state === "2"){
                     this.$XModal.alert({ content: '注銷狀態,當前操作無效!', mask: false });
                     return;
                 }
-                var msg_success="";
-                var msg_error=""; 
-                var mst_is_approve="確定是否要進行當操作？";
+                var ls_success= (val==='1')?"批準成功!":"反批準成功!";
+                var ls_error= (val==='1')?"批準失敗!":"反準失敗!";
+                var ls_type = (val==='1')?"批準":"反批準";
+                var ls_is_approve = `確定是否要進行【${ls_type}】操作？`;
+                //取后端單據狀態
+                let status = comm.checkApproveStatus('st_transfer_mostly',this.headData.id);
+                if(status==='2'){
+                    this.$XModal.alert({ content: "后端數據已是注銷狀態,當前操作無效!", mask: false });
+                    return;
+                }
                 if(val==='1') {//批準時                   
                     //檢查是否已批準
                     if(this.headData.state === "1"){
                         this.$XModal.alert({ content: '已是批准狀態,當前操作無效!', mask: false });
                         return;
                     }
-                    msg_success = "批準成功!";
-                    msg_error = "批準失敗!";
-                    mst_is_approve +="【批準】";
-                }
-                if(val==='0'){                    
-                    //反批准
-                    //設置后端服務器日期存儲在this.server_date
-                    this.getDateServer();
-                    //檢查已批準日期是否為當日,超過當日則不可反批準                  
-                    //將批準日期(字符串)轉換為對象
-                    var objCheckDate = new Date(this.headData.check_date);
-                    //再格式化為統一的日期字符串格式(yyyy-MM-dd)
-                    var check_date = comm.getDate(objCheckDate, 0);
-                    if(check_date != this.server_date){
-                        this.$XModal.alert({ content: '注意:【批準日期】必須為當前日期,方可進行此操作!', mask: false });
+                    if(status==="1"){
+                        //后臺數據已為批準狀態,已被別的用戶批準
+                        this.$XModal.alert({ content: "后端數據已是批準狀態,當前操作無效!", mask: false });
                         return;
                     }
-                    msg_success = "反批準成功!";
-                    msg_error = "反批準失敗!";
-                    mst_is_approve +="【反批準】";
-                }         
-                this.$XModal.confirm(mst_is_approve).then(type => {
+                }
+                if(val==='0'){ 
+                    //進行反批准
+                    //進行當前反批準操作前再次檢查后端是否已被別的用戶反批準.
+                    if(status==="0"){
+                        //后臺數據已為批準狀態,已被別的用戶批準
+                        this.$XModal.alert({ content: "后端數據已是未批準狀態,當前操作無效!", mask: false });
+                        return;
+                    }
+                    ////設置后端服務器日期存儲在this.server_date
+                    //this.getDateServer();
+                    ////檢查已批準日期是否為當日,超過當日則不可反批準                  
+                    ////將批準日期(字符串)轉換為對象
+                    //var objCheckDate = new Date(this.headData.check_date);
+                    ////再格式化為統一的日期字符串格式(yyyy-MM-dd)
+                    //var check_date = comm.getDate(objCheckDate, 0);
+                    //if(check_date != this.server_date){
+                    //    this.$XModal.alert({ content: '注意:【批準日期】必須為當前日期,方可進行此操作!', mask: false });
+                    //    return;
+                    //}
+                    //檢查已批準日期是否為當日,超過當日則不可反批準
+                    var isApprove = await comm.canApprove(this.headData.id,"w_transfer_in");//转入單
+                    if(isApprove ==="0"){
+                        this.$XModal.alert({ content: "注意:【批準日期】必須為當前日期,方可進行此操作!", mask: false });
+                        return;
+                    }
+                }
+                this.$XModal.confirm(ls_is_approve).then(type => {
                     if (type == "confirm") {
                         this.headData.check_by = this.userId;
                         var head = JSON.parse(JSON.stringify(this.headData));
                         var approve_type = val;
                         axios.post("/TransferIn/Approve",{head,approve_type}).then(
                             (response) => {
-                                if(response.data[0].approve_status==="OK"){response.data[0].ProductMo
+                                if(response.data[0].approve_status ==="OK"){response.data[0].ProductMo
                                     this.setStatusHead(false);
                                     //重查刷新數據
-                                    this.getHead(this.headData.id);
-                                    //this.$XModal.alert({ content: msg_success, mask: false });
-                                    this.$XModal.message({ content: msg_success, status: 'success' });
+                                    this.getHead(this.headData.id);                                   
+                                    this.$XModal.message({ content: ls_success, status: 'success' });
                                 }else{
-                                    if(response.data[0].action_type==="STOCK"){
+                                    if(response.data[0].action_type ==="STOCK"){
                                         //庫存不足
-                                        this.checkStockData=response.data;
-                                        msg_error += "【"+response.data[0].error_info+"】";
+                                        this.checkStockData = response.data;
+                                        ls_error += "【" + response.data[0].error_info + "】";
                                         this.showEditStore = true;
                                     }
-                                    this.$XModal.message({ content: msg_error,status: 'warning' , mask: false });
+                                    this.$XModal.message({ content: ls_error,status: 'warning' , mask: false });
                                 }                              
                             }
                         ).catch(function (response) {
-                            this.$XModal.alert({ content: "系統錯誤:"+response,status: 'error' , mask: false });                            
+                            this.$XModal.alert({ content: "系統錯誤:" + response,status: 'error' , mask: false });                            
                         });
                    }
                })
          } else {
-                   this.$XModal.alert({ content: '主檔編號不可為空,當前操作無效!', status: 'warning' });
-                   return;
+               this.$XModal.alert({ content: '主檔編號不可為空,當前操作無效!', status: 'warning' });
+               return;
           };
-        },       
+        },
         //彈窗中確認
-        submitEvent() {             
+        submitEvent() {
             if(this.headStatus===""){
                 this.$XModal.alert({ content: '非編輯狀態,不可以進行此操作!', mask: false });
                 return;

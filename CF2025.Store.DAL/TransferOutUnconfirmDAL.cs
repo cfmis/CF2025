@@ -197,7 +197,11 @@ namespace CF2025.Store.DAL
         public static TransferInHead GetHeadByID(string id)
         {
             TransferInHead mdjHead = new TransferInHead();
-            string strSql= "Select * FROM st_transfer_mostly with(nolock) Where id='" + id + "'" + " AND within_code='0000'";
+            string strSql=
+                @"Select id,Convert(varchar(10),transfer_date,121) AS transfer_date,department_id,handler,remark,create_by,update_by,check_by,
+                update_count,Convert(varchar(19),create_date,121) AS create_date,Convert(varchar(19),update_date,121) AS update_date,
+                Convert(varchar(19),check_date,121) AS check_date,state
+                FROM st_transfer_mostly with(nolock) Where id='" + id + "'" + " AND within_code='0000'";
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             if (dt.Rows.Count > 0)
             {

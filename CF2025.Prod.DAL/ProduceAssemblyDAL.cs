@@ -15,13 +15,19 @@ namespace CF2025.Prod.DAL
     public static class ProduceAssemblyDAL
     {
         private static SQLHelper sh = new SQLHelper(CachedConfigContext.Current.DaoConfig.OA);
+        private static PubFunDAL pubFunction = new PubFunDAL();
         private static string within_code = "0000";
+        private static string ls_servername = "hkserver.cferp.dbo";
+        private static string ldt_check_date = "";
         //private static string language_id = "1";
         //private static string sequence_id = "";
         public static jo_assembly_mostly GetHeadByID(string id)
         {
             jo_assembly_mostly mdjHead = new jo_assembly_mostly();
-            string strSql = string.Format("Select * FROM jo_assembly_mostly with(nolock) Where within_code='{0}' AND id='{1}'", within_code,id);
+            string strSql = string.Format(
+                @"Select id,Convert(nvarchar(10),con_date,121) As con_date,bill_origin,out_dept,in_dept,handover_id,handler,remark,
+                create_by,create_date,update_by,update_date,check_by,Convert(nvarchar(19),check_date,121) As check_date,update_count,state
+                FROM jo_assembly_mostly with(nolock) Where within_code='{0}' AND id='{1}'", within_code,id);
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             if (dt.Rows.Count > 0)
             {
@@ -100,8 +106,8 @@ namespace CF2025.Prod.DAL
         public static List<jo_assembly_details_part> GetDetailsPartByID(string id)
         {                 
             string strSql = string.Format(
-                @"SELECT A.id,A.upper_sequence,A.sequence_id,A.mo_id,A.goods_id,B.name AS goods_name,A.con_qty,A.unit_code
-                ,A.sec_qty,A.sec_unit,A.package_num,A.bom_qty,A.base_qty,Isnull(A.lot_no,'') As lot_no
+                @"SELECT A.id,A.upper_sequence,A.sequence_id,A.mo_id,A.goods_id,B.name AS goods_name,A.con_qty,A.unit_code,
+                A.sec_qty,A.sec_unit,A.package_num,A.bom_qty,A.base_qty,Isnull(A.lot_no,'') As lot_no
                 FROM dbo.jo_assembly_details_part A with(nolock)
                 INNER JOIN it_goods B ON A.within_code=B.within_code AND A.goods_id=B.id
                 Where A.within_code='{0}' AND A.id='{1}' Order by A.sequence_id", within_code, id);
@@ -162,14 +168,14 @@ namespace CF2025.Prod.DAL
         public static List<jo_assembly_details_part> GetAssembly(string mo_id,string goods_id,string out_dept,string in_dept)
         {
             string strSql = string.Format(
-                @"SELECT S.mo_id,S.materiel_id AS goods_id,S.sequence_id,S.bom_qty,S.base_qty,S.name AS goods_name
-                FROM(SELECT Distinct a.mo_id,c.materiel_id,c.bom_sequence as sequence_id,c.bom_qty,c.base_qty,it_goods.name		
-                FROM jo_bill_mostly a with(nolock)
-	                INNER JOIN jo_bill_goods_details b with(nolock) ON a.within_code=b.within_code AND a.id =b.id AND a.ver=b.ver
-                    INNER JOIN jo_bill_materiel_details c with(nolock) ON b.within_code=c.within_code AND b.id=c.id AND b.ver=c.ver AND b.sequence_id=c.upper_sequence
-	                LEFT OUTER JOIN it_goods ON b.within_code=it_goods.within_code AND b.goods_id=it_goods.id 
-                WHERE a.within_code='{0}' AND a.mo_id='{1}' AND a.state not in('0','2','V') 
-                  And b.goods_id='{2}' AND Isnull(b.hold,'')='' AND b.wp_id='{3}' AND next_wp_id='{4}') S
+                @"SELECT S.mo_id,S.goods_id,S.sequence_id,S.bom_qty,S.base_qty,S.goods_name
+                FROM (SELECT Distinct a.mo_id,c.materiel_id as goods_id,c.bom_sequence as sequence_id,c.bom_qty,c.base_qty,d.name as goods_name,a.state	
+                     FROM jo_bill_mostly a with(nolock)
+	                    INNER JOIN jo_bill_goods_details b with(nolock) ON a.within_code=b.within_code AND a.id =b.id AND a.ver=b.ver
+                        INNER JOIN jo_bill_materiel_details c with(nolock) ON b.within_code=c.within_code AND b.id=c.id AND b.ver=c.ver AND b.sequence_id=c.upper_sequence
+	                    LEFT JOIN it_goods d ON c.within_code=d.within_code AND c.materiel_id=d.id 
+                     WHERE a.within_code='{0}' AND a.mo_id='{1}' And b.goods_id='{2}' AND Isnull(b.hold,'')='' AND b.wp_id='{3}' AND b.next_wp_id='{4}') S
+                WHERE S.state NOT IN('0','2','V') 
                 ORDER BY S.sequence_id", within_code, mo_id,goods_id,out_dept,in_dept);
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             List<jo_assembly_details_part> lstDetail = new List<jo_assembly_details_part>();
@@ -251,9 +257,9 @@ namespace CF2025.Prod.DAL
         //保存
         public static string Save(jo_assembly_mostly headData, List<jo_assembly_details> lstDetailData1, List<jo_assembly_details_part> lstDetailData2, 
                                   List<jo_assembly_details> lstDelData1, List<jo_assembly_details_part> lstDelData2, 
-                                  List<jo_assembly_details> lstTurnOver, List<jo_assembly_details> lstTurnOverQc )
+                                  List<jo_assembly_details> lstTurnOver, List<jo_assembly_details> lstTurnOverQc,string user_id )
         {
-            string str = "", lot_no = "";
+            string str = "", lot_no = "", max_handover_id = "";
             StringBuilder sbSql = new StringBuilder(" SET XACT_ABORT ON ");
             sbSql.Append(" BEGIN TRANSACTION ");
             string id = headData.id;
@@ -278,7 +284,7 @@ namespace CF2025.Prod.DAL
                 string bill_code = "";  //model.id.Substring(1, 13);DC105220800001
                 year_month = headData.id.Substring(5, 4);   //2201
                 bill_code = headData.id.Substring(1, 13);   //C105220800001
-                string sql_sys_update1 = "";               
+                string sql_sys_update1 = "";
                 string sql_sys_id_insert = string.Format(
                     @" INSERT INTO sys_bill_max_separate(within_code,bill_code,bill_id,year_month,bill_text2,bill_text1,bill_text3,bill_text4,bill_text5) 
                     VALUES('0000','{0}','{1}','{2}','{3}','','','','')",
@@ -290,21 +296,21 @@ namespace CF2025.Prod.DAL
                     sql_sys_update1 = sql_sys_id_udate;
                 else
                     sql_sys_update1 = sql_sys_id_insert;
-               
+
                 //更新系統表移交單最大單號
                 //取移交單最大單號
                 string sql_f = string.Format(@"SELECT dbo.fn_zz_sys_bill_max_jo07('{0}','{1}','{2}') as id", headData.out_dept, headData.in_dept, "T");
                 DataTable dt = sh.ExecuteSqlReturnDataTable(sql_f);
-                string max_handover_id = dt.Rows[0]["id"].ToString(); //max_handover_id value is DT10560134510
+                max_handover_id = dt.Rows[0]["id"].ToString(); //max_handover_id value is DT10560134510
                 string billCode = max_handover_id.Substring(1, 12);   //biiCode value is T10560134510
                 string strSql_i = string.Format(
                 @" INSERT INTO sys_bill_max_jo07(within_code,bill_id,year_month,bill_code,bill_text1,bill_text2,bill_text3,bill_text4,bill_text5) 
-                VALUES('0000','JO07','','{0}','T','{1}','{2}','','')",billCode, headData.out_dept, headData.in_dept);
+                VALUES('0000','JO07','','{0}','T','{1}','{2}','','')", billCode, headData.out_dept, headData.in_dept);
                 string strSql_u = string.Format(
                 @" UPDATE sys_bill_max_jo07 SET bill_code='{0}' WHERE within_code='0000' AND bill_id='JO07' AND bill_text1='T' AND bill_text2='{1}' and bill_text3='{2}'",
                 billCode, headData.out_dept, headData.in_dept);
                 string sql_sys_update2 = "";
-                if (billCode.Substring(7,5) !="00001")//**
+                if (billCode.Substring(7, 5) != "00001")//**
                     sql_sys_update2 = strSql_u;
                 else
                     sql_sys_update2 = strSql_i;
@@ -312,7 +318,7 @@ namespace CF2025.Prod.DAL
                 str = sql_sys_update1 + sql_sys_update2;
                 sbSql.Append(str);
                 //***end save form max id to system tabe 
-                
+
                 //插入主表
                 //if (!string.IsNullOrEmpty(headData.in_dept))
                 //{
@@ -321,9 +327,9 @@ namespace CF2025.Prod.DAL
                 str = string.Format(
                   @" Insert Into jo_assembly_mostly(within_code,id,con_date,handler,update_count,transfers_state,remark,state,create_by,create_date,bill_type_no,
                   out_dept,in_dept,con_type,stock_type,bill_origin,handover_id,servername,update_date,update_by) 
-                  Values ('{0}','{1}','{2}','{3}','1','0','{4}','0','{5}',getdate(),'C','{6}','{7}','0','0','2','{8}','hkserver.cferp.dbo',getdate(),'{9}')",
-                  within_code, headData.id, headData.con_date, headData.handler, headData.remark, headData.create_by, headData.out_dept, headData.in_dept, 
-                  headData.handover_id, headData.create_by);
+                  Values ('{0}','{1}','{2}','{3}','1','0','{4}','0','{5}',getdate(),'C','{6}','{7}','0','0','2','{8}','{9}',getdate(),'{10}')",
+                  within_code, headData.id, headData.con_date, headData.handler, headData.remark, headData.create_by, headData.out_dept, headData.in_dept,
+                  headData.handover_id, ls_servername, headData.create_by);
                 sbSql.Append(str);
                 //插入明細表一
                 foreach (var item in lstDetailData1)
@@ -351,18 +357,18 @@ namespace CF2025.Prod.DAL
                     @" Insert Into jo_assembly_details(within_code,id,sequence_id,jo_id,jo_sequence_id,goods_id,con_qty,unit_code,sec_qty,sec_unit,mo_id,
                     package_num,signfor,location,carton_code,sign_by,sign_date,lot_no,prd_id,qc_qty) Values 
                     ('{0}','{1}','{2}','{3}','{4}','{5}',{6},'{7}',{8},'{9}','{10}','{11}',1,'{12}','{13}','{14}',getdate(),'{15}',{16},{17})",
-                    within_code,headData.id,item.sequence_id,item.jo_id,item.jo_sequence_id,item.goods_id,item.con_qty,item.unit_code,item.sec_qty,item.sec_unit,
-                    item.mo_id,item.package_num,headData.out_dept,headData.out_dept,headData.create_by,lot_no,item.prd_id,item.qc_qty);
+                    within_code, headData.id, item.sequence_id, item.jo_id, item.jo_sequence_id, item.goods_id, item.con_qty, item.unit_code, item.sec_qty, item.sec_unit,
+                    item.mo_id, item.package_num, headData.out_dept, headData.out_dept, headData.create_by, lot_no, item.prd_id, item.qc_qty);
                     sbSql.Append(str);
                 }
                 //插入明細表二
                 foreach (var item in lstDetailData2)
-                {                    
+                {
                     str = string.Format(
                     @" Insert Into jo_assembly_details_part(within_code,id,upper_sequence,sequence_id,mo_id,goods_id,con_qty,unit_code,sec_qty,sec_unit,
                     package_num,remark,bom_qty,base_qty,lot_no) Values ('{0}','{1}','{2}','{3}','{4}','{5}',{6},'{7}',{8},'{9}',{10},'{11}',{12},{13},'{14}')",
-                    within_code, headData.id,item.upper_sequence,item.sequence_id,item.mo_id,item.goods_id,item.con_qty,item.unit_code,item.sec_qty,
-                    item.sec_unit,item.package_num,item.remark,item.bom_qty,item.base_qty,item.lot_no);
+                    within_code, headData.id, item.upper_sequence, item.sequence_id, item.mo_id, item.goods_id, item.con_qty, item.unit_code, item.sec_qty,
+                    item.sec_unit, item.package_num, item.remark, item.bom_qty, item.base_qty, item.lot_no);
                     sbSql.Append(str);
                 }
                 //生成移交單
@@ -370,16 +376,16 @@ namespace CF2025.Prod.DAL
                 string update_count = "1", transfers_state = "0", bill_type_no = "T", con_type = "0", stock_type = "0", bill_origin = "2";
                 string sequence_id = "", aim_jo_id = "", aim_jo_sequence = "";
                 decimal jo_qty = 0, c_qty = 0, package_num = 0;
-                int index ;
+                int index;
                 if (lstTurnOver.Count > 0)
                 {
                     //移交單表頭                    
                     str = string.Format(
                     @" Insert Into jo_materiel_con_mostly(within_code,id,con_date,handler, update_count,transfers_state,remark,state,bill_type_no,out_dept,in_dept,
                     con_type,stock_type,bill_origin,create_by,create_date,servername,update_date,update_by) VALUES
-                    ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}',getdate(),'hkserver.cferp.dbo',getdate(),'{15}')",
-                    within_code, max_handover_id, headData.con_date, headData.handler, update_count,transfers_state, headData.remark, headData.state, 
-                    bill_type_no, headData.out_dept,headData.in_dept, con_type, stock_type, bill_origin,headData.create_by, headData.create_by);
+                    ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}',getdate(),'{15}',getdate(),'{16}')",
+                    within_code, max_handover_id, headData.con_date, headData.handler, update_count, transfers_state, headData.remark, headData.state,
+                    bill_type_no, headData.out_dept, headData.in_dept, con_type, stock_type, bill_origin, headData.create_by, ls_servername, headData.create_by);
                     sbSql.Append(str);
                     //移交單明細
                     index = 0;
@@ -394,8 +400,8 @@ namespace CF2025.Prod.DAL
                         (within_code,id,sequence_id,jo_id,jo_sequence_id,goods_id,jo_qty,c_qty,con_qty,unit_code,sec_qty,sec_unit,remark,mo_id,package_num,
                         location,carton_code,lot_no,aim_jo_id,aim_jo_sequence) Values
                         ('{0}','{1}','{2}','{3}','{4}','{5}',{6},{7},{8},'{9}',{10},'{11}','{12}','{13}',{14},'{15}','{16}','{17}','{18}','{19}')",
-                        within_code,max_handover_id, sequence_id,item.jo_id,item.jo_sequence_id,item.goods_id,jo_qty,c_qty,item.con_qty,item.unit_code,
-                        item.sec_qty,item.sec_unit,item.remark,item.mo_id,package_num, headData.out_dept, headData.out_dept, item.lot_no,aim_jo_id,aim_jo_sequence);
+                        within_code, max_handover_id, sequence_id, item.jo_id, item.jo_sequence_id, item.goods_id, jo_qty, c_qty, item.con_qty, item.unit_code,
+                        item.sec_qty, item.sec_unit, item.remark, item.mo_id, package_num, headData.out_dept, headData.out_dept, item.lot_no, aim_jo_id, aim_jo_sequence);
                         sbSql.Append(str);
                     }
                 }
@@ -414,16 +420,16 @@ namespace CF2025.Prod.DAL
                     //更新系統表最大單據號
                     strSql_u = string.Format(
                         @" UPDATE sys_bill_max_jo07 SET bill_code='{0}'
-                        WHERE within_code='0000' AND bill_id='JO07' AND bill_text1='T' AND bill_text2='{1}' and bill_text3='{2}'",billCode,headData.out_dept,in_dept);
-                    sql_sys_update2 = billCode.Substring(7, 5) != "00001" ? strSql_u : strSql_i;                    
+                        WHERE within_code='0000' AND bill_id='JO07' AND bill_text1='T' AND bill_text2='{1}' and bill_text3='{2}'", billCode, headData.out_dept, in_dept);
+                    sql_sys_update2 = billCode.Substring(7, 5) != "00001" ? strSql_u : strSql_i;
                     sbSql.Append(sql_sys_update2);
                     //生成QC移交單表頭
                     str = string.Format(
                     @" Insert Into jo_materiel_con_mostly(within_code,id,con_date,handler, update_count,transfers_state,remark,state,bill_type_no,out_dept,in_dept,
                     con_type,stock_type,bill_origin,create_by,create_date,servername,update_date,update_by)
-                    VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}',getdate(),'hkserver.cferp.dbo',getdate(),'{15}')",
+                    VALUES('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}',getdate(),'{15}',getdate(),'{16}')",
                     within_code, max_handover_id_qc, headData.con_date, headData.handler, update_count, transfers_state, headData.remark, headData.state,
-                    bill_type_no, headData.out_dept, in_dept, con_type, stock_type, bill_origin, headData.create_by, headData.create_by);
+                    bill_type_no, headData.out_dept, in_dept, con_type, stock_type, bill_origin, headData.create_by, ls_servername, headData.create_by);
                     sbSql.Append(str);
                     //QC移交單明細
                     index = 0;
@@ -453,19 +459,21 @@ namespace CF2025.Prod.DAL
                     string assembly_id = "", assembly_seq_id = "";
                     foreach (var item in lstDelData1)
                     {
-                        str = string.Format(@" DELETE FROM jo_assembly_details with(ROWLOCK) Where within_code='0000' AND id='{0}' AND sequence_id='{1}'", item.id, item.sequence_id);
+                        str = string.Format(
+                            @" DELETE FROM jo_assembly_details with(ROWLOCK) Where within_code='0000' AND id='{0}' AND sequence_id='{1}'",
+                            item.id, item.sequence_id);
                         sbSql.Append(str);
                         //刪除對應的移交單(包括QC移交單)
                         assembly_id = item.id;
                         assembly_seq_id = item.sequence_id;
                         str = string.Format(
-                        @" DELETE FROM jo_materiel_con_details Where mo_id='{0}' And goods_id='{1}' And aim_jo_id='{2}' And aim_jo_sequence='{3}'", 
+                        @" DELETE FROM jo_materiel_con_details Where mo_id='{0}' And goods_id='{1}' And aim_jo_id='{2}' And aim_jo_sequence='{3}'",
                         item.mo_id, item.goods_id, assembly_id, assembly_seq_id);
                         sbSql.Append(str);
                     }
                 }
                 //首先處理刪除(表格二)
-                if (lstDelData2 !=null)
+                if (lstDelData2 != null)
                 {
                     foreach (var item in lstDelData2)
                     {
@@ -474,12 +482,13 @@ namespace CF2025.Prod.DAL
                         item.id, item.upper_sequence, item.sequence_id);
                         sbSql.Append(str);
                     }
-                }                
+                }
                 //更新組裝轉換表頭
                 str = string.Format(
                 @" UPDATE jo_assembly_mostly with(ROWLOCK) SET con_date='{2}',handler='{3}',remark='{4}',update_by='{5}',update_date=getdate(),out_dept='{6}',in_dept='{7}',
                     update_count= Convert(nvarchar(5),Convert(int,update_count)+1)
-                WHERE within_code='{0}' AND id='{1}'", within_code,headData.id,headData.con_date,headData.handler,headData.remark,headData.update_by,headData.out_dept,headData.in_dept);
+                WHERE within_code='{0}' AND id='{1}'",
+                within_code, headData.id, headData.con_date, headData.handler, headData.remark, headData.update_by, headData.out_dept, headData.in_dept);
                 sbSql.Append(str);
                 //更新明細表一
                 decimal ldc_con_qty = 0, ldc_sec_qty = 0;
@@ -513,8 +522,8 @@ namespace CF2025.Prod.DAL
                             Set jo_id='{3}',jo_sequence_id='{4}',goods_id='{5}',con_qty={6},unit_code='{7}',sec_qty={8},sec_unit='{9}', mo_id='{10}', package_num={11},
                             location='{12}',carton_code='{13}',lot_no='{14}',prd_id={15},qc_qty={16}
                             WHERE within_code='{0}' AND id='{1}' AND sequence_id='{2}'",
-                            within_code, headData.id, item.sequence_id, item.jo_id, item.jo_sequence_id, item.goods_id, item.con_qty, item.unit_code, item.sec_qty, item.sec_unit, 
-                            item.mo_id, item.package_num, item.location, item.carton_code, lot_no, item.prd_id,item.qc_qty);                           
+                            within_code, headData.id, item.sequence_id, item.jo_id, item.jo_sequence_id, item.goods_id, item.con_qty, item.unit_code, item.sec_qty, item.sec_unit,
+                            item.mo_id, item.package_num, item.location, item.carton_code, lot_no, item.prd_id, item.qc_qty);
                             sbSql.Append(str);
                             //更新移交單明細                                                        
                             if (!string.IsNullOrEmpty(headData.handover_id))
@@ -524,10 +533,10 @@ namespace CF2025.Prod.DAL
                                 @" UPDATE jo_materiel_con_details 
                                 SET jo_id='{6}',jo_sequence_id='{7}',con_qty={8},unit_code='{9}',sec_qty={10},sec_unit='{11}',remark='{12}',
                                 package_num={13},location='{14}',carton_code='{15}',lot_no='{16}'
-                                Where mo_id='{0}' And goods_id='{1}' And within_code='{2}' And id='{3}' And aim_jo_id='{4}' And aim_jo_sequence='{5}'", 
-                                item.mo_id, item.goods_id, within_code, headData.handover_id,item.id,item.sequence_id,
-                                item.jo_id,item.jo_sequence_id,ldc_con_qty,item.unit_code,ldc_sec_qty,item.sec_unit,item.remark,
-                                item.package_num, item.location,item.carton_code,lot_no);
+                                Where mo_id='{0}' And goods_id='{1}' And within_code='{2}' And id='{3}' And aim_jo_id='{4}' And aim_jo_sequence='{5}'",
+                                item.mo_id, item.goods_id, within_code, headData.handover_id, item.id, item.sequence_id,
+                                item.jo_id, item.jo_sequence_id, ldc_con_qty, item.unit_code, ldc_sec_qty, item.sec_unit, item.remark,
+                                item.package_num, item.location, item.carton_code, lot_no);
                                 sbSql.Append(str);
                             }
                         }
@@ -540,13 +549,13 @@ namespace CF2025.Prod.DAL
                             @" Insert Into jo_assembly_details
                             (within_code,id,sequence_id,jo_id,jo_sequence_id,goods_id,con_qty,unit_code,sec_qty,sec_unit,mo_id,package_num,location,carton_code,lot_no,prd_id) 
                             Values('{0}','{1}','{2}','{3}','{4}','{5}',{6},'{7}',{8},'{9}','{10}',{11},'{12}','{13}','{14}','{15}')",
-                            within_code, headData.id, item.sequence_id, item.jo_id,item.jo_sequence_id,item.goods_id,item.con_qty,item.unit_code,item.sec_qty,item.sec_unit, 
-                            item.mo_id,item.package_num, headData.out_dept, headData.out_dept, lot_no,item.prd_id);
+                            within_code, headData.id, item.sequence_id, item.jo_id, item.jo_sequence_id, item.goods_id, item.con_qty, item.unit_code, item.sec_qty, item.sec_unit,
+                            item.mo_id, item.package_num, headData.out_dept, headData.out_dept, lot_no, item.prd_id);
                             sbSql.Append(str);
                             decimal jo_qty = 0, c_qty = 0;
-                            string aim_jo_id = "", aim_jo_sequence="";
+                            string aim_jo_id = "", aim_jo_sequence = "";
                             if (!string.IsNullOrEmpty(headData.handover_id))//已保存有移交單號
-                            {                                
+                            {
                                 //新增的記錄插入已存在的移交單中
                                 aim_jo_id = item.id;//組裝單號
                                 aim_jo_sequence = item.sequence_id;//組裝轉換單的序號
@@ -555,11 +564,11 @@ namespace CF2025.Prod.DAL
                                 (within_code,id,sequence_id,jo_id,jo_sequence_id,goods_id,jo_qty,c_qty,con_qty,unit_code,sec_qty,sec_unit,remark,mo_id,package_num,
                                 location,carton_code,lot_no,aim_jo_id,aim_jo_sequence) Values
                                 ('{0}','{1}','{2}','{3}','{4}','{5}',{6},{7},{8},'{9}',{10},'{11}','{12}','{13}',{14},'{15}','{16}','{17}','{18}','{19}')",
-                                within_code, headData.handover_id,item.sequence_id,item.jo_id,item.jo_sequence_id,item.goods_id,jo_qty,c_qty,ldc_con_qty,item.unit_code,
+                                within_code, headData.handover_id, item.sequence_id, item.jo_id, item.jo_sequence_id, item.goods_id, jo_qty, c_qty, ldc_con_qty, item.unit_code,
                                 ldc_sec_qty, item.sec_unit, item.remark, item.mo_id, item.package_num, headData.out_dept, headData.out_dept, item.lot_no, aim_jo_id, aim_jo_sequence);
                                 sbSql.Append(str);
                                 //判斷是否有交QC移交單數據?
-                                if (item.qc_qty > 0 && headData.in_dept !="702") //*&& item.con_qty > item.qc_qty*/
+                                if (item.qc_qty > 0 && headData.in_dept != "702") //*&& item.con_qty > item.qc_qty*/
                                 {
                                     //查找此組裝單號有沒生成QC的移交單,有就利用原有的移交單
                                     if (strQcID == "")
@@ -578,15 +587,15 @@ namespace CF2025.Prod.DAL
                                             (within_code,id,sequence_id,jo_id,jo_sequence_id,goods_id,jo_qty,c_qty,con_qty,unit_code,sec_qty,sec_unit,remark,mo_id,package_num,
                                             location,carton_code,lot_no,aim_jo_id,aim_jo_sequence) Values
                                             ('{0}','{1}','{2}','{3}','{4}','{5}',{6},{7},{8},'{9}',{10},'{11}','{12}','{13}',{14},'{15}','{16}','{17}','{18}','{19}')",
-                                            within_code,strQcID,item.sequence_id,item.jo_id,item.jo_sequence_id,item.goods_id,jo_qty,c_qty,item.qc_qty,item.unit_code,
-                                            0.01, item.sec_unit,item.remark, item.mo_id, 0, headData.out_dept, headData.out_dept, lot_no, aim_jo_id, aim_jo_sequence);
+                                            within_code, strQcID, item.sequence_id, item.jo_id, item.jo_sequence_id, item.goods_id, jo_qty, c_qty, item.qc_qty, item.unit_code,
+                                            0.01, item.sec_unit, item.remark, item.mo_id, 0, headData.out_dept, headData.out_dept, lot_no, aim_jo_id, aim_jo_sequence);
                                             sbSql.Append(str);
                                         }
                                         else
                                         {
                                             //重新生成QC移交單
                                             //更新系統表最大單據編號  
-                                            string in_dept="702", update_count = "1", transfers_state = "0", bill_type_no = "T", con_type = "0", stock_type = "0", bill_origin = "2";                                            
+                                            string in_dept = "702", update_count = "1", transfers_state = "0", bill_type_no = "T", con_type = "0", stock_type = "0", bill_origin = "2";
                                             strQcID = string.Format(@"SELECT dbo.fn_zz_sys_bill_max_jo07('{0}','{1}','{2}') AS id", headData.out_dept, in_dept, "T");
                                             DataTable dtQc = sh.ExecuteSqlReturnDataTable(strQcID);
                                             strQcID = dtQc.Rows[0]["id"].ToString();    //max_id value is DT10570234510
@@ -615,9 +624,9 @@ namespace CF2025.Prod.DAL
                                             (within_code,id,sequence_id,jo_id,jo_sequence_id,goods_id,jo_qty,c_qty,con_qty,unit_code,sec_qty,sec_unit,remark,mo_id,package_num,
                                             location,carton_code,lot_no,aim_jo_id,aim_jo_sequence) Values
                                             ('{0}','{1}','{2}','{3}','{4}','{5}',{6},{7},{8},'{9}',{10},'{11}','{12}','{13}',{14},'{15}','{16}','{17}','{18}','{19}')",
-                                            within_code,strQcID,item.sequence_id,item.jo_id,item.jo_sequence_id,item.goods_id,jo_qty,c_qty,item.qc_qty,item.unit_code,0.01,
-                                            item.sec_unit, item.remark, item.mo_id, 0, headData.out_dept, headData.out_dept, lot_no, aim_jo_id, aim_jo_sequence); 
-                                            sbSql.Append(str);                                            
+                                            within_code, strQcID, item.sequence_id, item.jo_id, item.jo_sequence_id, item.goods_id, jo_qty, c_qty, item.qc_qty, item.unit_code, 0.01,
+                                            item.sec_unit, item.remark, item.mo_id, 0, headData.out_dept, headData.out_dept, lot_no, aim_jo_id, aim_jo_sequence);
+                                            sbSql.Append(str);
                                         }
                                     }
                                     else //strQcID不為空情況
@@ -628,7 +637,7 @@ namespace CF2025.Prod.DAL
                                         (within_code,id,sequence_id,jo_id,jo_sequence_id,goods_id,jo_qty,c_qty,con_qty,unit_code,sec_qty,sec_unit,remark,mo_id,package_num,
                                         location,carton_code,lot_no,aim_jo_id,aim_jo_sequence) Values
                                         ('{0}','{1}','{2}','{3}','{4}','{5}',{6},{7},{8},'{9}',{10},'{11}','{12}','{13}',{14},'{15}','{16}','{17}','{18}','{19}')",
-                                        within_code,strQcID,item.sequence_id,item.jo_id,item.jo_sequence_id,item.goods_id,jo_qty,c_qty,item.qc_qty,item.unit_code,0.01,
+                                        within_code, strQcID, item.sequence_id, item.jo_id, item.jo_sequence_id, item.goods_id, jo_qty, c_qty, item.qc_qty, item.unit_code, 0.01,
                                         item.sec_unit, item.remark, item.mo_id, 0, headData.out_dept, headData.out_dept, lot_no, aim_jo_id, aim_jo_sequence);
                                         sbSql.Append(str);
                                     }
@@ -641,70 +650,170 @@ namespace CF2025.Prod.DAL
                 foreach (var item in lstDetailData2)
                 {
                     if (!string.IsNullOrEmpty(item.row_status))
-                    {                        
+                    {
                         if (item.row_status == "EDIT")
                         {
                             lot_no = item.lot_no;
                             str = string.Format(
                             @" UPDATE jo_assembly_details_part with(Rowlock) SET mo_id='{4}',goods_id='{5}',con_qty={6},unit_code='{7}',sec_qty={8},sec_unit='{9}',package_num={10},
                             remark='{11}',bom_qty={12},base_qty={13},lot_no='{14}' 
-                            WHERE within_code='{0}' AND id='{1}' AND upper_sequence='{2}' AND sequence_id='{3}'", 
-                            within_code,headData.id,item.upper_sequence,item.sequence_id, item.mo_id,item.goods_id,item.con_qty,item.unit_code,item.sec_qty,item.sec_unit,                           
-                            item.package_num, item.remark, item.bom_qty, item.base_qty, item.lot_no) ;
+                            WHERE within_code='{0}' AND id='{1}' AND upper_sequence='{2}' AND sequence_id='{3}'",
+                            within_code, headData.id, item.upper_sequence, item.sequence_id, item.mo_id, item.goods_id, item.con_qty, item.unit_code, item.sec_qty, item.sec_unit,
+                            item.package_num, item.remark, item.bom_qty, item.base_qty, item.lot_no);
                         }
                         else
                         {
                             str = string.Format(
                              @" Insert Into jo_assembly_details_part(within_code,id,upper_sequence,sequence_id,mo_id,goods_id,con_qty,unit_code,sec_qty,sec_unit,package_num,
                              remark,bom_qty,base_qty,lot_no) Values ('{0}','{1}','{2}','{3}','{4}','{5}',{6},'{7}',{8},'{9}',{10},'{11}',{12},{13},'{14}')",
-                             within_code, headData.id, item.upper_sequence, item.sequence_id,item.mo_id,item.goods_id,item.con_qty, item.unit_code,item.sec_qty,item.sec_unit, 
-                             item.package_num, item.remark,item.bom_qty, item.base_qty, item.lot_no);
+                             within_code, headData.id, item.upper_sequence, item.sequence_id, item.mo_id, item.goods_id, item.con_qty, item.unit_code, item.sec_qty, item.sec_unit,
+                             item.package_num, item.remark, item.bom_qty, item.base_qty, item.lot_no);
                         }
                         sbSql.Append(str);
                     }
                 }
-            }            
+            }
             sbSql.Append(@" COMMIT TRANSACTION ");
             string result = sh.ExecuteSqlUpdate(sbSql.ToString());
             sbSql.Clear();
-
-            //批準
+            
+            //保存成功之后進行批準操作           
+            //更新PAD生產嗙貨給組裝轉換已入單數據標識
             if (result == "")
             {
-                //--start更新PAD生產嗙貨給組裝轉換已入單數據標識
+                //--start更新PAD生產嗙貨給組裝轉換已入單標識
                 string sql = string.Format(
-                @"Select Count(1) As counts 
+                @"Select Count(1) As cnt 
                 From jo_assembly_mostly A WITH(NOLOCK),jo_assembly_details B WITH(NOLOCK),product_records C WITH(NOLOCK)
                 Where A.within_code=B.within_code And A.id=B.id And B.prd_id=C.prd_id And Isnull(C.imput_flag,'')='' And
                       A.within_code='{0}' And A.id='{1}'", within_code, headData.id);
                 DataTable dt = sh.ExecuteSqlReturnDataTable(sql);
-                if (dt.Rows.Count > 0)
-                {
-                    if (int.Parse(dt.Rows[0]["counts"].ToString()) > 0)
-                    {
-                        sbSql.Clear();
-                        sbSql.Append(@" SET XACT_ABORT ON ");
-                        sbSql.Append(@" BEGIN TRANSACTION ");
-                        // = new StringBuilder(" SET XACT_ABORT ON ");                        
-                        sql = string.Format(
-                        @" Update C WITH(ROWLOCK) Set C.imput_flag ='Y',C.imput_time=GetDate()        
-                        From jo_assembly_mostly A,jo_assembly_details B,product_records C        
-                        Where A.within_code = B.within_code And A.id = B.id And B.prd_id = C.prd_id        
-                                And Isnull(C.imput_flag,'')='' And A.within_code='{0}' And A.id ='{1}'", within_code, headData.id);
-                        sbSql.Append(sql);
-                        sbSql.Append(@" COMMIT TRANSACTION ");
-                        sh.ExecuteSqlUpdate(sbSql.ToString());
-                        sbSql.Clear();
-                    }
+                if (int.Parse(dt.Rows[0]["cnt"].ToString()) > 0)
+                {                    
+                    sbSql.Clear();
+                    sbSql.Append(@" SET XACT_ABORT ON ");
+                    sbSql.Append(@" BEGIN TRANSACTION ");                                            
+                    sql = string.Format(
+                    @" Update C WITH(ROWLOCK) Set C.imput_flag ='Y',C.imput_time=GetDate()        
+                    From jo_assembly_mostly A,jo_assembly_details B,product_records C        
+                    Where A.within_code = B.within_code And A.id = B.id And B.prd_id = C.prd_id        
+                            And Isnull(C.imput_flag,'')='' And A.within_code='{0}' And A.id ='{1}'", within_code, headData.id);
+                    sbSql.Append(sql);
+                    sbSql.Append(@" COMMIT TRANSACTION ");
+                    result = sh.ExecuteSqlUpdate(sbSql.ToString());
+                    sbSql.Clear();
                 }
-                //--end
-                //如果保存成功,后臺進行批準動作
-                var dept_id = headData.in_dept;
-                var status = head_insert_status;    //  status:"NEW" 更新組裝單主表的[移交單]字段,批準人,批準日期
+                //--end 更新PAD生產嗙貨給組裝轉換已入單數據標識
 
-            }
+                //--start 批準組裝轉換單,移交單
+                //因前面生成的移交單的并沒有交易數據,還是未批準狀態,還需單獨批準對應的移交單,并生成交易和庫存
+                //批準組裝轉換單,批準移交單,生成組裝轉換單,移交單的交易信息,庫存信息,更新批準狀態
+                if (result == "")
+                {                    
+                    if (head_insert_status == "NEW")//新的組裝轉換單
+                    {                        
+                        headData.handover_id = max_handover_id;
+                    }
+                    //批準組裝轉換單,移交單
+                    result = Approve(headData, user_id, "1");//批準
+                } 
+                else
+                {
+                    result = "-1" + result;
+                }
+                //--end 批準移交單
+
+            }// end 保存成功
             return result;
         }
+        
+        /// <summary>
+        /// 批準移交單,更改移交單的批準狀態,交易的生成,庫存的更改
+        /// </summary>
+        /// <param name="headData"></param>
+        /// <param name="handover_id"></param>
+        /// <param name="check_date"></param>
+        /// <param name="user_id"></param>
+        /// <returns></returns>
+        public static string ApproveRechange(jo_assembly_mostly headData,string handover_id,string check_date, string user_id)
+        {
+            string result = "00",str="";
+            string handover_id1 = "", handover_id2 = "";
+            if (!string.IsNullOrEmpty(handover_id))
+            {
+                handover_id1 = handover_id.Substring(0, 8);  //DT105601
+                handover_id2 = handover_id.Substring(0, 5) + "702";  //DT105702
+            }
+            else
+            {
+                result = "00";
+                return result;
+            }                      
+            StringBuilder sbSql = new StringBuilder();
+            sbSql.Append(@" SET XACT_ABORT ON ");
+            sbSql.Append(@" BEGIN TRANSACTION ");
+            str = string.Format(
+            @"SELECT Distinct S.id 
+                    FROM (select a.id from jo_materiel_con_mostly a with(nolock),jo_materiel_con_details b with(nolock) 
+                            where a.within_code=b.within_code and a.id=b.id and a.within_code='{0}' and a.id like '{1}%' and a.con_date='{3}' and b.aim_jo_id='{4}'
+	                        union all
+	                        select a.id from jo_materiel_con_mostly a with(nolock),jo_materiel_con_details b with(nolock) 
+                            where a.within_code=b.within_code and a.id=b.id and a.within_code='{0}' and a.id like '{2}%' and a.con_date='{3}' and b.aim_jo_id='{4}'
+	                        ) S", within_code, handover_id1, handover_id2, headData.con_date, headData.id);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(str);
+            if (dt.Rows.Count > 0)
+            {
+                result = "00";
+                //循環生成移交單交易及更新移交單相關庫存
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    result = SetRechangeStBusiness(dt.Rows[i]["id"].ToString(), check_date, "pfc_ok", "JO", user_id);
+                    if (result.Substring(0, 2) == "-1")
+                    {
+                        break;//失敗,退出循環
+                    }
+                    else
+                    {
+                        //成功,更新移交單批準狀態 
+                        str = string.Format(
+                                @" Update jo_materiel_con_mostly with(Rowlock) SET check_date='{2}',check_by='{3}',state='{4}' WHERE within_code='{0}' and id='{1}'",
+                                within_code, dt.Rows[i]["id"].ToString(), check_date, user_id, "1");
+                        sbSql.Append(str);
+                    }
+                }
+
+                if (result.Substring(0, 2) == "00") // SetRechangeStBusiness()執行成功
+                {
+                    if (headData.in_dept == "702")
+                    {
+                        /*以下情況有可能發生,即組裝一張交QC(702)的組裝轉換單,
+                            *因組裝單批準的模塊中更新jo_assembly_mostly的批準信息時過慮掉702
+                            *所以這里要單獨更新
+                        */
+                        str = string.Format(
+                        @" Update jo_assembly_mostly with(Rowlock) 
+                                    SET check_date='{2}',check_by='{3}',state='{4}',handover_id='{5}'
+                                    WHERE within_code='{0}' and id='{1}'",
+                            within_code, headData.id, check_date, user_id, "1", handover_id1);
+                        sbSql.Append(str);
+                    }
+                    //提交移交單批準人,批準日期"
+                    sbSql.Append(" COMMIT TRANSACTION ");
+                    result = sh.ExecuteSqlUpdate(sbSql.ToString());
+                    sbSql.Clear();
+                    if (result == "")
+                    {
+                        result = "00";
+                    }else
+                    {
+                        result = "-1" + result;
+                    }
+                }
+            }            
+
+            return result;
+        }
+
 
         //檢查庫存,返回庫存差異數
         public static List<check_part_stock> CheckStorage(List<check_part_stock> partData )
@@ -760,7 +869,7 @@ namespace CF2025.Prod.DAL
         //批量生產單是否已開過組裝轉換
         public static string CheckIsExistsPrdId(int prd_id,string id)
         {
-            string result = "";
+            string result = ""; 
             string strSql = string.Format(
                 @"Select A.id From jo_assembly_mostly A,jo_assembly_details B
                 Where A.within_code = B.within_code And A.id = B.id And A.state <> '2' And
@@ -886,19 +995,740 @@ namespace CF2025.Prod.DAL
             }
             return result;
         }
-        //批準/反批準,approve_type:1--批準;0--反批準
-        public static string Approve(string id, string handover_id,string user_id, string approve_type)
+        
+        /// <summary>
+        /// 批準/反批準,生成組裝單,移交單的交易,庫存更新等(失敗返回的字串前兩位是"-1")
+        /// </summary>
+        /// <param name="id">組裝單號</param>        
+        /// <param name="user_id">當前用戶</param>
+        /// <param name="approve_type">approve_type:1--批準;0--反批準</param>
+        /// <returns>返回字串為空,表示成功</returns>        
+        public static string Approve(jo_assembly_mostly head,string user_id, string approve_type)
         {
-            string result = "0";
-            SqlParameter[] paras = new SqlParameter[]{
-                new SqlParameter("@id", id),
-                new SqlParameter("@handover_id", handover_id),
-                new SqlParameter("@user_id",user_id),
-                new SqlParameter("@approve_type", approve_type)
-            };
-            DataTable dt = new DataTable();
-            dt = sh.ExecuteProcedureRetrunDataTable("strProcName", paras);
+            string result = "", return_value = "", strSql = "";
+            StringBuilder sbSql = new StringBuilder();
+            string active_name = approve_type == "1" ? "批準" : "反批準";
+            DataTable dt = new DataTable();            
+
+            //--start 批準
+            if (approve_type == "1")
+            {
+                //設置全局的批準日期
+                ldt_check_date = CommonDAL.GetDbDateTime("L");//批準日期(長日期時間)
+
+                // --start action_id:31
+                //插入库存交易表//扣除原料库存
+                strSql = string.Format(
+                @" INSERT INTO st_business_record(within_code, id, goods_id, goods_name, unit, action_time,
+                                                action_id,
+                                                ii_qty, ii_location_id, ii_code, rate, sequence_id,operator, check_date,
+                                                ib_qty, qty, mo_id, lot_no, sec_qty, sec_unit, dept_id, servername)
+                SELECT b.within_code, b.id, b.goods_id, b.goods_name, b.unit_code, a.con_date,
+                         '31',--//组装转换原料出库
+                         Abs(b.con_qty), C.location, C.location, 0 as swit_rate, b.sequence_id,'{2}','{3}',
+					     Abs(dbo.FN_CHANGE_UNITBYCV(b.within_code, b.goods_id, b.unit_code, 1, '', '', '*')),
+					     Abs(round(dbo.FN_CHANGE_UNITBYCV(b.within_code, b.goods_id, b.unit_code, b.con_qty, '', '', '/'), 4)),
+					     b.mo_id,b.lot_no,Abs(b.sec_qty),b.sec_unit,A.out_dept,'{4}'
+                FROM     jo_assembly_mostly a,
+                         jo_assembly_details_part b,
+					     cd_department C
+                Where a.within_code = b.within_code and a.id = b.id and a.within_code ='{0}' and
+                        A.within_code = C.within_code And A.out_dept = C.id And a.id ='{1}' and isNull(C.location, '') <> ''",
+                within_code, head.id, user_id, ldt_check_date, ls_servername);
+                sbSql.Clear();
+                sbSql.Append(" SET XACT_ABORT ON ");
+                sbSql.Append(" BEGIN TRANSACTION ");
+                sbSql.Append(strSql);
+                sbSql.Append(@" COMMIT TRANSACTION ");
+                result = sh.ExecuteSqlUpdate(sbSql.ToString());
+                sbSql.Clear();
+                if (result == "")
+                {
+                    result = "00";//成功
+                }
+                else
+                { 
+                    result ="-1"+ result+ "\r\n"+ "交易数据保存失败!" + "\r\n" + "<" + active_name + ">(st_business_record)" + "\r\n";
+                    return result;
+                }
+                //更新库存
+                return_value = pubFunction.of_update_st_details("I", "31", head.id, "*", ldt_check_date, "");               
+                if (return_value.Substring(0,2) == "-1")
+                {
+                    result = return_value + "\r\n"+ "庫存數據保存失败![扣除原料库存]+" + "\r\n" + "<" + active_name + ">(st_details)" + "\r\n";
+                    return result;                 
+                }
+                // --end action_id:31
+
+                //start action_id:51
+                //--添加废料的库存增加记录
+                int ll_cnt = 0;
+                strSql = string.Format(
+                @"Select Count(1) as cnt
+                FROM jo_assembly_mostly a,
+                     jo_assembly_details_scrap b,
+                     cd_department C
+                Where a.within_code=b.within_code and a.id=b.id and a.within_code ='{0}' and
+                      A.within_code=C.within_code And A.out_dept=C.id And a.id='{1}' and isNull(C.location,'')<>'' ",within_code, head.id);
+                dt = sh.ExecuteSqlReturnDataTable(strSql);
+                ll_cnt = int.Parse(dt.Rows[0]["cnt"].ToString());
+                if (ll_cnt > 0)
+                {
+                    strSql = string.Format(
+                    @"INSERT INTO st_business_record(within_code, id, goods_id, goods_name, unit, action_time,
+                                                    action_id,
+                                                    ii_qty, ii_location_id, ii_code, rate, sequence_id,operator, check_date,
+                                                    ib_qty, qty, mo_id, lot_no, sec_qty, sec_unit, dept_id, servername)
+                    SELECT b.within_code, b.id, b.goods_id, b.goods_name, b.unit_code, a.con_date,
+                                 '51',--//组装转换废料入库
+                                 Abs(b.con_qty), C.location, C.location, 0 as swit_rate, b.sequence_id,'{2}','{3}',
+						 Abs(dbo.FN_CHANGE_UNITBYCV(b.within_code, b.goods_id, b.unit_code, 1, '', '', '*')),
+						 Abs(round(dbo.FN_CHANGE_UNITBYCV(b.within_code, b.goods_id, b.unit_code, b.con_qty, '', '', '/'), 4)),
+						 b.mo_id,b.lot_no,Abs(b.sec_qty),b.sec_unit,a.out_dept,'{4}'
+                    FROM  jo_assembly_mostly a, jo_assembly_details_scrap b, cd_department C
+                    Where a.within_code = b.within_code and a.id = b.id and a.within_code ='{0}' and
+                          a.within_code=C.within_code And a.out_dept=C.id And a.id='{1}' and isNull(C.location,'') <> ''",
+                    within_code, head.id, user_id,ldt_check_date, ls_servername);
+                    sbSql.Clear();
+                    sbSql.Append(" SET XACT_ABORT ON ");
+                    sbSql.Append(" BEGIN TRANSACTION ");
+                    sbSql.Append(strSql);
+                    sbSql.Append(@" COMMIT TRANSACTION ");
+                    result = sh.ExecuteSqlUpdate(sbSql.ToString());
+                    sbSql.Clear();
+                    if (result == "")
+                    {
+                        result = "00";
+                    }
+                    else
+                    {
+                        result = "-1" + result + "\r\n" + "添加废料交易数据保存失败!" + "\r\n" + "<" + "批準" + ">(po_receipt_details)" + "\r\n";
+                        return result;
+                    }
+                    //更新库存
+                    return_value = pubFunction.of_update_st_details("I", "51", head.id, "*", ldt_check_date, "");
+                    if (return_value.Substring(0,2) == "-1")
+                    {
+                        result = return_value + "\r\n" + "庫存數據保存失败![废料]" + "\r\n" + "<" + active_name + ">(st_details)" + "\r\n";
+                        return result;
+                    }
+                    // --end action_id:51
+                }
+
+                //--start action_id:29
+                //--添加成品的库存增加记录
+                strSql = string.Format(
+                @" INSERT INTO st_business_record(within_code, id, goods_id, goods_name, unit, action_time,
+                                                action_id,
+                                                ii_qty, ii_location_id,
+                                                ii_code, rate, sequence_id,operator, check_date,
+                                                ib_qty, qty, mo_id, lot_no, sec_qty, sec_unit, dept_id, servername)
+                SELECT b.within_code,b.id,b.goods_id,b.goods_name,b.unit_code,a.con_date,
+                    '29',--//组装转换入库
+                    Abs(b.con_qty),C.location,C.location,0 as swit_rate,b.sequence_id,'{2}','{3}',
+                    Abs(dbo.FN_CHANGE_UNITBYCV(b.within_code, b.goods_id, b.unit_code, 1, '', '', '*')),
+                    Abs(round(dbo.FN_CHANGE_UNITBYCV(b.within_code, b.goods_id, b.unit_code, b.con_qty, '', '', '/'), 4)),
+                    b.mo_id,b.lot_no,Abs(b.sec_qty),b.sec_unit,A.out_dept,'{4}'
+                FROM  jo_assembly_mostly a,
+                      jo_assembly_details b,
+                      cd_department C
+                Where a.within_code = b.within_code and a.id = b.id and a.within_code ='{0}' and
+                      a.within_code=C.within_code And a.out_dept=C.id And a.id='{1}' and IsNull(C.location,'')<>'' ",
+                within_code, head.id, user_id,ldt_check_date,ls_servername);
+                sbSql.Clear();
+                sbSql.Append(" SET XACT_ABORT ON ");
+                sbSql.Append(" BEGIN TRANSACTION ");
+                sbSql.Append(strSql);
+                sbSql.Append(@" COMMIT TRANSACTION ");
+                result = sh.ExecuteSqlUpdate(sbSql.ToString());
+                sbSql.Clear();
+                if (result == "")
+                {
+                    result = "00";
+                }
+                else
+                {
+                    result = "-1" + result + "\r\n" + "交易数据保存失败![成品组装转换入库]" + "\r\n" + "<" + active_name + ">(jo_assembly_details)" + "\r\n";
+                    return result;
+                }
+                //更新库存                                  
+                return_value = pubFunction.of_update_st_details("I", "29", head.id, "*", ldt_check_date, "");
+                if (return_value.Substring(0,2) == "-1")
+                {
+                    //数据保存失败
+                    result = return_value + "\r\n" + "数据保存失败!<批準>((st_details)" ;
+                    return result;
+                }
+                //--end action_id:29               
+                //--如果主表中有选择收货部门就自动生成相应的移交单数据
+                //If wf_generate_turn_over() = -1 Then Return - 1
+               
+                //批準移交單(其中包含有調用生成移交單交易、更新移交單相關庫存的方法)
+                result = ApproveRechange(head, head.handover_id, ldt_check_date, user_id);
+
+            } //--end 批準
+
+            //--start 反批準組裝轉換單
+            if (approve_type == "0")
+            {                
+                int ll_cnt = 0;
+                strSql = string.Format(
+                @"Select Count(1) as cnt FROM st_business_record WITH (NOLOCK) Where within_code='{0}' and id='{1}' And action_id In('29','31','51')",                			
+                within_code, head.id);
+                dt = sh.ExecuteSqlReturnDataTable(strSql);
+                ll_cnt = int.Parse(dt.Rows[0]["cnt"].ToString());
+
+                if (ll_cnt > 0)
+                {
+                    //還原庫存
+                    //更新库存
+                    return_value = pubFunction.of_update_st_details("D", "29", head.id, "*", ldt_check_date, "");
+                    if (return_value.Substring(0,2) == "-1")
+                    {
+                        result = return_value + "数据保存失败![D,29]" + "\r\n" + "<" + active_name + ">(st_details)" + "\r\n";
+                        return result;
+                    }
+                    //更新库存
+                    return_value = pubFunction.of_update_st_details("D", "31", head.id, "*", ldt_check_date, "");
+                    if (return_value.Substring(0,2) == "-1")
+                    {
+                        result = return_value + "\r\n" + "数据保存失败![D,31]" + "\r\n" + "<" + active_name + ">(st_details)" + "\r\n";
+                        return result;
+                    }
+                    //---
+                    ll_cnt = 0;
+                    strSql = string.Format(
+                    @"Select Count(1) as cnt FROM st_business_record WITH(NOLOCK) Where within_code='{0}' and id='{1}' And action_id='51'",within_code,head.id);
+                    dt = sh.ExecuteSqlReturnDataTable(strSql);
+                    ll_cnt = int.Parse(dt.Rows[0]["cnt"].ToString());
+                    if (ll_cnt > 0)
+                    {
+                        //更新库存
+                        return_value = pubFunction.of_update_st_details("D", "51", head.id, "*", ldt_check_date, "");
+                        if (return_value.Substring(0,2) == "-1")
+                        {
+                            result = return_value + "\r\n"+"数据保存失败![D,51]" + "\r\n" + "<" + active_name + ">(st_details)" + "\r\n";
+                            return result;
+                        }
+                    }
+                    //---
+                    //刪除相并交易
+                    strSql = string.Format(
+                        @" Delete FROM st_business_record WITH(ROWLOCK) Where within_code='{0}' and id='{1}' And action_id In('31','51','29')",within_code, head.id);
+                    sbSql.Clear();
+                    sbSql.Append(" SET XACT_ABORT ON ");
+                    sbSql.Append(" BEGIN TRANSACTION ");
+                    sbSql.Append(strSql);
+                    sbSql.Append(@" COMMIT TRANSACTION ");
+                    result = sh.ExecuteSqlUpdate(sbSql.ToString());
+                    sbSql.Clear();
+                    if (result == "")
+                    {
+                        result = "00";
+                    }
+                    else {
+                        result = "-1" + result + "\r\n" + "数据保存失败![刪除交易數據:'31','51','29]" + "\r\n" + "<" + active_name + ">(st_business_record)" + "\r\n";
+                        return result;
+                    }
+                }// if ll_cnt>0
+
+                //无条件控制负数的出现2012-05-22??               
+                //dt = pubFunction.wf_check_inventory_qty(id, "w_produce_assembly");
+                //if (dt.Rows[0]["id"].ToString() == "-1")
+                //{                    
+                //    result = dt.Rows[0]["errtext"].ToString();                    
+                //    return result;
+                //}
+            } //--end 反批準
+
+
+            return result;
+        }//--end 批準/反批準
+        
+        
+        /// <summary>
+        /// 反批準
+        /// </summary>
+        /// <param name="id">組裝單號</param>
+        /// <param name="handover_id">移交單號</param>
+        /// <param name="user_id">當前用戶</param>        
+        /// <returns>返回字串為空,表示成功</returns>        
+        public static string UnApprove(jo_assembly_mostly head, string handover_id, string user_id,string check_date)
+        {
+            string result = "00", strSql = "";
+            //檢查是否存在相關的移交單已批準,不允許反批準組裝轉換單(考慮多用戶操作環境)handover_id
+            if (handover_id != "")
+            {
+                //查包含的全部移交單是否有已批準的
+                if(CheckRechangeStatus(within_code, head.handover_id, head.con_date, head.id, "1") == "1")
+                {
+                    result = "-1" + "注意:對應的移交單[" + handover_id + "]已批準,當前操作無效!!";
+                    return result;
+                }                
+                //strSql = string.Format(
+                //    @"select [state] from jo_materiel_con_mostly with(nolock) where within_code='{0}' and id='{1}' AND [state]='1'", within_code, handover_id);
+                //DataTable dt = new DataTable();
+                //dt = sh.ExecuteSqlReturnDataTable(strSql);
+                //if (dt.Rows.Count > 0)
+                //{
+                //    result ="-1"+ "注意:對應的移交單[" + handover_id + "]已批準,當前操作無效!!";
+                //    return result;
+                //}
+            }            
+            ldt_check_date = check_date;//取組裝轉換單中的批準日期
+            //執行反批準
+            result = Approve(head, user_id, "0"); //反批準組裝轉換單,與移交單無關,因相關移交單已在另一功能模塊中反批準.
+
+            if (result.Substring(0,2) =="-1")
+            {
+                result = result + "反批準操作失敗!";
+                return result;
+            }
+            //清空批準相關信息           
+            strSql = string.Format(
+                @"Update jo_assembly_mostly with(Rowlock) SET check_date=null,check_by='',state='{2}',update_by='{3}',update_date=getdate()
+                  WHERE within_code='{0}' and id='{1}'", within_code, head.id, "0",user_id );           
+            result = sh.ExecuteSqlUpdate(strSql);            
+            if (result == "")
+            {
+                result = "00";//成功
+            }
+            else
+            {
+                result = "-1" + result + "反批準失败![" + head.id + "]";
+                return result;
+            }
             return result;
         }
-    }
+
+
+        /// <summary>
+        /// 生成移交單交易數據(返回值為字符串,字串前兩位:-1代表失敗;00:成功)
+        /// </summary>
+        /// <param name="as_id">移交單據編號</param>
+        /// <param name="as_check_date">當前批準日期時間</param>
+        /// <param name="as_active_name">pfc_ok/pfc_unok</param>
+        /// <param name="as_bill_type">"JO:移交單"</param>
+        /// <param name="as_user_id"></param>
+        /// <returns></returns>
+        public static string SetRechangeStBusiness(string as_id,string as_check_date, string as_active_name, string as_bill_type,string as_user_id)
+        {
+            string strStatus = "00"; //strStatus字符串前兩位:-1代表失敗;00:成功
+            string result = "", return_value = "";        
+           
+            StringBuilder sbSql = new StringBuilder(" SET XACT_ABORT ON ");
+            sbSql.Append(" BEGIN TRANSACTION ");
+
+            string ls_dept_id = "", ls_out_dept = "", ls_aim_jo_id = "",  ls_goods_id = "", ls_bill_type_no = "", ls_mo_id = "";
+            string ls_con_date = "", ls_check_date = "", ls_bill_origin = "", ls_stock_type = "", ls_aim_jo_sequence = "",ls_error="";
+            decimal ldec_con_qty = 0, ldec_sec_qty = 0;
+            int li_cnt = 0, li_cnt_state1 = 0, li_cnt_state3 = 0, li_cnt_state4 = 0;
+            ls_check_date = as_check_date;
+            //反批准时清空日期变量
+            if (as_active_name == "pfc_unok")
+            {
+                ls_check_date = "";  //**** 更新要注意NULL轉換
+            }
+            //******************
+            //是否存在移交單
+            string strSql = string.Format(
+                @"SELECT a.bill_type_no,ISNULL(a.bill_origin,'') as bill_origin,ISNULL(a.stock_type, '') as stock_type, a.out_dept,
+                a.in_dept,Convert(varchar(10),a.con_date,121) as con_date
+                FROM jo_materiel_con_mostly a WITH(NOLOCK)
+                WHERE a.within_code='{0}' AND a.id ='{1}' AND a.state <>'2'", within_code,as_id);
+            DataTable dt = new DataTable();
+            dt = sh.ExecuteSqlReturnDataTable(strSql);
+            if (dt.Rows.Count < 1)
+            {
+                strStatus = "00";               
+                return strStatus;//沒有移交單直接返回
+            }
+            ls_bill_type_no = dt.Rows[0]["bill_type_no"].ToString();
+            ls_bill_origin = dt.Rows[0]["bill_origin"].ToString();
+            ls_stock_type = dt.Rows[0]["stock_type"].ToString();
+            ls_out_dept = dt.Rows[0]["out_dept"].ToString();
+            ls_dept_id = dt.Rows[0]["in_dept"].ToString();
+            ls_con_date = dt.Rows[0]["con_date"].ToString();
+            //******************
+
+            //as_bill_type = "JO" 為移交單;
+            if (as_bill_type == "JO")
+            {
+                //理论上要求同一张移交单需要使用同一张组装转换单的数据,所以只以第一笔数据的组装单号为准
+                strSql = string.Format(
+                    @"SELECT TOP 1 ISNULL(aim_jo_id,'') as aim_jo_id FROM jo_materiel_con_details WITH(NOLOCK) WHERE within_code='{0}' AND id ='{1}'",
+                    within_code, as_id);
+                dt = sh.ExecuteSqlReturnDataTable(strSql);
+                if (dt.Rows.Count > 0)
+                {
+                    ls_aim_jo_id = dt.Rows[0]["aim_jo_id"].ToString();
+                }
+                ls_aim_jo_id = string.IsNullOrEmpty(ls_aim_jo_id) ? "" : ls_aim_jo_id;
+
+                //更新组装单中的移交单号字段,批準/反批準信息
+                //有702通常都有另一長正常的移交單,正常移交單已更新组装单中的批準/反批準信息,所以批準702的移交單不需再重復更新
+                if (ls_dept_id != "702")
+                {
+                    if (ls_aim_jo_id != "")
+                    {
+                        strSql = string.Format(
+                            @" UPDATE A WITH(ROWLOCK) SET A.handover_id='{2}',
+                            A.check_date = (Case When '{3}'='pfc_ok' Then '{4}' Else null End),
+                            A.check_by = (Case When '{3}'='pfc_ok' Then '{5}' Else null End),
+                            A.state = (Case When '{3}'='pfc_ok' Then '1' Else  '0' End)
+                            FROM jo_assembly_mostly A
+                            WHERE A.within_code='{0}' And A.id ='{1}'", // AND Isnull(A.handover_id,'')=''
+                            within_code, ls_aim_jo_id, as_id, as_active_name, ls_check_date,as_user_id);
+                        sbSql.Append(strSql);
+                    }
+                }
+            }//--end if (as_bill_type == "JO")
+
+            //start as_active_name == "pfc_ok" || as_active_name == "pfc_unok"
+            if (as_active_name == "pfc_ok" || as_active_name == "pfc_unok")
+            {
+                if (as_bill_type == "JO") //有生產計劃流程情况的处理
+                {
+                    strSql = string.Format(
+                        @"Select b.goods_id,b.con_qty,b.sec_qty,Isnull(b.aim_jo_id,'') as aim_jo_id,Isnull(b.aim_jo_sequence,'') as aim_jo_sequence,a.in_dept,a.out_dept,b.mo_id
+                        From jo_materiel_con_mostly a with(nolock)
+                        Inner Join jo_materiel_con_details b with(nolock) On a.within_code = b.within_code And a.id = b.id
+                        Where a.within_code='{0}' And a.id ='{1}'", within_code, as_id);
+                    dt = sh.ExecuteSqlReturnDataTable(strSql);
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+                        ls_goods_id = dt.Rows[i]["goods_id"].ToString();
+                        ls_aim_jo_id = dt.Rows[i]["aim_jo_id"].ToString();
+                        ls_aim_jo_sequence = dt.Rows[i]["aim_jo_sequence"].ToString();
+                        ls_dept_id = dt.Rows[i]["in_dept"].ToString();
+                        ls_out_dept = dt.Rows[i]["out_dept"].ToString();
+                        ls_mo_id = dt.Rows[i]["mo_id"].ToString();
+                        ldec_con_qty = decimal.Parse(dt.Rows[i]["con_qty"].ToString());
+                        ldec_sec_qty = decimal.Parse(dt.Rows[i]["sec_qty"].ToString());
+                        if (as_active_name == "pfc_unok")
+                        {
+                            ldec_con_qty = -ldec_con_qty;
+                            ldec_sec_qty = -ldec_sec_qty;
+                        }
+                        //--更新组装明细资料中批準/反批準相關字段信息
+                        strSql = string.Format(
+                        @" Update A WITH(ROWLOCK)
+                        Set A.signfor = (Case When '{3}'='pfc_ok' Then '1' Else '' End),
+							A.sign_by = (Case When '{3}'='pfc_ok' Then '{4}' Else '' End),
+							A.sign_date = (Case When LEN('{5}')=0 Then null Else '{5}' End)
+                        From  jo_assembly_details A
+                        Where A.within_code ='{0}' And A.id ='{1}' And A.sequence_id='{2}'", within_code, ls_aim_jo_id, ls_aim_jo_sequence, as_active_name, as_user_id, ls_check_date);
+                        sbSql.Append(strSql);
+                        
+                        // 20150922 (P528)修改到签收时处理
+                        //更新predept_rechange_date,predept_rechange_qty
+                        li_cnt = 0;
+                        strSql = string.Format(
+                        @"Select count(1) as cnt
+                        From jo_bill_mostly M with(NOLOCK)
+                            Inner Join jo_bill_goods_details D WITH(NOLOCK) On M.within_code = D.within_code And M.id = D.id And M.ver = D.ver
+                            Inner Join jo_bill_materiel_details DD WITH(NOLOCK) On D.within_code = DD.within_code And D.id = DD.id And D.ver = DD.ver And D.sequence_id = DD.upper_sequence
+                        Where M.within_code ='{0}' And M.mo_id ='{1}' And M.state Not In('2','V') And D.wp_id ='{2}' And DD.materiel_id ='{3}'",
+                        within_code, ls_mo_id, ls_dept_id, ls_goods_id);
+                        dt = sh.ExecuteSqlReturnDataTable(strSql);
+                        li_cnt = dt.Rows.Count;
+                        if (li_cnt > 0)
+                        {                            
+                            strSql = string.Format(
+                                @" Update D WITH(ROWLOCK)        
+                                SET D.predept_rechange_qty = Isnull(D.predept_rechange_qty, 0) + IsNull({4}, 0),
+                                    D.predept_rechange_sec_qty = Isnull(D.predept_rechange_sec_qty, 0) + IsNull({5}, 0)        
+                                From jo_bill_mostly M
+                                     Inner Join jo_bill_goods_details D On M.within_code = D.within_code And M.id = D.id And M.ver = D.ver        
+                                     Inner Join jo_bill_materiel_details DD On D.within_code = DD.within_code And D.id=DD.id And D.ver=DD.ver And D.sequence_id=DD.upper_sequence        
+                                Where M.within_code='{0}' And M.mo_id='{1}' And M.state Not In('2','V') And D.wp_id='{2}' And DD.materiel_id='{3}' ",
+                                within_code, ls_mo_id, ls_dept_id, ls_goods_id, ldec_con_qty, ldec_sec_qty);
+                            sbSql.Append(strSql);
+                            //START	HXL	2013-10-22	P452
+                            strSql = string.Format(
+                            @" Update DD WITH(ROWLOCK)        
+                                SET DD.i_qty = Isnull(DD.i_qty,0) + {4}, DD.i_sec_qty = Isnull(DD.i_sec_qty,0) + {5}       
+                                From jo_bill_mostly M
+                                    Inner Join jo_bill_goods_details D On M.within_code = D.within_code And M.id = D.id And M.ver = D.ver        
+                                    Inner Join jo_bill_materiel_details DD On D.within_code=DD.within_code And D.id=DD.id And D.ver=DD.ver And D.sequence_id=DD.upper_sequence        
+                                Where M.within_code='{0}' And M.mo_id='{1}' AND M.state Not In('2','V') And        
+                                    D.wp_id='{2}' And DD.materiel_id='{3}' And Isnull(DD.location,'')='' ",
+                             within_code, ls_mo_id, ls_dept_id, ls_goods_id, ldec_con_qty, ldec_sec_qty);
+                            //End	HXL	2013-10-22	P452
+                            sbSql.Append(strSql);                         
+                        }
+
+                        //更新c_qty_ok,c_sec_qty_ok,更新f_complete_date(移交下部门日期)
+                        li_cnt = 0;
+                        strSql = string.Format(
+                           @"Select Count(1) as cnt From jo_bill_mostly M WITH (NOLOCK)
+                            Inner Join jo_bill_goods_details D WITH(NOLOCK) On M.within_code = D.within_code And M.id = D.id And M.ver = D.ver
+                            Where M.within_code='{0}' And M.mo_id='{1}' And M.state Not In('2','V') And D.goods_id='{2}' And
+                            D.wp_id='{3}' And D.next_wp_id ='{4}'", within_code, ls_mo_id, ls_goods_id, ls_out_dept, ls_dept_id);
+                        dt = sh.ExecuteSqlReturnDataTable(strSql);
+                        li_cnt = int.Parse(dt.Rows[0]["cnt"].ToString());
+                        //--start 流程是否存在
+                        if (li_cnt > 0)
+                        {
+                            strSql = string.Format(
+                            @" Update D WITH(ROWLOCK)
+                            SET D.c_qty_ok = Isnull(D.c_qty_ok,0) + {5},
+                                D.c_sec_qty_ok=Isnull(D.c_sec_qty_ok,0) + {6},
+                                D.c_qty = Isnull(D.c_qty, 0) + {5},
+                                D.c_sec_qty = Isnull(D.c_sec_qty,0) + {6}
+                            From jo_bill_mostly M Inner Join jo_bill_goods_details D On M.within_code = D.within_code And M.id = D.id And M.ver = D.ver
+                            Where M.within_code='{0}' And M.mo_id='{1}' And M.state Not In('2','V') And d.goods_id='{2}' And
+                                  D.wp_id ='{3}' and D.next_wp_id ='{4}' ",
+                            within_code, ls_mo_id, ls_goods_id, ls_out_dept, ls_dept_id, ldec_con_qty, ldec_sec_qty);
+                            sbSql.Append(strSql);                           
+                            //20130813 从触发器中移过来
+                            strSql = string.Format(
+                            @" Update D WITH(ROWLOCK)
+                            SET D.goods_state=(Case When (Isnull(D.prod_qty,0)-Isnull(D.c_qty,0)<=0) Then '4' Else (Case When Isnull(D.c_qty,0)>0 Then '3' Else '1' End) End) 
+                            From jo_bill_mostly M Inner Join jo_bill_goods_details D On M.within_code = D.within_code And M.id = D.id And M.ver = D.ver
+                            Where M.within_code ='{0}' And M.mo_id ='{1}' And M.state Not In('2','V') And d.goods_id='{2}' And D.wp_id='{3}' And D.next_wp_id ='{4}' ",
+                            within_code, ls_mo_id, ls_goods_id, ls_out_dept, ls_dept_id);
+                            sbSql.Append(strSql);
+                           
+                            //=====start 20130813 从触发器中移过来
+                            li_cnt = 0;
+                            li_cnt_state1 = 0;
+                            li_cnt_state3 = 0;
+                            li_cnt_state4 = 0;
+                            //--                            
+                            strSql = string.Format(
+                            @" Select Sum(1) as cnt,
+                                  Sum(Case When Isnull(D.goods_state, '0') = '1' Then 1 Else 0 End) as cnt_state1,
+                                  Sum(Case When Isnull(D.goods_state, '0') = '3' Then 1 Else 0 End) as cnt_state3,
+                                  Sum(Case When Isnull(D.goods_state, '0') = '4' Then 1 Else 0 End) as cnt_state4
+                             From jo_bill_mostly M WITH (NOLOCK) Inner Join jo_bill_goods_details D WITH(NOLOCK) On M.within_code=D.within_code And M.id=D.id And M.ver=D.ver
+                             Where  M.within_code='{0}' And M.mo_id='{1}' AND M.state Not In('2','V')", within_code, ls_mo_id);
+                            dt = sh.ExecuteSqlReturnDataTable(strSql);
+                            li_cnt = pubFunction.checkInt(dt.Rows[0]["cnt"].ToString());                            
+                            li_cnt_state1 = pubFunction.checkInt(dt.Rows[0]["cnt_state1"].ToString());
+                            li_cnt_state3 = pubFunction.checkInt(dt.Rows[0]["cnt_state3"].ToString());
+                            li_cnt_state4 = pubFunction.checkInt(dt.Rows[0]["cnt_state4"].ToString());
+                            
+                            if (li_cnt > 0) //如果明细有生产中的数据,主表的状态也要为生产中
+                            {
+                                strSql = string.Format(
+                                @" Update M WITH(ROWLOCK)
+                                Set M.state=(Case When({2} > 0) Then '3' 
+                                                  When({3} = {4}) Then '4' 
+                                                  When({3} = {5}) Then '1'
+                                                  Else M.state 
+                                            End)
+						        From jo_bill_mostly M
+                                Where M.within_code='{0}' And M.mo_id='{1}' And M.state Not In('2','V','3')", 
+                                within_code, ls_mo_id, li_cnt_state3, li_cnt, li_cnt_state4, li_cnt_state1 );//And M.state<>'3'
+                                sbSql.Append(strSql);                              
+                            }
+
+                            //--清除预留库存
+                            li_cnt = 0;
+                            //--start 20131107
+                            strSql = string.Format(
+                                @"Select Count(1) as cnt
+                                From jo_bill_materiel_details A WITH (NOLOCK),
+                                     mrp_st_details_lot B WITH(NOLOCK),
+                                     jo_bill_mostly C WITH(NOLOCK),
+                                     jo_bill_goods_details D WITH(NOLOCK)
+                                Where A.within_code = B.within_code And A.mrp_id = B.id
+                                    And A.within_code = C.within_code And A.id = C.id And A.ver = C.ver
+                                    And A.within_code = D.within_code And A.id=D.id And A.ver=D.ver And A.upper_sequence=D.sequence_id
+                                    And A.within_code = '{0}' And C.mo_id='{1}' And D.goods_id='{2}' And D.wp_id='{3}' And D.next_wp_id='{4}'",
+                                within_code, ls_mo_id, ls_goods_id, ls_out_dept, ls_dept_id);
+                            dt = sh.ExecuteSqlReturnDataTable(strSql);
+                            li_cnt = int.Parse(dt.Rows[0]["cnt"].ToString());
+                            //--end 20131107
+                            if (li_cnt > 0)
+                            {
+                                strSql = string.Format(
+                                    @" Delete B WITH(ROWLOCK)
+                                    From jo_bill_materiel_details A,
+                                         mrp_st_details_lot B,
+                                         jo_bill_mostly C,
+                                         jo_bill_goods_details D
+                                    Where A.within_code = B.within_code And A.mrp_id = B.id
+                                        And A.within_code = C.within_code And A.id = C.id And A.ver = C.ver
+                                        And A.within_code=D.within_code And A.id=D.id And A.ver=D.ver And A.upper_sequence=D.sequence_id
+                                        And A.within_code='{0}' And C.mo_id='{1}' And D.goods_id='{2}' And D.wp_id='{3}' And D.next_wp_id='{4}'",
+                                    within_code, ls_mo_id, ls_goods_id, ls_out_dept, ls_dept_id);
+                                sbSql.Append(strSql);                               
+                            }
+                            // ===== end 20130813 huangyun 从触发器中移过来
+
+                        } // --end 流程是否存在
+                    }  //--end for  FOR循環相當于后臺SQL的游標cur_jo_date
+                }  //--ene  if (as_bill_type == "JO")
+
+                //以上是批準(pfc_ok)與反批準(pfc_unok)都要執行的部分,更組裝單信息,生產計劃完成數量,刪除MRP相關數據
+
+
+                /************************************************************************************************/
+                //扣除原料库存 strat 90
+                li_cnt = 0;
+                if (as_active_name == "pfc_ok")
+                {
+                    //插入库存交易表(action_id:50 - 减项)
+                    strSql = string.Format(
+                    @" INSERT INTO st_business_record(within_code, id, goods_id, goods_name, unit, action_time, action_id, ii_qty, ii_location_id,
+                        ii_code, rate, sequence_id,operator, check_date, ib_qty, qty, mo_id, lot_no, sec_qty, sec_unit, dept_id, servername)
+                    SELECT b.within_code,b.id,b.goods_id,b.goods_name,b.unit_code,a.con_date,
+					       '50',--//移交单成品出库
+                           ABS(b.con_qty),C.location,C.location,0 as swit_rate,b.sequence_id,'{2}','{3}',
+					       ABS(dbo.FN_CHANGE_UNITBYCV(b.within_code, b.goods_id, b.unit_code, 1, '', '', '*')),
+					       ABS(Round(dbo.FN_CHANGE_UNITBYCV(b.within_code, b.goods_id, b.unit_code, b.con_qty, '', '', '/'), 4)),
+					       b.mo_id,b.lot_no,ABS(b.sec_qty),b.sec_unit,A.out_dept,'{4}'
+                    FROM jo_materiel_con_mostly a,
+                         jo_materiel_con_details b,
+				         cd_department C
+                    Where a.within_code = b.within_code and a.id = b.id And a.within_code='{0}' And
+                          a.within_code=C.within_code And a.out_dept=C.id And a.id='{1}' And ISNULL(C.location,'')<>'' ",
+                          within_code, as_id, as_user_id, ls_check_date, ls_servername);
+                    sbSql.Append(strSql);                   
+                    sbSql.Append(@" COMMIT TRANSACTION ");                    
+                    result = sh.ExecuteSqlUpdate(sbSql.ToString());//提交更改
+
+                    if (result == "") //前面執行成功
+                    {
+                        //更新库存(action_id:50 - 减项 ) 
+                        return_value = pubFunction.of_update_st_details("I", "50", as_id, "*", ls_check_date, ls_error);//扣减库存前检查对应的交易是否存在,交易不存在不执行对应库存的扣减
+                        if (return_value.Substring(0,2) == "-1")
+                        {
+                            strStatus = return_value + "\r\n" + "数据保存失败!" + "\r\n" + "<" + as_active_name + ">(50:st_details)" + "\r\n";                           
+                            return strStatus;
+                        }
+                        //--start 20120910 
+                        //--添加成品的库存增加记录(action_id:49 + 加項)
+                        //--固定添加到ZZZ仓位中,目前是为了Hold住这一些库存,不允许盘点,调整,转仓
+                        strSql = string.Format(
+                        @" INSERT INTO st_business_record(within_code, id, goods_id, goods_name, unit, action_time, action_id, ii_qty,ii_location_id,
+                            ii_code, rate, sequence_id,operator, check_date, ib_qty, qty, mo_id, lot_no, sec_qty, sec_unit, dept_id, servername)
+                        SELECT b.within_code,b.id,b.goods_id,b.goods_name,b.unit_code,a.con_date,
+				             '49',--//移交单成品入库
+                             ABS(b.con_qty),C.location,'ZZZ',0 as swit_rate,b.sequence_id,'{2}','{3}',
+				             ABS(dbo.FN_CHANGE_UNITBYCV(b.within_code, b.goods_id, b.unit_code, 1,'','','*')),
+				             ABS(Round(dbo.FN_CHANGE_UNITBYCV(b.within_code, b.goods_id, b.unit_code, b.con_qty,'','','/'),4)),
+				             b.mo_id,b.lot_no,ABS(b.sec_qty),b.sec_unit,a.out_dept,'{4}'
+                        FROM jo_materiel_con_mostly a,
+                             jo_materiel_con_details b,
+				             cd_department C
+                        Where a.within_code = b.within_code And a.id = b.id And a.within_code ='{0}' And
+                              a.within_code = C.within_code And a.out_dept = C.id And a.id ='{1}' And ISNULL(C.location,'')<>'' ",
+                        within_code, as_id, as_user_id, ls_check_date, ls_servername);
+                        result = sh.ExecuteSqlUpdate(strSql);
+                        if (result != "")
+                        {
+                            strStatus = "-1" + result + "\r\n" + "数据保存失败!" + "\r\n" + "<" + as_active_name + ">(49:st_business_record)" + "\r\n";                       
+                            return strStatus;
+                        }
+                        //--end 20120910
+
+                        //更新库存(action_id:49 + 加項)
+                        return_value = pubFunction.of_update_st_details("I", "49", as_id, "*", ldt_check_date, ls_error); //增加库存前检查对应的交易是否存在,交易記錄不存在則不执行对应库存的增加
+                        if (return_value.Substring(0,2) == "-1")
+                        {
+                            strStatus = return_value + "\r\n" + "数据保存失败!" + "\r\n" + "<" + as_active_name + ">(49:st_details)" + "\r\n";                            
+                            return strStatus;
+                        }
+                    }
+                }  //--end if (as_active_name == "pfc_ok") 90
+
+                //--start 91
+                if (as_active_name == "pfc_unok")
+                {
+                    //--Start 執行pfc_ok/pfc_unok公共部分的語句
+                    sbSql.Append(@" COMMIT TRANSACTION ");
+                    result = sh.ExecuteSqlUpdate(sbSql.ToString());//提交更改
+                    if (result != "")
+                    {
+                        strStatus = "-1" + result + "\r\n" + "数据保存失败!" + "\r\n" + "<" + as_active_name + ">(jo_bill_goods)" + "\r\n";                      
+                        return strStatus;
+                    }
+                    //--end 
+
+                    strSql = string.Format(
+                        @"Select Count(1) as cnt FROM st_business_record WITH(NOLOCK) Where within_code='{0}' And id='{1}' And action_id In('49','50')",
+                        within_code, as_id);
+                    dt = sh.ExecuteSqlReturnDataTable(strSql);
+                    li_cnt = int.Parse(dt.Rows[0]["cnt"].ToString());
+                    if (li_cnt > 0)
+                    {
+                        //先更新库存,再删除交易数据 ***
+                        return_value = pubFunction.of_update_st_details("D", "49", as_id, "*", ldt_check_date, ls_error);
+                        if (return_value.Substring(0,2) == "-1")
+                        {
+                            strStatus = return_value + "\r\n" + "数据保存失败!" + "\r\n" + "<" + as_active_name + ">(49:st_details)" + "\r\n";                           
+                            return strStatus;
+                        }
+                        //先更新库存,再删除交易数据 ***
+                        return_value = pubFunction.of_update_st_details("D", "50", as_id, "*", ldt_check_date, ls_error);
+                        if (return_value.Substring(0,2) == "-1")
+                        {
+                            strStatus = return_value + "\r\n" + "数据保存失败!" + "\r\n" + "<" + as_active_name + ">(50:st_details)" + "\r\n";                           
+                            return strStatus;
+                        }
+                        //--
+                        strSql = string.Format(
+                        @" Delete FROM st_business_record WITH(ROWLOCK)
+                        Where within_code ='{0}' And id = '{1}' And action_id In('49','50')",
+                        within_code, as_id);
+                        result = sh.ExecuteSqlUpdate(strSql);
+                        if (result != "")
+                        {
+                            strStatus = "-1" + result + "\r\n" + "数据保存失败!" + "\r\n" + "<" + as_active_name + ">(Del 49,50:st_business_record)" + "\r\n";
+                            return strStatus;
+                        }
+                    }
+                } //--end if (as_active_name == "pfc_unok")
+                // --end 91
+
+                //无条件控制负数的出现2012-05-22
+                //w_produce_assembly 组装转换單
+                return_value = pubFunction.wf_check_inventory_qty(as_id, "w_produce_assembly");
+                if (return_value.Substring(0,2) == "-1")
+                {
+                    strStatus = return_value;                   
+                    return strStatus;
+                }
+
+            }//end as_active_name == "pfc_ok" or "pfc_unok"
+            
+            return strStatus;
+        }//--end SetRechangeStBusiness()
+
+        /// <summary>
+        /// 檢查組裝單包含的移交單號是都批準或反批準
+        /// </summary>
+        /// <param name="within_code"></param>
+        /// <param name="handover_id">移交單號</param>
+        /// <param name="con_date">組裝單號日期</param>
+        /// <param name="id">組裝單號</param>
+        /// <param name="state">查詢狀態:1--查批準;0--查未批準</param>
+        /// <returns>返回值:1--表示存在;0--表示不存</returns>
+        public static string CheckRechangeStatus(string within_code,string handover_id,string con_date,string id,string state)
+        {
+            string result = "0";
+            if(string.IsNullOrEmpty(handover_id))
+            {
+                result = "1";
+                return result ;
+            }
+            string handover_id1 = handover_id.Substring(0, 8);  //DT105601           
+            string handover_id2 = handover_id.Substring(0, 5) + "702";  //DT105702
+            string strSql = string.Format(
+                @"SELECT Distinct S.id 
+                FROM (select a.id from jo_materiel_con_mostly a with(nolock),jo_materiel_con_details b with(nolock) 
+                      where a.within_code=b.within_code and a.id=b.id and a.within_code='{0}' and a.id like '{4}%' and a.con_date='{1}' and a.state='{2}' and b.aim_jo_id='{3}'
+                      union all
+                      select a.id from jo_materiel_con_mostly a with(nolock),jo_materiel_con_details b with(nolock) 
+                      where a.within_code=b.within_code and a.id=b.id and a.within_code='{0}' and a.id like '{5}%' and a.con_date='{1}' and a.state='{2}' and b.aim_jo_id='{3}'
+                     ) S", within_code, con_date,state,id, handover_id1, handover_id2);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            result = (dt.Rows.Count > 0) ? "1" : "0";            
+            return result;
+        }
+
+    } // --end public static class ProduceAssemblyDAL
 }

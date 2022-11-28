@@ -3,10 +3,16 @@ var comm= {
         var url = "/Base/PublicQuery?window_id=" + id;//對應Controller
         this.showMessageDialog(url, "查詢", 800, 600, true); //1024 600
     }, 
+    /*查找貨品編號窗口*
+    * Allen
+    */
     openFindItem:function(id){
         var url = "/Base/PublicItemQuery" ;
         this.showMessageDialog(url, "查詢", 800, 600, true); //1024 600
     }, 
+    /*密碼確認窗口*
+    * Allen
+    */
     openPassword: function(user_id){
         var url = "/Base/Common/PasswordConfirm?user_id=" + user_id;
         this.showMessageDialog(url, "密碼確認", 500, 300, true);
@@ -33,7 +39,9 @@ var comm= {
         $('#msgwindow').dialog('close');
     },
 
-    //檢查輸入日期是否正確 Allen
+    /*檢查輸入日期是否正確*
+    * Allen
+    */
     checkDate:function(strDate){
         var r =/^(?:(?!0000)[0-9]{4}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:0[48]|[2468][048]|[13579][26])00)-02-29)$/;
         if(!r.exec(strDate)){
@@ -81,7 +89,9 @@ var comm= {
         return jsonData.map(v => filterVal.map(j => v[j]))
     },
 
-    // 获取当前时间
+    /**获取当前时间**
+    * Allen 
+    */
     getCurrentDate:function() {
         const date = new Date();
         let year = date.getFullYear();
@@ -92,7 +102,9 @@ var comm= {
         return `${year}-${month}-${day}`;
     },
 
-    //獲取當前日期時間
+    /**獲取當前日期時間**
+    * Allen
+    */
     getCurrentTime: function() {
         //获取当前时间并打印
         var _this = this;
@@ -107,10 +119,12 @@ var comm= {
         return (dateTime)
     },
 
-    //返回字符格式日期(yyyy-MM-dd) Allen
-    //date:須是日期格式對象
-    //addDays:天數增加幾天,例如:0則返當前日期,2,返回前日期再加上兩天
-    //參數例子:addDays=0則返當前日期; addDays=2返回前日期再加上兩天
+    /**返回字符格式日期(yyyy-MM-dd)**
+    *date:須是日期格式對象
+    *addDays:天數增加幾天,例如:0則返當前日期,2,返回前日期再加上兩天
+    *參數例子:addDays=0則返當前日期; addDays=2返回前日期再加上兩天
+    * Allen
+    */
     getDate: function(date,addDays){
         var year = date.getFullYear();
         var month = date.getMonth() + 1;
@@ -120,8 +134,10 @@ var comm= {
         return (year +'-'+ month +'-'+ day).toString();
     },
     
-    //數字轉固定長度字串,前面補0 Allen
-    //num 傳入數值(整數),n為字串長度
+    /**數字轉固定長度字串,前面補0 **
+    * num 傳入數值(整數),n為字串長度
+    * Allen
+    */
     pad: function(num, n) {
         //return Array(n>num?(n-(''+num).length+1):0).join(0)+num;
         var len = num.toString().length;
@@ -132,7 +148,9 @@ var comm= {
         return num;
     },
 
-    //字串轉大寫 Allen 2022/05/20
+    /**字串轉大寫**
+    * Allen 2022/05/20
+    */
     stringToUppercase: function(str) {       
         var val="";
         if(str){
@@ -142,7 +160,9 @@ var comm= {
         }
         return val;
     },
-    //输入为全数字(整数) Allen 2022/05/21
+    /**输入为全数字(整数)** 
+    * Allen 2022/05/21
+    */
     allNumber(obj,strField,value) {
         //obj对像为数组,例如表格当前行对象
         value = value.replace(/[^\d]/g,""); //只能输入数字
@@ -153,7 +173,9 @@ var comm= {
         //this.$set(this.selectRow, strField, value ); vue中的赋值方法
         obj[strField] = parseInt(value);
     },    
-    //输入为全数字(两位小数) Allen 2022/05/21
+    /**输入为全数字(两位小数)** 
+    * Allen 2022/05/21
+    */
     allNumberDec2(obj,strField,value){
         //obj对像为数组,例如表格当前行对象
         value = '' + (value ===''?0.00:value); //保证value是字符串
@@ -176,15 +198,41 @@ var comm= {
         obj[strField] = parseFloat(value);//避免有返回00.00的现象
     },    
 
-    //獲取單據狀態
+    /**獲取單據狀態**
+    * Allen 2022/11/22
+    */
     checkApproveStatus:async function (tableName,id){
-        let result = "";
+        let result = "0";
         await axios.get("/Base/Common/CheckApproveStatus",{params:{table_name:tableName,id:id}}).then(
             (res)=>{
                 result = res.data;
             });
         return result;
     },  
+    /**檢查用戶部門權限**
+    *返回值:0--無權限;1--有權限
+    * Allen 2022/11/22
+    */
+    checkUserDeptRights:async function(user_id,dept_id){
+        let result = "0";
+        await axios.get("/Base/Common/CheckUserDeptRights",{params:{user_id:user_id,dept_id:dept_id}}).then(
+            (res)=>{
+                result = res.data;
+            });
+        return result;
+    },
+    /**檢查當前單據是否可以反批準(檢查日期)**
+    *返回值: "1"--可以反批準;"0"--不可以反批準
+    * Allen 2022/11/23
+    */
+    canApprove:async function(id,window_id){
+        let result = "0";
+        await axios.get("/Base/Common/CheckCanApprove?id=" + id + "&window_id=" + window_id).then(            
+              (res) => {
+                  result = res.data;
+              })
+        return result;
+    },
 
     //獲取當前日期時間
     getWipID: async  function() {
