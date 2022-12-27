@@ -43,7 +43,7 @@
                 </vxe-select>*@
                 <el-select v-model="headData.department_id"
                             @@change="getMaxID('ST05',headData.department_id)"
-                            filterable clearable :disabled="isDisableDropBoxHead" style="width:100%">
+                            filterable clearable default-first-option style="width:100%" :disabled="isDisableDropBoxHead">
                     <el-option v-for="item in deptList" :key="item.value" :value="item.value" :label="item.label" style="height:25px;font-size: 9px"/>
                 </el-select>
             </vxe-form-item>

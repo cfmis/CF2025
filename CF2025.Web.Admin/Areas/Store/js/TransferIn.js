@@ -413,7 +413,7 @@
                 this.$XModal.alert({ content: '請首先指定需要刪除的項目!',mask: false });
             }
         },
-        getMaxID(bill_id, dept_id) {
+        getMaxID(bill_id, dept_id) {           
             //請求后臺Action并传多個參數,多個參數傳值方法:第一參數用url..."?id="++value,后面的參數用+"&Ver="+value
             var $table = this.$refs.xTableIn;            
             axios.get("/Base/Common/GetMaxID?bill_id=" + bill_id + "&dept_id=" + dept_id + "&serial_len=3").then(
