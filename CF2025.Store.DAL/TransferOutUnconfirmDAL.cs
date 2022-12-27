@@ -18,6 +18,7 @@ namespace CF2025.Store.DAL
     {
         private static SQLHelper sh = new SQLHelper(CachedConfigContext.Current.DaoConfig.OA);
         //private static string strRemoteDB = "DGERP2.cferp.dbo.";//SQLHelper.RemoteDB;
+
         //查詢轉出待確認列表
         public static List<TransferOutDetails> GetSearchDataList(TransferOutFind model)
         {           

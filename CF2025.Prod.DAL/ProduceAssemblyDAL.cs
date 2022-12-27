@@ -21,6 +21,7 @@ namespace CF2025.Prod.DAL
         public static string ldt_check_date = "";
         //private static string language_id = "1";
         //private static string sequence_id = "";
+
         public static jo_assembly_mostly GetHeadByID(string id)
         {
             jo_assembly_mostly mdjHead = new jo_assembly_mostly();

@@ -14,13 +14,18 @@ namespace CF.SQLServer.DAL
         SQLHelper sh = new SQLHelper(CachedConfigContext.Current.DaoConfig.OA);//DaoConfig.OA:DGERP4;DaoConfig.CRM:CF2025
         DataTable tblStatus = new DataTable();
         string strStatus = "";
-        string within_code = "0000";        
-        //as_type:触发器类型:I(Insert)/D(Delete)
-        //as_action_id:交易类型
-        //as_id:交易单号
-        //as_sequence_id:(交易单序号,*表示全部的交易单明细)
-        //adt_check_date:单据交易日期
-        //as_errtext:更新库存错误信息        
+        string within_code = "0000";
+                 
+        /// <summary>
+        /// 更新庫存
+        /// </summary>
+        /// <param name="as_type">触发器类型:I(Insert)/D(Delete)</param>
+        /// <param name="as_action_id">交易类型</param>
+        /// <param name="as_id">交易单号</param>
+        /// <param name="as_sequence_id">(交易单序号,*表示全部的交易单明细)</param>
+        /// <param name="as_check_date">单据交易日期</param>
+        /// <param name="as_errtext">更新库存错误信息 </param>
+        /// <returns>成功返回'00',失敗返回'-1'加出錯信息</returns>
         public string of_update_st_details(string as_type, string as_action_id, string as_id, string as_sequence_id, string as_check_date, string as_errtext)
         {           
             strStatus = "00";//返回的字串strStatus:-1失敗;00:成功
