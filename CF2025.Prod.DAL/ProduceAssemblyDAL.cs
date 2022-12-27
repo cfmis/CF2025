@@ -14,11 +14,11 @@ namespace CF2025.Prod.DAL
 {
     public static class ProduceAssemblyDAL
     {
-        private static SQLHelper sh = new SQLHelper(CachedConfigContext.Current.DaoConfig.OA);
-        private static PubFunDAL pubFunction = new PubFunDAL();
-        private static string within_code = "0000";
-        private static string ls_servername = "hkserver.cferp.dbo";
-        private static string ldt_check_date = "";
+        public static SQLHelper sh = new SQLHelper(CachedConfigContext.Current.DaoConfig.OA);
+        public static PubFunDAL pubFunction = new PubFunDAL();
+        public static string within_code = "0000";
+        public static string ls_servername = "hkserver.cferp.dbo";
+        public static string ldt_check_date = "";
         //private static string language_id = "1";
         //private static string sequence_id = "";
         public static jo_assembly_mostly GetHeadByID(string id)
@@ -241,19 +241,7 @@ namespace CF2025.Prod.DAL
                 lstDetail.Add(mdjDetail);
             }
             return lstDetail;
-        }
-        private static bool CheckHeadId(string id)
-        {
-            bool result = true;
-            string strSql = "Select id FROM jo_assembly_mostly with(nolock) Where within_code='0000' AND id= '" + id + "'" ;
-            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
-            if (dt.Rows.Count > 0)
-                result = true;
-            else
-                result = false;
-            return result;
-        }
-
+        }        
         //保存
         public static string Save(jo_assembly_mostly headData, List<jo_assembly_details> lstDetailData1, List<jo_assembly_details_part> lstDetailData2, 
                                   List<jo_assembly_details> lstDelData1, List<jo_assembly_details_part> lstDelData2, 
@@ -264,16 +252,11 @@ namespace CF2025.Prod.DAL
             sbSql.Append(" BEGIN TRANSACTION ");
             string id = headData.id;
             string head_insert_status = headData.head_status;
-            string sql_lot_no = string.Format(
-            @" DECLARE @lot_no nvarchar(20) 
-               EXEC usp_create_lot_no '{0}','{1}','{2}',@lot_no OUTPUT 
-               SELECT @lot_no AS lot_no", 
-            within_code, headData.out_dept, headData.out_dept);
-            DataTable dtLotNo = new DataTable();
-
+            
             if (head_insert_status == "NEW")//全新的單據
             {
-                if (CheckHeadId(id))
+                bool id_exists = CommonDAL.CheckIdIsExists("jo_assembly_mostly", id);
+                if (id_exists)
                 {
                     //已存在此單據號,重新取最大單據號
                     headData.id = CommonDAL.GetMaxID("JO19", headData.out_dept, 5);//DDI1052201001
@@ -333,9 +316,8 @@ namespace CF2025.Prod.DAL
                 sbSql.Append(str);
                 //插入明細表一
                 foreach (var item in lstDetailData1)
-                {
-                    dtLotNo = sh.ExecuteSqlReturnDataTable(sql_lot_no); //自動生成批號
-                    lot_no = dtLotNo.Rows[0]["lot_no"].ToString();
+                {                   
+                    lot_no = CommonDAL.GetDeptLotNo(headData.out_dept, headData.in_dept); //自動生成批號
                     //改变list中某个元素值 (例子: var model = list.Where(c => c.ID == ).FirstOrDefault(); model.Value1 = ;)
                     //历遍移交單臨時數組,更改批號與組裝單批號一致
                     lstTurnOver.ForEach(i =>
@@ -512,9 +494,8 @@ namespace CF2025.Prod.DAL
                         {
                             lot_no = item.lot_no; //編輯時原記錄已有批號
                             if (string.IsNullOrEmpty(lot_no))
-                            {
-                                dtLotNo = sh.ExecuteSqlReturnDataTable(sql_lot_no);//重新獲取批號
-                                lot_no = dtLotNo.Rows[0]["lot_no"].ToString();
+                            {                               
+                                lot_no = CommonDAL.GetDeptLotNo(headData.out_dept, headData.in_dept); //重新獲取批號
                             }
                             //更新組裝轉換明細                            
                             str = string.Format(
@@ -542,9 +523,8 @@ namespace CF2025.Prod.DAL
                         }
                         else //INSERT ITEM//有項目新增
                         {
-                            //組裝轉換明細,插入新增的記錄
-                            dtLotNo = sh.ExecuteSqlReturnDataTable(sql_lot_no);//生成批號
-                            lot_no = dtLotNo.Rows[0]["lot_no"].ToString();
+                            //組裝轉換明細,插入新增的記錄                            
+                            lot_no = CommonDAL.GetDeptLotNo(headData.out_dept, headData.in_dept); //生成批號
                             str = string.Format(
                             @" Insert Into jo_assembly_details
                             (within_code,id,sequence_id,jo_id,jo_sequence_id,goods_id,con_qty,unit_code,sec_qty,sec_unit,mo_id,package_num,location,carton_code,lot_no,prd_id) 
@@ -764,10 +744,11 @@ namespace CF2025.Prod.DAL
             if (dt.Rows.Count > 0)
             {
                 result = "00";
+                string window_id = "w_produce_assembly";
                 //循環生成移交單交易及更新移交單相關庫存
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
-                    result = SetRechangeStBusiness(dt.Rows[i]["id"].ToString(), check_date, "pfc_ok", "JO", user_id);
+                    result = SetRechangeStBusiness(dt.Rows[i]["id"].ToString(), check_date, "pfc_ok", "JO", user_id, window_id);
                     if (result.Substring(0, 2) == "-1")
                     {
                         break;//失敗,退出循環
@@ -844,7 +825,7 @@ namespace CF2025.Prod.DAL
         public static string CheckParameters(string id)
         {
             string result = "0";            
-            string strSql = string.Format(@"Select value From sy_parameters_setup WITH (NOLOCK) Where sequence_id = '{0}' And within_code = '0000'", id);
+            string strSql = string.Format(@"Select value From sy_parameters_setup WITH (NOLOCK) Where sequence_id='{0}' And within_code='0000'", id);
             DataTable dt = new DataTable();
             dt = sh.ExecuteSqlReturnDataTable(strSql);
             if (dt.Rows.Count > 0)
@@ -1255,7 +1236,7 @@ namespace CF2025.Prod.DAL
         /// <returns>返回字串為空,表示成功</returns>        
         public static string UnApprove(jo_assembly_mostly head, string handover_id, string user_id,string check_date)
         {
-            string result = "00", strSql = "";
+            string result = "00";
             //檢查是否存在相關的移交單已批準,不允許反批準組裝轉換單(考慮多用戶操作環境)handover_id
             if (handover_id != "")
             {
@@ -1285,19 +1266,12 @@ namespace CF2025.Prod.DAL
                 return result;
             }
             //清空批準相關信息           
-            strSql = string.Format(
+            string strSql = string.Format(
                 @"Update jo_assembly_mostly with(Rowlock) SET check_date=null,check_by='',state='{2}',update_by='{3}',update_date=getdate()
                   WHERE within_code='{0}' and id='{1}'", within_code, head.id, "0",user_id );           
-            result = sh.ExecuteSqlUpdate(strSql);            
-            if (result == "")
-            {
-                result = "00";//成功
-            }
-            else
-            {
-                result = "-1" + result + "反批準失败![" + head.id + "]";
-                return result;
-            }
+            result = sh.ExecuteSqlUpdate(strSql);
+            result = (result == "") ? "00" : "-1" + result + "反批準失败![" + head.id + "]";  //"00"表示成功
+
             return result;
         }
 
@@ -1311,7 +1285,7 @@ namespace CF2025.Prod.DAL
         /// <param name="as_bill_type">"JO:移交單"</param>
         /// <param name="as_user_id"></param>
         /// <returns></returns>
-        public static string SetRechangeStBusiness(string as_id,string as_check_date, string as_active_name, string as_bill_type,string as_user_id)
+        public static string SetRechangeStBusiness(string as_id,string as_check_date, string as_active_name, string as_bill_type,string as_user_id,string as_window_id)
         {
             string strStatus = "00"; //strStatus字符串前兩位:-1代表失敗;00:成功
             string result = "", return_value = "";        
@@ -1327,7 +1301,7 @@ namespace CF2025.Prod.DAL
             //反批准时清空日期变量
             if (as_active_name == "pfc_unok")
             {
-                ls_check_date = "";  //**** 更新要注意NULL轉換
+                ls_check_date = "";  //**** 更新要注意NULL轉換  *********
             }
             //******************
             //是否存在移交單
@@ -1356,7 +1330,7 @@ namespace CF2025.Prod.DAL
             {
                 //理论上要求同一张移交单需要使用同一张组装转换单的数据,所以只以第一笔数据的组装单号为准
                 strSql = string.Format(
-                    @"SELECT TOP 1 ISNULL(aim_jo_id,'') as aim_jo_id FROM jo_materiel_con_details WITH(NOLOCK) WHERE within_code='{0}' AND id ='{1}'",
+                    @"SELECT TOP 1 ISNULL(aim_jo_id,'') As aim_jo_id FROM jo_materiel_con_details WITH(NOLOCK) WHERE within_code='{0}' AND id ='{1}'",
                     within_code, as_id);
                 dt = sh.ExecuteSqlReturnDataTable(strSql);
                 if (dt.Rows.Count > 0)
@@ -1366,18 +1340,19 @@ namespace CF2025.Prod.DAL
                 ls_aim_jo_id = string.IsNullOrEmpty(ls_aim_jo_id) ? "" : ls_aim_jo_id;
 
                 //更新组装单中的移交单号字段,批準/反批準信息
-                //有702通常都有另一長正常的移交單,正常移交單已更新组装单中的批準/反批準信息,所以批準702的移交單不需再重復更新
+                //有702通常都有另一長正常的移交單,因正常移交單已更新组装单中的批準/反批準信息,所以批準702的移交單時不需再重復更新组装单中的批準信息
                 if (ls_dept_id != "702")
                 {
                     if (ls_aim_jo_id != "")
                     {
                         strSql = string.Format(
-                            @" UPDATE A WITH(ROWLOCK) SET A.handover_id='{2}',
-                            A.check_date = (Case When '{3}'='pfc_ok' Then '{4}' Else null End),
-                            A.check_by = (Case When '{3}'='pfc_ok' Then '{5}' Else null End),
-                            A.state = (Case When '{3}'='pfc_ok' Then '1' Else  '0' End)
+                            @" UPDATE A WITH(ROWLOCK) 
+                            SET A.handover_id='{2}',
+                                A.check_date = (Case When '{3}'='pfc_ok' Then '{4}' Else null End),
+                                A.check_by = (Case When '{3}'='pfc_ok' Then '{5}' Else null End),
+                                A.state = (Case When '{3}'='pfc_ok' Then '1' Else  '0' End)
                             FROM jo_assembly_mostly A
-                            WHERE A.within_code='{0}' And A.id ='{1}'", // AND Isnull(A.handover_id,'')=''
+                            WHERE A.within_code='{0}' And A.id='{1}'", // AND Isnull(A.handover_id,'')=''
                             within_code, ls_aim_jo_id, as_id, as_active_name, ls_check_date,as_user_id);
                         sbSql.Append(strSql);
                     }
@@ -1403,32 +1378,36 @@ namespace CF2025.Prod.DAL
                         ls_dept_id = dt.Rows[i]["in_dept"].ToString();
                         ls_out_dept = dt.Rows[i]["out_dept"].ToString();
                         ls_mo_id = dt.Rows[i]["mo_id"].ToString();
-                        ldec_con_qty = decimal.Parse(dt.Rows[i]["con_qty"].ToString());
-                        ldec_sec_qty = decimal.Parse(dt.Rows[i]["sec_qty"].ToString());
+                        ldec_con_qty = pubFunction.checkDecimal(dt.Rows[i]["con_qty"].ToString());
+                        ldec_sec_qty = pubFunction.checkDecimal(dt.Rows[i]["sec_qty"].ToString());
                         if (as_active_name == "pfc_unok")
                         {
                             ldec_con_qty = -ldec_con_qty;
                             ldec_sec_qty = -ldec_sec_qty;
                         }
                         //--更新组装明细资料中批準/反批準相關字段信息
-                        strSql = string.Format(
-                        @" Update A WITH(ROWLOCK)
-                        Set A.signfor = (Case When '{3}'='pfc_ok' Then '1' Else '' End),
-							A.sign_by = (Case When '{3}'='pfc_ok' Then '{4}' Else '' End),
-							A.sign_date = (Case When LEN('{5}')=0 Then null Else '{5}' End)
-                        From  jo_assembly_details A
-                        Where A.within_code ='{0}' And A.id ='{1}' And A.sequence_id='{2}'", within_code, ls_aim_jo_id, ls_aim_jo_sequence, as_active_name, as_user_id, ls_check_date);
-                        sbSql.Append(strSql);
+                        if (ls_aim_jo_id != "") //加此判斷因電鍍絕大多沒有組裝單,直接開移交單,ls_aim_jo_id為空
+                        {
+                            strSql = string.Format(
+                            @" Update A WITH(ROWLOCK)
+                                Set A.signfor = (Case When '{3}'='pfc_ok' Then '1' Else '' End),
+							        A.sign_by = (Case When '{3}'='pfc_ok' Then '{4}' Else '' End),
+							        A.sign_date = (Case When '{3}'='pfc_ok' Then '{5}' Else null End)
+                                From jo_assembly_details A
+                                Where A.within_code='{0}' And A.id='{1}' And A.sequence_id='{2}'", 
+                                within_code, ls_aim_jo_id, ls_aim_jo_sequence, as_active_name, as_user_id, ls_check_date);
+                            sbSql.Append(strSql);
+                        }
                         
                         // 20150922 (P528)修改到签收时处理
-                        //更新predept_rechange_date,predept_rechange_qty
+                        //更新累計移交數量及最后移交日期predept_rechange_date,predept_rechange_qty
                         li_cnt = 0;
                         strSql = string.Format(
                         @"Select count(1) as cnt
                         From jo_bill_mostly M with(NOLOCK)
                             Inner Join jo_bill_goods_details D WITH(NOLOCK) On M.within_code = D.within_code And M.id = D.id And M.ver = D.ver
-                            Inner Join jo_bill_materiel_details DD WITH(NOLOCK) On D.within_code = DD.within_code And D.id = DD.id And D.ver = DD.ver And D.sequence_id = DD.upper_sequence
-                        Where M.within_code ='{0}' And M.mo_id ='{1}' And M.state Not In('2','V') And D.wp_id ='{2}' And DD.materiel_id ='{3}'",
+                            Inner Join jo_bill_materiel_details DD WITH(NOLOCK) On D.within_code=DD.within_code And D.id=DD.id And D.ver=DD.ver And D.sequence_id=DD.upper_sequence
+                        Where M.within_code ='{0}' And M.mo_id ='{1}' And M.state <>'2' And D.wp_id ='{2}' And DD.materiel_id ='{3}'",
                         within_code, ls_mo_id, ls_dept_id, ls_goods_id);
                         dt = sh.ExecuteSqlReturnDataTable(strSql);
                         li_cnt = dt.Rows.Count;
@@ -1440,31 +1419,31 @@ namespace CF2025.Prod.DAL
                                     D.predept_rechange_sec_qty = Isnull(D.predept_rechange_sec_qty, 0) + IsNull({5}, 0)        
                                 From jo_bill_mostly M
                                      Inner Join jo_bill_goods_details D On M.within_code = D.within_code And M.id = D.id And M.ver = D.ver        
-                                     Inner Join jo_bill_materiel_details DD On D.within_code = DD.within_code And D.id=DD.id And D.ver=DD.ver And D.sequence_id=DD.upper_sequence        
-                                Where M.within_code='{0}' And M.mo_id='{1}' And M.state Not In('2','V') And D.wp_id='{2}' And DD.materiel_id='{3}' ",
+                                     Inner Join jo_bill_materiel_details DD On D.within_code=DD.within_code And D.id=DD.id And D.ver=DD.ver And D.sequence_id=DD.upper_sequence        
+                                Where M.within_code='{0}' And M.mo_id='{1}' And M.state<>'2' And D.wp_id='{2}' And DD.materiel_id='{3}' ",
                                 within_code, ls_mo_id, ls_dept_id, ls_goods_id, ldec_con_qty, ldec_sec_qty);
                             sbSql.Append(strSql);
                             //START	HXL	2013-10-22	P452
                             strSql = string.Format(
                             @" Update DD WITH(ROWLOCK)        
-                                SET DD.i_qty = Isnull(DD.i_qty,0) + {4}, DD.i_sec_qty = Isnull(DD.i_sec_qty,0) + {5}       
-                                From jo_bill_mostly M
+                               SET DD.i_qty = Isnull(DD.i_qty,0) + {4}, DD.i_sec_qty = Isnull(DD.i_sec_qty,0) + {5}       
+                               From jo_bill_mostly M
                                     Inner Join jo_bill_goods_details D On M.within_code = D.within_code And M.id = D.id And M.ver = D.ver        
                                     Inner Join jo_bill_materiel_details DD On D.within_code=DD.within_code And D.id=DD.id And D.ver=DD.ver And D.sequence_id=DD.upper_sequence        
-                                Where M.within_code='{0}' And M.mo_id='{1}' AND M.state Not In('2','V') And        
-                                    D.wp_id='{2}' And DD.materiel_id='{3}' And Isnull(DD.location,'')='' ",
+                               Where M.within_code='{0}' And M.mo_id='{1}' AND M.state<>'2' And D.wp_id='{2}' And DD.materiel_id='{3}' And Isnull(DD.location,'')=''",
                              within_code, ls_mo_id, ls_dept_id, ls_goods_id, ldec_con_qty, ldec_sec_qty);
                             //End	HXL	2013-10-22	P452
                             sbSql.Append(strSql);                         
                         }
 
-                        //更新c_qty_ok,c_sec_qty_ok,更新f_complete_date(移交下部门日期)
+                        //更新完成數量:c_qty_ok,c_sec_qty_ok,移交下部门日期:f_complete_date
                         li_cnt = 0;
                         strSql = string.Format(
-                           @"Select Count(1) as cnt From jo_bill_mostly M WITH (NOLOCK)
-                            Inner Join jo_bill_goods_details D WITH(NOLOCK) On M.within_code = D.within_code And M.id = D.id And M.ver = D.ver
-                            Where M.within_code='{0}' And M.mo_id='{1}' And M.state Not In('2','V') And D.goods_id='{2}' And
-                            D.wp_id='{3}' And D.next_wp_id ='{4}'", within_code, ls_mo_id, ls_goods_id, ls_out_dept, ls_dept_id);
+                           @"Select Count(1) as cnt 
+                            From jo_bill_mostly M WITH (NOLOCK)
+                                Inner Join jo_bill_goods_details D WITH(NOLOCK) On M.within_code=D.within_code And M.id=D.id And M.ver=D.ver
+                            Where M.within_code='{0}' And M.mo_id='{1}' And M.state<>'2' And D.goods_id='{2}' And D.wp_id='{3}' And D.next_wp_id='{4}'", 
+                           within_code, ls_mo_id, ls_goods_id, ls_out_dept, ls_dept_id);
                         dt = sh.ExecuteSqlReturnDataTable(strSql);
                         li_cnt = int.Parse(dt.Rows[0]["cnt"].ToString());
                         //--start 流程是否存在
@@ -1477,16 +1456,15 @@ namespace CF2025.Prod.DAL
                                 D.c_qty = Isnull(D.c_qty, 0) + {5},
                                 D.c_sec_qty = Isnull(D.c_sec_qty,0) + {6}
                             From jo_bill_mostly M Inner Join jo_bill_goods_details D On M.within_code = D.within_code And M.id = D.id And M.ver = D.ver
-                            Where M.within_code='{0}' And M.mo_id='{1}' And M.state Not In('2','V') And d.goods_id='{2}' And
-                                  D.wp_id ='{3}' and D.next_wp_id ='{4}' ",
+                            Where M.within_code='{0}' And M.mo_id='{1}' And M.state<>'2' And D.goods_id='{2}' And D.wp_id='{3}' And D.next_wp_id ='{4}' ",
                             within_code, ls_mo_id, ls_goods_id, ls_out_dept, ls_dept_id, ldec_con_qty, ldec_sec_qty);
-                            sbSql.Append(strSql);                           
-                            //20130813 从触发器中移过来
+                            sbSql.Append(strSql);
+                            //20130813 从触发器中移过来,更新流程完成狀態,'4'完成,'3'未完成, state='G'強制完成
                             strSql = string.Format(
                             @" Update D WITH(ROWLOCK)
                             SET D.goods_state=(Case When (Isnull(D.prod_qty,0)-Isnull(D.c_qty,0)<=0) Then '4' Else (Case When Isnull(D.c_qty,0)>0 Then '3' Else '1' End) End) 
                             From jo_bill_mostly M Inner Join jo_bill_goods_details D On M.within_code = D.within_code And M.id = D.id And M.ver = D.ver
-                            Where M.within_code ='{0}' And M.mo_id ='{1}' And M.state Not In('2','V') And d.goods_id='{2}' And D.wp_id='{3}' And D.next_wp_id ='{4}' ",
+                            Where M.within_code='{0}' And M.mo_id ='{1}' And M.state<>'2' And d.goods_id='{2}' And D.wp_id='{3}' And D.next_wp_id ='{4}' ",
                             within_code, ls_mo_id, ls_goods_id, ls_out_dept, ls_dept_id);
                             sbSql.Append(strSql);
                            
@@ -1502,7 +1480,7 @@ namespace CF2025.Prod.DAL
                                   Sum(Case When Isnull(D.goods_state, '0') = '3' Then 1 Else 0 End) as cnt_state3,
                                   Sum(Case When Isnull(D.goods_state, '0') = '4' Then 1 Else 0 End) as cnt_state4
                              From jo_bill_mostly M WITH (NOLOCK) Inner Join jo_bill_goods_details D WITH(NOLOCK) On M.within_code=D.within_code And M.id=D.id And M.ver=D.ver
-                             Where  M.within_code='{0}' And M.mo_id='{1}' AND M.state Not In('2','V')", within_code, ls_mo_id);
+                             Where  M.within_code='{0}' And M.mo_id='{1}' AND M.state<>'2'", within_code, ls_mo_id);
                             dt = sh.ExecuteSqlReturnDataTable(strSql);
                             li_cnt = pubFunction.checkInt(dt.Rows[0]["cnt"].ToString());                            
                             li_cnt_state1 = pubFunction.checkInt(dt.Rows[0]["cnt_state1"].ToString());
@@ -1587,7 +1565,7 @@ namespace CF2025.Prod.DAL
                           a.within_code=C.within_code And a.out_dept=C.id And a.id='{1}' And ISNULL(C.location,'')<>'' ",
                           within_code, as_id, as_user_id, ls_check_date, ls_servername);
                     sbSql.Append(strSql);                   
-                    sbSql.Append(@" COMMIT TRANSACTION ");                    
+                    sbSql.Append(@" COMMIT TRANSACTION ");
                     result = sh.ExecuteSqlUpdate(sbSql.ToString());//提交更改
 
                     if (result == "") //前面執行成功
@@ -1601,7 +1579,7 @@ namespace CF2025.Prod.DAL
                         }
                         //--start 20120910 
                         //--添加成品的库存增加记录(action_id:49 + 加項)
-                        //--固定添加到ZZZ仓位中,目前是为了Hold住这一些库存,不允许盘点,调整,转仓
+                        //--固定添加到ZZZ仓位中,目的是为了Hold住这一些库存,不允许盘点,调整,转仓
                         strSql = string.Format(
                         @" INSERT INTO st_business_record(within_code, id, goods_id, goods_name, unit, action_time, action_id, ii_qty,ii_location_id,
                             ii_code, rate, sequence_id,operator, check_date, ib_qty, qty, mo_id, lot_no, sec_qty, sec_unit, dept_id, servername)
@@ -1626,7 +1604,7 @@ namespace CF2025.Prod.DAL
                         //--end 20120910
 
                         //更新库存(action_id:49 + 加項)
-                        return_value = pubFunction.of_update_st_details("I", "49", as_id, "*", ldt_check_date, ls_error); //增加库存前检查对应的交易是否存在,交易記錄不存在則不执行对应库存的增加
+                        return_value = pubFunction.of_update_st_details("I", "49", as_id, "*", ls_check_date, ls_error); //增加库存前检查对应的交易是否存在,交易記錄不存在則不执行对应库存的增加
                         if (return_value.Substring(0,2) == "-1")
                         {
                             strStatus = return_value + "\r\n" + "数据保存失败!" + "\r\n" + "<" + as_active_name + ">(49:st_details)" + "\r\n";                            
@@ -1656,14 +1634,14 @@ namespace CF2025.Prod.DAL
                     if (li_cnt > 0)
                     {
                         //先更新库存,再删除交易数据 ***
-                        return_value = pubFunction.of_update_st_details("D", "49", as_id, "*", ldt_check_date, ls_error);
+                        return_value = pubFunction.of_update_st_details("D", "49", as_id, "*", as_check_date, ls_error);
                         if (return_value.Substring(0,2) == "-1")
                         {
                             strStatus = return_value + "\r\n" + "数据保存失败!" + "\r\n" + "<" + as_active_name + ">(49:st_details)" + "\r\n";                           
                             return strStatus;
                         }
                         //先更新库存,再删除交易数据 ***
-                        return_value = pubFunction.of_update_st_details("D", "50", as_id, "*", ldt_check_date, ls_error);
+                        return_value = pubFunction.of_update_st_details("D", "50", as_id, "*", as_check_date, ls_error);
                         if (return_value.Substring(0,2) == "-1")
                         {
                             strStatus = return_value + "\r\n" + "数据保存失败!" + "\r\n" + "<" + as_active_name + ">(50:st_details)" + "\r\n";                           
@@ -1686,11 +1664,14 @@ namespace CF2025.Prod.DAL
 
                 //无条件控制负数的出现2012-05-22
                 //w_produce_assembly 组装转换單
-                return_value = pubFunction.wf_check_inventory_qty(as_id, "w_produce_assembly");
-                if (return_value.Substring(0,2) == "-1")
+                if (as_window_id != "")
                 {
-                    strStatus = return_value;                   
-                    return strStatus;
+                    return_value = pubFunction.wf_check_inventory_qty(as_id, as_window_id);//組裝轉換單:"w_produce_assembly"
+                    if (return_value.Substring(0, 2) == "-1")
+                    {
+                        strStatus = return_value;
+                        return strStatus;
+                    }
                 }
 
             }//end as_active_name == "pfc_ok" or "pfc_unok"

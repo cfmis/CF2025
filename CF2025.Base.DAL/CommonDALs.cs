@@ -211,7 +211,6 @@ namespace CF2025.Base.DAL
             return Result;
         }
 
-
         public static List<ModelItemQuery> ItemQueryList(ModelItemQuery SearchAry)
         {
             SqlParameter[] paras = new SqlParameter[]
@@ -345,15 +344,24 @@ namespace CF2025.Base.DAL
             return id;
         }
 
-        //取單據批準狀態
-        public static string CheckApproveStatus(string table_name, string id)
+        //移交單最大單據號
+        public static string GetMaxIDJo07(string out_dept, string in_dept, string doc_type)
         {
-            string strSql = string.Format("Select state From {0} WHERE within_code='0000' and id='{1}'", table_name, id);
+            string strSql = string.Format(@"SELECT dbo.fn_zz_sys_bill_max_jo07('{0}','{1}','{2}') as id", out_dept, in_dept, doc_type);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            string id = dt.Rows[0]["id"].ToString(); // Return value DT10560134510
+            return id;
+        }
+
+        //取單據批準狀態
+        public static string CheckApproveState(string table_name, string id)
+        {
+            string strSql = string.Format("Select state From {0} with(nolock) WHERE within_code='0000' and id='{1}'", table_name, id);
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             string result = "0";
             if (dt.Rows.Count > 0)
             {
-                dt.Rows[0]["state"].ToString();
+                result = dt.Rows[0]["state"].ToString();
             }
             return result;
         }
@@ -363,17 +371,17 @@ namespace CF2025.Base.DAL
         {
             string strSql = string.Format("Select user_name From sys_user WHERE within_code='' and user_id='{0}'", user_id);
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
-            string rtn = "";
+            string result = "";
             if (dt.Rows.Count > 0)
-                rtn = dt.Rows[0]["user_name"].ToString();
-            return rtn;
+                result = dt.Rows[0]["user_name"].ToString();
+            return result;
         }
         //檢查用戶與密碼
         public static string GetUserInfo(string user_id, string password)
         {
             string strSql = string.Format("Select user_name,password From sys_user WHERE within_code='' and user_id='{0}'", user_id);
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
-            string rtn = "";
+            string result = "";
             if (dt.Rows.Count > 0)
             {
                 string strPwd = "";
@@ -384,14 +392,14 @@ namespace CF2025.Base.DAL
                 if (strPwd != dt.Rows[0]["password"].ToString())
                 {
                     //密碼錯誤
-                    rtn = "PASSWORD_ERROR";
+                    result = "PASSWORD_ERROR";
                 }
             }
             else
             {
-                rtn = "USER_ID_ERROR";
+                result = "USER_ID_ERROR";
             }           
-            return rtn;
+            return result;
         }
 
         public static string GetDbDateTime(string type)
@@ -445,32 +453,80 @@ namespace CF2025.Base.DAL
             return result;
         }
 
-        //public static decimal checkDecimal(string val)
-        //{
-        //    decimal result = 0;
-        //    if (!string.IsNullOrEmpty(val))
-        //    {
-        //        result = decimal.Parse(val);
-        //    }else
-        //    {
-        //        result = 0;
-        //    }
-        //    return result;
-        //}
+        //檢查移交單是否已簽收
+        public static string CheckSignfor(string id)
+        {
+            string result = "0";
+            string sql = string.Format(
+                @"Select Count(1) as cnt From jo_materiel_con_details WITH(NOLOCK) Where within_code='0000' and id='{0}' and Isnull(signfor,'0')='1'", id);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(sql);
+            result = dt.Rows[0]["cnt"].ToString();
+            return result;
+        }
 
-        //public static Int32 checkInt(string val)
-        //{
-        //    Int32 result = 0;
-        //    if (!string.IsNullOrEmpty(val))
-        //    {
-        //        result = Int32.Parse(val);
-        //    }
-        //    else
-        //    {
-        //        result = 0;
-        //    }
-        //    return result;
-        //}
+        //判断計劃是否批準狀態
+        public static int GetPlanApproveState(string mo_id)
+        {
+            int result = 0;
+            string sql = string.Format(
+                @" Select Count(1) as cnt From jo_bill_mostly A WITH (NOLOCK) Where A.within_code='0000' And A.mo_id ='{0}' And A.state='0'", mo_id);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(sql);
+            result = int.Parse(dt.Rows[0]["cnt"].ToString());
+            return result;
+        }
+
+        //判断工单是否被hold住
+        public static int GetPlanHoldState(string mo_id,string goods_id,string out_dept,string in_dept)
+        {
+            int result = 0;
+            string sql = string.Format(
+                @"Select Count(1) As cnt From jo_bill_mostly a WITH (NOLOCK),jo_bill_goods_details b WITH (NOLOCK)
+                 Where a.within_code=b.within_code And a.id=b.id And a.ver=b.ver And a.state NOT IN ('2','V') 
+                 And a.within_code='0000' And a.mo_id='{0}' And b.goods_id='{1}' And b.wp_id='{2}' And b.next_wp_id='{3}'
+                 And Isnull(b.hold,'')<>''", mo_id,goods_id,out_dept, in_dept);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(sql);
+            result = int.Parse(dt.Rows[0]["cnt"].ToString());
+            return result;
+        }
+
+        //判断OC是否被hold住
+        public static int GetOcHoldState(string mo_id)
+        {
+            int result = 0;
+            string sql = string.Format(
+                @"Select Count(1) As cnt From so_order_manage a WITH (NOLOCK),so_deliver_date b WITH (NOLOCK)
+                Where a.within_code=b.within_code And a.id=b.id And a.ver=b.ver And b.within_code='0000' and b.mo_id='{0}' And b.hold_state='1' ", mo_id);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(sql);
+            result = int.Parse(dt.Rows[0]["cnt"].ToString());
+            return result;
+        }
+
+        //檢查單據號是否已存在
+        public static bool CheckIdIsExists(string tableName,string id)
+        {
+            bool result = false;
+            string strSql = string.Format(@"Select id FROM {0} with(nolock) Where within_code='0000' AND id='{1}'", tableName,id);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            if (dt.Rows.Count > 0)
+                result = true;
+            else
+                result = false;
+            return result;
+        }
+
+        //獲取部門移交單批號
+        public static string GetDeptLotNo(string out_dept,string in_dept)
+        {
+            string result = "";
+            string strSql = string.Format(
+            @" DECLARE @lot_no nvarchar(20) 
+               EXEC usp_create_lot_no '{0}','{1}','{2}',@lot_no OUTPUT 
+               SELECT @lot_no AS lot_no",
+            "0000", out_dept, out_dept);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            result = dt.Rows[0]["lot_no"].ToString();
+            return result;
+        }       
 
     }
 }

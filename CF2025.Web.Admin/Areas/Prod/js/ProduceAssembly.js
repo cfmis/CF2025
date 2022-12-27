@@ -148,7 +148,7 @@
             //異步執行 
             setTimeout(() => {               
                 this.getDetailsPart(this.searchID);
-                this.checkRechangeApproveStatus();//檢查控制反批準按鈕的顯示/隱藏.
+                //this.checkRechangeApproveStatus();//檢查控制反批準按鈕的顯示/隱藏.
                 this.loading = false;
             }, 500);
 
@@ -179,7 +179,10 @@
             //某單元格獲取焦點
             //this.$refs.xTable1.setActiveCell(this.selectRow, "con_qty");
             //var result = this.filterOriginData2();
-        },         
+        },
+        focusInDept(){
+            this.$refs['inDept'].focus(); //this.$refs包含自定義的引用對象
+        },
         filterOriginData2(){
             if (this.curRowSeqId !== '') {
                 let keyword = this.curRowSeqId.toLowerCase();
@@ -554,7 +557,7 @@
                 this.$XModal.alert({ content: "此單據已批準,當前操作無效!", mask: false });
                 return;
             }
-            let status = await comm.checkApproveStatus('jo_assembly_mostly',this.headData.id);
+            let status = await comm.checkApproveState('jo_assembly_mostly',this.headData.id);
             if(status ==='1'||status ==='2'){
                 let str = (status ==='1')?"批準":"注銷";
                 this.$XModal.alert({ content: `后端數據已是${str}狀態,當前操作無效!`, mask: false });
@@ -608,7 +611,7 @@
                     this.$XModal.alert({ content: "已是最后一行,不可以繼續刪除!", mask: false });
                     return;
                 }
-                let status = await comm.checkApproveStatus('jo_assembly_mostly',this.headData.id);
+                let status = await comm.checkApproveState('jo_assembly_mostly',this.headData.id);
                 if(status ==='1'|| status ==='2'){
                     let str = (status ==='1')?"批準":"注銷";
                     this.$XModal.alert({ content: `后端數據已是${str}狀態,當前操作無效!`, mask: false });
@@ -685,7 +688,7 @@
                 var ls_type = (val==='1')?"批準":"反批準";
                 var ls_is_approve = `確定是否要進行【${ls_type}】操作？`;
                 //取后端單據狀態
-                let status = comm.checkApproveStatus('jo_assembly_mostly',this.headData.id);               
+                let status = comm.checkApproveState('jo_assembly_mostly',this.headData.id);               
                 if(status==='2'){
                     this.$XModal.alert({ content: "后端數據已是注銷狀態,當前操作無效!", mask: false });
                     return;
@@ -727,7 +730,7 @@
                     if(isApprove ==="0"){
                         this.$XModal.alert({ content: "注意:【批準日期】必須為當前日期,方可進行此操作!", mask: false });
                         return;
-                    }                    
+                    }
                 }                
                 this.$XModal.confirm(ls_is_approve).then(type => {
                     if (type == "confirm") {
@@ -737,7 +740,7 @@
                         var user_id = this.userId;
                         this.loading = true;
                         //當按下反批準/批準按鈕立即禁止顯示當前按鈕,當操作失敗時再恢復顯示
-                        displayButtonApprove(approve_type,"1");//禁止顯示反批準/批準按鈕
+                        this.showButtonApprove(approve_type,"1");//禁止顯示反批準/批準按鈕
                         axios.post("/ProduceAssembly/Approve",{head,user_id,approve_type}).then(
                             (res) => {
                                 if(res.data ==="OK"){
@@ -747,15 +750,15 @@
                                     this.$XModal.message({ content: ls_success, status: "success" });                                    
                                 }
                                 else{                                       
-                                    this.$XModal.message({ content: ls_error + res.data,status: "warning" , mask: false });  
-                                    displayButtonApprove(approve_type,"0");//顯示反批準/批準按鈕
+                                    this.$XModal.alert({ content: ls_error + res.data,status: "warning" , mask: false });  
+                                    this.showButtonApprove(approve_type,"0");//顯示反批準/批準按鈕
                                 }
                                 this.loading = false;
                             }
                         ).catch(function (res) {
                             this.loading = false;
                             this.$XModal.alert({ content: "系統錯誤:" + res,status: "error" , mask: false }); 
-                            displayButtonApprove(approve_type,"0");//顯示反批準/批準按鈕                            
+                            this.showButtonApprove(approve_type,"0");//顯示反批準/批準按鈕                            
                         });
                     }
                 })
@@ -765,7 +768,7 @@
             };
         },
         //*禁止/顯示 反批準/批準 按鈕,        
-        displayButtonApprove(approve_type,value){
+        showButtonApprove(approve_type,value){
             //approve_type:1--批準;0--反批準. value:1--隱藏,0--顯示
             if(approve_type ==="1"){                
                 this.unok_status = value;//禁止顯示反批準按鈕
@@ -904,9 +907,17 @@
                     this.$set(this.headData,'con_date',this.$utils.toDateString(this.headData.con_date, 'yyyy-MM-dd'));
                     //深度複製一個對象，用來判斷數據是否有修改
                     this.tempHeadData = JSON.parse(JSON.stringify(this.headData));
-                    //const ymd = this.$utils.toDateString(this.tempHeadData.con_date, 'yyyy-MM-dd');
-                    //console.log(ymd);
-                    rtn = this.headData.handover_id;
+                    //const ymd = this.$utils.toDateString(this.tempHeadData.con_date, 'yyyy-MM-dd');                  
+                    if(this.headData.state ==='1'){                        
+                        this.unok_status = "0";//顯示反批準按鈕
+                    }else{
+                        if(this.headData.state ==='0'){                           
+                            this.ok_status = "0";//顯示批準按鈕
+                        }else{
+                            this.ok_status = "1";//隱藏批準按鈕
+                            this.unok_status = "1";//隱藏反批準按鈕
+                        }
+                    }
                 },
                 (response) => {
                     alert(response.status);
@@ -923,8 +934,7 @@
                     this.tableData1 = response.data;
                     this.curRowSeqId = "";
                     if(this.tableData1.length>0){
-                        this.curRowSeqId = this.tableData1[0].sequence_id;
-                        //console.log(this.curRowSeqId);
+                        this.curRowSeqId = this.tableData1[0].sequence_id;                       
                         if(this.headData.state==='0'){
                             this.tempSelectRow = JSON.parse(JSON.stringify(this.tableData1[0]));//暫存當前行,以便檢查是否有更改                           
                         }
@@ -1131,8 +1141,7 @@
                                 //先移除,后再添加
                                 this.originData2.splice(i,1);
                             }
-                        }
-                        console.log( this.delData2);
+                        }                        
                     }
                     //重新設置表格二中的
                     //成份組成
@@ -1214,24 +1223,20 @@
             var res= await axios.get("/Base/DataComboxList/GetDateServer");
             this.server_date = res.data;
         },
-        saveAllEvent: async function() {            
-            const $table = this.$refs.xTable1;
-            if(this.headData.id==="" && this.headData.out_dept===""){                
-                this.$XModal.alert({ content: '組裝部門不可為空!', mask: false });//mask: false 彈窗時父窗口不需庶置
+        saveAllEvent: async function() {
+            if(this.headData.id ==="" ){                
+                this.$XModal.alert({ content: '編號不可為空!', mask: false });//mask: false 彈窗時父窗口不需庶置
                 return;
             }
             if(this.headData.transfer_date ===""){
                 this.$XModal.alert({ content: '組裝日期不可為空!', mask: false });
                 return;
             }
+            const $table = this.$refs.xTable1;
             if($table.tableData.length == 0){
                 this.$XModal.alert({ content: '明細資料不可為空!', mask: false });
                 return;
-            }
-            if(this.$refs.xTable2.tableData.length == 0){
-                this.$XModal.alert({ content: '成份資料不可為空!', mask: false });
-                return;
-            }
+            }           
             // 保存前對成份明細資料1進行有效性檢查
             const errMap = $table.fullValidate().catch(errMap => errMap);
             let check_tableData1_flag = true;
@@ -1246,43 +1251,44 @@
             if(!check_tableData1_flag){
                 return;
             }
-            //保存前對成份明細資料2進行有效性檢查
-            let items_update = null,row_no=0,sequence_id="",check_tableData2_flag = true;
-            let strDept="102,202,302,122,222,322,104,124"; //定義開料部門
-            for(let i=0;i<$table.tableData.length;i++){
-                row_no = i+1;
-                items_update = $table.tableData[i];
-                sequence_id = items_update.sequence_id;
-                for(let j=0;j < this.originData2.length;j++){
-                    if(this.originData2[j].upper_sequence === sequence_id){
-                        //開料部門,批號不可為空
-                        if(strDept.indexOf(this.headData.out_dept) != -1){
-                            if(this.originData2[j].lot_no === "") {
-                                this.$refs.xTable1.setCurrentRow(items_update);//定位至某一行
-                                this.curRowSeqId = sequence_id;
-                                this.setTableData2ByCurrentMo();
-                                check_tableData2_flag = false;                               
-                                break;
-                            }
-                        }
-                        if(this.originData2[j].goods_id === "" || parseFloat(this.originData2[j].con_qty)<=0 || parseFloat(this.originData2[j].sec_qty)<=0) {
-                            this.$refs.xTable1.setCurrentRow(items_update);//定位至某一行
-                            this.curRowSeqId = sequence_id;
-                            this.setTableData2ByCurrentMo();
-                            check_tableData2_flag = false;
-                            break;
-                        }
-                    }
-                }
-                if(!check_tableData2_flag){
-                    break;
-                }
-            }   
-            if(!check_tableData2_flag){
-                //成份資料數據有效性通不過
-                this.$XModal.alert({ content: `第${row_no}行:【${items_update.mo_id}】【${items_update.goods_id}】\n對應成份資料數據不完整,請返回檢查!`, mask: false });
-                return;
-            }
+            ////保存前對成份明細資料2進行有效性檢查
+            //let items_update = null,row_no=0,sequence_id="",check_tableData2_flag = true;
+            //let strDept="102,202,302,122,222,322,104,124"; //定義開料部門
+            //for(let i=0;i<$table.tableData.length;i++){
+            //    row_no = i+1;
+            //    items_update = $table.tableData[i];
+            //    sequence_id = items_update.sequence_id;
+            //    for(let j=0;j < this.originData2.length;j++){
+            //        if(this.originData2[j].upper_sequence === sequence_id){
+            //            //開料部門,批號不可為空
+            //            if(strDept.indexOf(this.headData.out_dept) != -1){
+            //                if(this.originData2[j].lot_no === "") {
+            //                    this.$refs.xTable1.setCurrentRow(items_update);//定位至某一行
+            //                    this.curRowSeqId = sequence_id;
+            //                    this.setTableData2ByCurrentMo();
+            //                    check_tableData2_flag = false;                               
+            //                    break;
+            //                }
+            //            }
+            //            if(this.originData2[j].goods_id === "" || parseFloat(this.originData2[j].con_qty)<=0 || parseFloat(this.originData2[j].sec_qty)<=0) {
+            //                this.$refs.xTable1.setCurrentRow(items_update);//定位至某一行
+            //                this.curRowSeqId = sequence_id;
+            //                this.setTableData2ByCurrentMo();
+            //                check_tableData2_flag = false;
+            //                break;
+            //            }
+            //        }
+            //    }
+            //    if(!check_tableData2_flag){
+            //        break;
+            //    }
+            //}   
+            //if(!check_tableData2_flag){
+            //    //成份資料數據有效性通不過
+            //    this.$XModal.alert({ content: `第${row_no}行:【${items_update.mo_id}】【${items_update.goods_id}】\n對應成份資料數據不完整,請返回檢查!`, mask: false });
+            //    return;
+            //}
+
             //檢查當前用戶是否有負責部門的操作權限
             var userid = this.userId;
             var deptid = this.headData.out_dept;
@@ -1308,9 +1314,10 @@
                     sec_qty:this.originData2[i].sec_qty});
             }
             var partData = this.partData;
-            await this.checkStock(partData); //此處必須加await,且checkStock函數也要設置成同步執行
+            let strError = await this.checkStock(partData); //此處必須加await,且checkStock函數也要設置成同步執行
             if(this.validStockFlag===false){
                 //檢查成份庫存不足,返回放棄當前保存
+                this.$XModal.alert({ content: strError, mask: false });
                 return;
             }            
             //******以上是數據校驗部分
@@ -1325,14 +1332,11 @@
                 (response) => {
                     if(response.data=="OK"){                                  
                         this.setStatusHead(false);
-                        //重查刷新數據
-                        //this.getHead(this.headData.id);
-                        //this.getDetails(this.headData.id);
-                        //this.getDetailsPart(this.headData.id);
+                        //重查刷新數據                       
                         this.searchID = this.headData.id;
-                        this.findByID();                        
-                        this.cancelButton = false;                        
-                        this.unok_status = "1";//禁止顯示反批準按鈕
+                        this.findByID();
+                        this.cancelButton = false;
+                        //this.unok_status = "1";//禁止顯示反批準按鈕
                         this.$XModal.message({ content: '數據保存成功!', status: 'success' });
                     }else{
                         this.$XModal.alert({ content: '數據保存失敗!',status: 'error' , mask: false });                                 
@@ -1342,8 +1346,8 @@
                 alert(response);
             });
             this.headEditFlag = "";
-            this.delData1=[];
-            this.delData2=[];
+            this.delData1 = [];
+            this.delData2 = [];
             
         },
         //檢查控制反批準按鈕的顯示/隱藏.
@@ -1354,8 +1358,9 @@
                 })
         },
         //保存前檢查庫存是否夠扣除
-        checkStock:async function(partData){           
-            await axios.post("/ProduceAssembly/CheckStock",{partData}).then(
+        checkStock:async function(partData){
+            let rtn="";
+            await axios.post("/ProduceAssembly/CheckStock",{partData}).then(               
                 (response) => {                    
                     if(response.data.length>0){
                         //庫存檢查不通過
@@ -1367,7 +1372,7 @@
                         for(let i=0;i<this.tableData1.length;i++){
                             if(this.tableData1[i].sequence_id === seqNo){
                                 row_no = i+1;
-                                let rw = this.Rows.data[i];
+                                let rw = this.tableData1[i] ;//this.Rows.data[i];
                                 this.tempSelectRow = JSON.parse(JSON.stringify(rw));//暫存當前行,以便檢查是否有更改
                                 this.$refs.xTable1.setCurrentRow(rw);//定位至當前索引所在的行
                                 this.rowDataEdit = rw;
@@ -1376,11 +1381,13 @@
                                 this.setTableData2ByCurrentMo();
                                 break;
                             }
-                        }                       
-                        this.$XModal.alert({ content: `第 ${row_no} 行【${this.selectRow.mo_id} -- ${this.selectRow.goods_id}】\n成份:【${response.data[0].goods_id}】庫存不足!\n 数量差異: ${con_qty}\n 重量差異: ${sec_qty}`,status: 'warning' , mask: false });
+                        }    
+                        rtn =`第 ${row_no} 行【${this.selectRow.mo_id} -- ${this.selectRow.goods_id}】\n成份:【${response.data[0].goods_id}】庫存不足!\n 数量差異: ${con_qty}\n 重量差異: ${sec_qty}`;
+                        //this.$XModal.alert({ content: `第 ${row_no} 行【${this.selectRow.mo_id} -- ${this.selectRow.goods_id}】\n成份:【${response.data[0].goods_id}】庫存不足!\n 数量差異: ${con_qty}\n 重量差異: ${sec_qty}`,status: 'warning' , mask: false });
                     }else{
                         this.validStockFlag = true;//庫存檢查通過
-           }}) 
+            }})
+            return rtn;
         },        
         //--start保存前檢查
         checkPreUpdate:async function(){

@@ -7,11 +7,11 @@ using CF2025.Web.Admin.Common;
 using CF2025.Prod.DAL;
 using CF2025.Prod.Contract;
 
-namespace CF2025.Web.Admin.Areas.Produce.Controllers
+namespace CF2025.Web.Admin.Areas.Prod.Controllers
 {
-    public class ProduceAssemblyController : Controller
+    public class ProduceAssemblyController : AdminControllerBase //Controller
     {
-        // GET: Produce/ProduceAssembly
+        // 組裝轉換
         public ActionResult Index()
         {
             string user_id = "";
@@ -50,16 +50,6 @@ namespace CF2025.Web.Admin.Areas.Produce.Controllers
             var goods= ProduceAssemblyDAL.GetGoodsId(mo_id,out_dept, in_dept);
             return Json(goods, JsonRequestBehavior.AllowGet);
         }
-        //public JsonResult CheckMo(string mo_id)
-        //{
-        //    var mo = ProduceAssemblyDAL.CheckMo(mo_id);
-        //    return Json(mo, JsonRequestBehavior.AllowGet);
-        //}
-        //public JsonResult CheckItem(string goods_id)
-        //{
-        //    var item = ProduceAssemblyDAL.CheckItem(goods_id);
-        //    return Json(item, JsonRequestBehavior.AllowGet);
-        //}
 
         //GetAssembly
         public JsonResult GetAssembly(string mo_id, string goods_id, string out_dept, string in_dept)
@@ -72,21 +62,6 @@ namespace CF2025.Web.Admin.Areas.Produce.Controllers
             var goods = ProduceAssemblyDAL.GetLotNoList(goods_id, location_id, mo_id);
             return Json(goods, JsonRequestBehavior.AllowGet);
         }
-
-        ////取最大單號
-        //public ActionResult GetMaxID(string bill_id,string dept_id,int serial_len)
-        //{
-        //    var result = ProduceAssemblyDAL.GetMaxID(bill_id,dept_id, serial_len);
-        //    return Json(result, JsonRequestBehavior.AllowGet);
-        //}
-
-        ////檢查批準狀態
-        ////[HttpPost]
-        //public JsonResult CheckApproveStatus(string table_name,string id)
-        //{
-        //    var result = ProduceAssemblyDAL.CheckApproveStatus(table_name,id);
-        //    return Json(result, JsonRequestBehavior.AllowGet);
-        //}
 
         //批準,反準
         [HttpPost]

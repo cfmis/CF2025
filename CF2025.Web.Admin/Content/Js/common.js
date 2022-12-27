@@ -196,14 +196,13 @@ var comm= {
             value = parseFloat(value); 
         }
         obj[strField] = parseFloat(value);//避免有返回00.00的现象
-    },    
-
+    }, 
     /**獲取單據狀態**
     * Allen 2022/11/22
     */
-    checkApproveStatus:async function (tableName,id){
+    checkApproveState:async function (tableName,id){
         let result = "0";
-        await axios.get("/Base/Common/CheckApproveStatus",{params:{table_name:tableName,id:id}}).then(
+        await axios.get("/Base/Common/CheckApproveState",{params:{table_name:tableName,id:id}}).then(
             (res)=>{
                 result = res.data;
             });
@@ -233,6 +232,57 @@ var comm= {
               })
         return result;
     },
+    /**檢查移交單是否已簽收**
+    *返回值: "1"--已有簽收;"0"--未簽收
+    *  Allen 2022/12/07
+    */
+    checkSignfor:async function(id){
+        let result = "1";
+        await axios.get("/Base/Common/CheckSignfor", { params: { id: id }}).then(
+             (res) => {
+                 result = res.data ;
+             })
+        return result;
+    },
+    /*生產計劃是否已批準
+    * 返回值: "0"--未批準 ;"1"--已批準;
+    * Allen_Leung 2022/12/09
+    */
+    getPlanApproveState:async function(mo_id){
+        let result = 0;
+        await axios.get("/Base/Common/GetPlanApproveState", { params: { mo_id: mo_id }}).then(
+             (res) => {
+                 result = res.data ;
+             })
+        return result;
+    },
+    /**生產計劃Hold狀態**
+    * 返回值: "0"--未Hold;"1"--已Hold;
+    * Allen_Leung 2022/12/09
+    */
+    getPlanHoldState:async function(mo_id,goods_id,out_dept,in_dept){
+        let result = 0;        
+        await axios.get("/Base/Common/GetPlanHoldState", { params: { mo_id:mo_id,goods_id:goods_id,out_dept:out_dept,in_dept:in_dept} }).then(
+             (res) => {
+                 result = res.data ;
+             })
+        return result;
+    },
+    /**OC Hold狀態**
+    * 返回值: "0"--未Hold;"1"--已Hold;
+    * Allen_Leung 2022/12/09
+    */
+    getOcHoldState:async function(mo_id){
+        let result = 0;
+        await axios.get("/Base/Common/GetOcHoldState", { params: { mo_id:mo_id}}).then(
+             (res) => {
+                 result = res.data ;
+             })
+        return result;
+    },
+    
+
+
 
     //獲取當前日期時間
     getWipID: async  function() {

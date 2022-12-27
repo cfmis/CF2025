@@ -21,9 +21,9 @@ namespace CF.SQLServer.DAL
         //as_sequence_id:(交易单序号,*表示全部的交易单明细)
         //adt_check_date:单据交易日期
         //as_errtext:更新库存错误信息        
-        public string of_update_st_details(string as_type, string as_action_id, string as_id, string as_sequence_id, string adt_check_date, string as_errtext)
+        public string of_update_st_details(string as_type, string as_action_id, string as_id, string as_sequence_id, string as_check_date, string as_errtext)
         {           
-            strStatus = "00";//返回的字串strStatus:-1代表失敗;00:成功
+            strStatus = "00";//返回的字串strStatus:-1失敗;00:成功
             string ls_action_id, ls_id, ls_sequence_id, ls_goods_id = "", ls_action_content, ls_unit_kind, ls_main_unit_kind;
             string ls_unit, ls_customer_id, ls_vendor_id, ls_sec_unit_kind, ls_sec_unit, ls_lot_no, ls_lot_remark, strSql = "";
             string ls_ii_location_id, ls_ii_code, ls_mo_id, ls_goods_name, ls_shelf, ls_lot_mo, ls_carton_code;
@@ -32,22 +32,22 @@ namespace CF.SQLServer.DAL
             string strSqlTrans = " SET XACT_ABORT ON "+ " BEGIN TRANSACTION ";
             string strSqlCommit = " COMMIT TRANSACTION ";
             DataTable lds_details = new DataTable();
-
+            //是否存在交易
             strSql = string.Format(
-            @"Select A.action_id,A.id,A.sequence_id,A.goods_id,B.name As 'goods_name',A.ii_location_id,A.ii_code,
-			Isnull(A.ii_qty,0) As 'ii_qty',Isnull(A.sec_qty,0) As 'sec_qty',A.sec_unit,A.ib_qty,A.unit,A.customer_id,A.vendor_id,A.lot_no,
-			Isnull(A.mo_id,'') As 'mo_id',C.kind As 'unit_kind',D.kind As 'sec_unit_kind',E.kind As 'main_unit_kind',A.shelf,A.lot_remark,
+            @"Select A.action_id,A.id,A.sequence_id,A.goods_id,B.name As goods_name,A.ii_location_id,A.ii_code,
+			Isnull(A.ii_qty,0) As ii_qty,Isnull(A.sec_qty,0) As sec_qty,A.sec_unit,A.ib_qty,A.unit,A.customer_id,A.vendor_id,A.lot_no,
+			Isnull(A.mo_id,'') As mo_id,C.kind As unit_kind,D.kind As sec_unit_kind,E.kind As main_unit_kind,A.shelf,A.lot_remark,
             H.action_content	
             From st_business_record A WITH (NOLOCK) 
                 Left Join it_goods B WITH (NOLOCK) On A.within_code = B.within_code And A.goods_id = B.id
 				Left Join cd_units C WITH (NOLOCK) On A.within_code = C.within_code And A.unit = C.id
 				Left Join cd_units D WITH (NOLOCK) On A.within_code = D.within_code And A.sec_unit = D.id
 				Left Join cd_units E WITH (NOLOCK) On B.within_code = E.within_code And B.unit_code = E.id
-				Left Join cd_productline F WITH (NOLOCK)	On A.within_code = F.within_code And A.ii_location_id = F.id
+				Left Join cd_productline F WITH (NOLOCK) On A.within_code = F.within_code And A.ii_location_id = F.id
 				Left Join (Select T.id,Ltrim(Rtrim(T.content)) As action_content From sys_business_action T WITH (NOLOCK) Where T.language='1') H On A.action_id=H.id
             Where A.within_code ='{0}' And A.id ='{1}' And (A.sequence_id ='{2}' Or '{2}'='*')
-		          And A.action_id = '{3}' And Convert(Char(19),A.check_date,121) = Convert(Char(19),'{4}',121)
-            Order By A.id,A.sequence_id", within_code, as_id, as_sequence_id, as_action_id, adt_check_date);            
+		          And A.action_id ='{3}' And Convert(Char(19),A.check_date,121) = Convert(Char(19),'{4}',121)
+            Order By A.id,A.sequence_id", within_code, as_id, as_sequence_id, as_action_id, as_check_date);            
             DataTable lds_st_business = new DataTable();
             lds_st_business = sh.ExecuteSqlReturnDataTable(strSql);
                  
@@ -260,7 +260,9 @@ namespace CF.SQLServer.DAL
                                 {
                                     strSql = string.Format(
                                     @" Update st_details_lot WITH(ROWLOCK)
-                                    Set qty = IsNull(qty, 0) - IsNull({0}, 0),sec_qty = Isnull(sec_qty, 0) - Isnull({1}, 0),out_date=GETDATE(),
+                                    Set qty = Case When (IsNull(qty,0)-IsNull( {0} ,0)) >0 Then (IsNull(qty,0)-IsNull( {0} ,0)) Else 0 End,
+                                        sec_qty = Case When (Isnull(sec_qty,0)-Isnull( {1} ,0)) >0 Then (Isnull(sec_qty,0)-Isnull( {1} ,0)) Else 0 End,
+                                        out_date= GETDATE(),
                                         remark = (Case '{2}' When '' Then remark Else '{2}' End)
                                     Where within_code='{3}' And location_id='{4}' And carton_code='{5}' And goods_id='{6}' And Isnull(lot_no,'')='{7}' And IsNull(mo_id,'')='{8}'",
                                     ldc_lot_qty, ldc_lot_sec_qty, ls_shelf, within_code, ls_ii_location_id, ls_ii_code, ls_goods_id, ls_lot_no, ls_lot_mo);
@@ -286,7 +288,7 @@ namespace CF.SQLServer.DAL
 				            From st_business_record A
                             Where A.within_code ='{1}' And A.action_id ='{2}' And A.id = '{3}' And A.sequence_id = '{4}' And
                                   A.goods_id ='{5}' And Convert(Char(19), A.check_date,120) = Convert(Char(19),'{6}',120)",
-                            ls_lot_remark, within_code, ls_action_id, ls_id, ls_sequence_id, ls_goods_id, adt_check_date);
+                            ls_lot_remark, within_code, ls_action_id, ls_id, ls_sequence_id, ls_goods_id, as_check_date);
                             string result = sh.ExecuteSqlUpdate(strSqlTrans + strSql + strSqlCommit);
                             if (result != "")
                             {
@@ -364,8 +366,10 @@ namespace CF.SQLServer.DAL
                                 //--反批准时一定会存在库存	
                                 strSql = string.Format(
                                 @" Update st_details_lot WITH(ROWLOCK)
-                                Set qty = IsNull(qty, 0)-IsNull({0},0), sec_qty = Isnull(sec_qty, 0)-Isnull({1}, 0), out_date = GETDATE(),
-                                  remark = (Case '{2}' When '' Then remark Else '{2}' End)
+                                Set qty = Case When (IsNull(qty,0)-IsNull( {0} ,0)) >0 Then (IsNull(qty,0)-IsNull( {0} ,0)) Else 0 End, 
+                                    sec_qty = Case When (Isnull(sec_qty,0)-Isnull( {1} ,0)) >0 Then (Isnull(sec_qty,0)-Isnull( {1} ,0)) Else 0 End, 
+                                    out_date = GETDATE(),
+                                    remark = (Case '{2}' When '' Then remark Else '{2}' End)
                                 Where within_code='{3}' And location_id='{4}' And carton_code='{5}' And goods_id='{6}' And Isnull(lot_no,'')='{7}' And IsNull(mo_id,'')='{8}'",
                                 ldc_lot_qty, ldc_lot_sec_qty, ls_shelf, within_code, ls_ii_location_id, ls_ii_code, ls_goods_id, ls_lot_no, ls_lot_mo);
                                 //--

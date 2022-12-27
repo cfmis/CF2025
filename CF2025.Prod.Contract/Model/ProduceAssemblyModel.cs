@@ -24,6 +24,7 @@ namespace CF2025.Prod.Contract
         public string update_date { get; set; }
         public string check_date { get; set;}
         public string state { get; set; }
+        public string stock_type { get; set; }        
         public string head_status { get; set; }
     }
 
@@ -52,7 +53,10 @@ namespace CF2025.Prod.Contract
         public int prd_id { get; set; }
         public string jo_id { get; set; }
         public string jo_sequence_id { get; set; }
+        public string aim_jo_id { get; set; }
+        public string aim_jo_sequence { get; set; }        
         public decimal qc_qty { get; set; }
+        public string qc_result { get; set; }
         public string row_status { get; set; }
     }
 
@@ -116,6 +120,18 @@ namespace CF2025.Prod.Contract
     {
         public decimal con_qty { get; set; }
         public decimal sec_qty { get; set; }
+    }
+
+    public class shadding_color_info
+    {
+        public decimal prod_qty { get; set; }
+        public decimal sec_qty { get; set; }
+        public decimal color_qty { get; set; }
+        public string shading_color { get; set; }
+        public string shading_color_state { get; set; }
+        public string next_wp_id { get; set; }
+        public decimal obligate_qty { get; set; }
+       
     }
 
 

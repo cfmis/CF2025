@@ -48,13 +48,14 @@
                 <vxe-form-item title="組裝部門" :item-render="{}" span="6" class="vxe-form-item-group" style="color:blue">
                     <el-select v-model="headData.out_dept"
                                @@change="getMaxID('JO19',headData.out_dept)"
-                               filterable clearable style="width:100%" :disabled="isDisableGenNo">
+                               @@keydown.enter.native="focusInDept()"
+                               filterable clearable default-first-option style="width:100%" :disabled="isDisableGenNo">
                         <el-option v-for="item in deptList" :key="item.value" :value="item.value" :label="item.label" style="height:25px;font-size: 9px"/>
                     </el-select>
                 </vxe-form-item>
                 <vxe-form-item title="收貨部門" :item-render="{}" span="6" class="vxe-form-item-group" style="color:blue">
-                    <el-select v-model="headData.in_dept" @*@change="getMaxID('JO19',headData.out_dept)"*@
-                                filterable clearable style="width:100%" :disabled="isDisableGenNo">
+                    <el-select v-model="headData.in_dept" ref="inDept" @*@change="getMaxID('JO19',headData.out_dept)"*@
+                                filterable clearable default-first-option style="width:100%" :disabled="isDisableGenNo">
                         <el-option v-for="item in deptList" :key="item.value" :value="item.value" :label="item.label" style="height:25px;font-size: 9px"/>
                     </el-select>
                 </vxe-form-item>

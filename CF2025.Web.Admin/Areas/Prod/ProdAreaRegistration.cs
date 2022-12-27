@@ -1,6 +1,6 @@
 ﻿using System.Web.Mvc;
 
-namespace CF2025.Web.Admin.Areas.Produce
+namespace CF2025.Web.Admin.Areas.Prod
 {
     public class ProdAreaRegistration : AreaRegistration 
     {

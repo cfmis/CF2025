@@ -459,7 +459,7 @@
                 var ls_type = (val==='1')?"批準":"反批準";
                 var ls_is_approve = `確定是否要進行【${ls_type}】操作？`;
                 //取后端單據狀態
-                let status = comm.checkApproveStatus('st_transfer_mostly',this.headData.id);
+                let status = comm.checkApproveState('st_transfer_mostly',this.headData.id);
                 if(status==='2'){
                     this.$XModal.alert({ content: "后端數據已是注銷狀態,當前操作無效!", mask: false });
                     return;
