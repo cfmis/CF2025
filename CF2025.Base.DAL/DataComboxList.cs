@@ -85,12 +85,15 @@ namespace CF2025.Base.DAL
                
                 case "set_state_list"://設定狀態
                     strSql += "SELECT id,id+'--' + name AS name FROM cd_mo_type WHERE within_code='" + within_code + "' AND mo_type='T' ORDER BY id";
-                    break;               
+                    break;
+                case "cd_carton_size"://裝箱尺寸
+                    strSql += "SELECT id,id+'--' + name AS name FROM cd_carton_size WHERE within_code='" + within_code + "' ORDER BY id";
+                    break;
                 default:
                     strSql += "";
                     break;
             }
-           
+            //cd_carton_size
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             ModelBaseList obj1 = new ModelBaseList();
             obj1.value = "";
