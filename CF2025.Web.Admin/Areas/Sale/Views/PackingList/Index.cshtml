@@ -1,12 +1,12 @@
 ﻿
-<div id="app">
+<div id="app"> @*style="margin-left:10px"*@
     <vxe-toolbar perfect size="medium" class="tools-menus" > @*style="height:35px;background-color:lightsteelblue"*@
         <template #buttons>
                 <vxe-button type="text" icon="iconfont icon-file-add1" style="width:70px;margin-left:-10px;" content="新增" @@click="newDoc()"></vxe-button> @*icon="fa fa-plus" status="primary"*@
+                <vxe-button type="text" icon="iconfont icon-tableaddrows" style="width:90px;margin-left:-15px;" @@click="addNewItem()" size="mini">項目新增</vxe-button>
                 <vxe-button type="text" icon="iconfont icon-save1" style="width:70px;margin-left:-15px;" content="儲存" @@click="saveEvent()"></vxe-button>
                 <vxe-button type="text" icon="iconfont icon-zu10011" style="width:70px;margin-left:-15px;" content="批準" @@click="approveEvent()"></vxe-button>
                 <vxe-button type="text" icon="iconfont icon-add7" style="width:80px;margin-left:-15px;" content="新版本" @@click="newVersion()"></vxe-button>
-                <vxe-button type="text" icon="iconfont icon-tableaddrows" style="width:90px;margin-left:-15px;" @@click="addNewItem()" size="mini">項目新增</vxe-button>
                 <vxe-button type="text" icon="iconfont icon-tabledeleterows" style="width:90px;margin-left:-15px;" @@click="deleteTableItemEvent()" size="mini">項目刪除</vxe-button>
                 <vxe-button type="text" icon="iconfont icon-cancel7" style="width:70px;margin-left:-15px;" @@click="cancelDoc()" content="注銷"></vxe-button>
                 <vxe-button type="text" icon="iconfont icon-n_cost" style="width:100px;margin-left:-15px;" @@click="addNewFareItem()" size="mini">新增附加費</vxe-button>
@@ -20,8 +20,8 @@
         <vxe-form :data="formData" size="mini"  title-align="right" title-width="100px" style="background-color:#ebf5f8;min-width: 1024px;max-width:1024px;" prevent-submit title-colon custom-layout>@**@
                 <vxe-form-item title="編號" field="ID" :item-render="{}" span="6" class="vxe-form-item-group">
                     <template #default="{ data }">
-                        <vxe-input v-model="data.ID" class="input-customize" @@blur="getInvoiceByID(data.ID)"></vxe-input>
-                         <input type="text" value=@ViewBag.DocType style="width:20%;display:none" ref="input1">
+                        <vxe-input v-model="data.ID" class="input-customize" @@blur="GetPackingListByID(data.ID)"></vxe-input>
+                         <input type="text" value=@ViewBag.packing_type style="width:20%;display:none" ref="packing_type">
                     </template>
                 </vxe-form-item>
                 <vxe-form-item title="裝箱日期" field="packing_date" :item-render="{}" span="6" class="vxe-form-item-group">
@@ -38,12 +38,12 @@
                 </vxe-form-item>
                 <vxe-form-item title="發票號" field="invoice_id" :item-render="{}" span="6" class="vxe-form-item-group">
                     <template #default="{ data }">
-                        <vxe-input v-model="data.invoice_id" class="input-customize" @@blur="getInvoiceByID(data.invoice_id)"></vxe-input>
+                        <vxe-input v-model="data.invoice_id" class="input-customize" @@blur="invoice_idEvent(data.invoice_id)"></vxe-input>
                     </template>
                 </vxe-form-item>
-                <vxe-form-item title="客戶編號" field="it_customer" :item-render="{}" span="6" class="vxe-form-item-group">
+                <vxe-form-item title="客戶編號" field="customer_id" :item-render="{}" span="6" class="vxe-form-item-group">
                     <template #default="{ data }">
-                        <vxe-input v-model="data.it_customer" class="input-customize" maxlength="8" style="width:70%"></vxe-input>
+                        <vxe-input v-model="data.customer_id" class="input-customize" maxlength="8" style="width:70%"></vxe-input>
                         <vxe-button icon="iconfont icon-buttongroup" class="input-customize" style="height:20px;width:18%;"></vxe-button>
                     </template>
                 </vxe-form-item>
@@ -59,7 +59,7 @@
                 </vxe-form-item>
                 <vxe-form-item title="狀態" field="matter" :item-render="{}" span="6" class="vxe-form-item-group">
                     <template #default="{ data }">
-                        <vxe-input v-model="data.matter" class="input-customize"></vxe-input>
+                        <vxe-input v-model="data.matter" class="input-customize" disabled></vxe-input>
                     </template>
                 </vxe-form-item>
                 <vxe-form-item title="聯繫人" field="linkman" :item-render="{}" span="6" class="vxe-form-item-group">
@@ -180,8 +180,15 @@
                 </vxe-form-item>
         </vxe-form>
     </div>
+    <!--中間按鈕-->
+    <p style="margin-top:30px;border-color:white;border-style:solid;">
+        <vxe-button icon="iconfont icon-file-add1" size="mini" content="從訂單(整套)" @@click="getDataFromOcInvPk('2','OC1')"></vxe-button>
+        <vxe-button icon="iconfont icon-file-add1" size="mini" content="從訂單(配件)" @@click="getDataFromOcInvPk('2','OC0')"></vxe-button>
+        <vxe-button icon="iconfont icon-file-add1" size="mini" content="從發票" @@click="getDataFromOcInvPk('2','INV')"></vxe-button>
+        <vxe-button icon="iconfont icon-file-add1" size="mini" content="從內部裝箱單" @@click="getDataFromOcInvPk('2','PK')"></vxe-button>
+    </p>
     <!--明細表記錄-->
-    <div style="margin-top:20px;">
+    <div style="margin-top:-10px;">
         <vxe-table border
                    show-overflow
                    height="400"
@@ -201,39 +208,39 @@
                    @@current-change="currentChangeEvent"
                    >
             <vxe-column type="seq" title="序號" width="50"></vxe-column>
-            <vxe-column field="po_no" title="PO/NO" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
-                <template #edit="{ row }">
-                    <vxe-input v-model="row.po_no" style="height:20px;width:98%"></vxe-input>
-                </template>
-            </vxe-column>
-            <vxe-column field="order_id" title="OC No" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
-                <template #edit="{ row }">
-                    <vxe-input v-model="row.order_id" style="height:20px;width:98%"></vxe-input>
-                </template>
-            </vxe-column>
             <vxe-column field="mo_id" title="頁數" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
                 <template #edit="{ row }">
                     <vxe-input v-model="row.mo_id" style="height:20px;width:98%" @@input="tablemo_idInputEvent(row)" @@blur="mo_idRowEvent(row)" @@change="setCurrentRowUpdateState(row)"></vxe-input>
                 </template>
             </vxe-column>
-            <vxe-column field="shipment_suit" title="套件出貨" width="80" :edit-render="{}">
+            <vxe-column field="shipment_suit" title="套件出貨" width="60" :edit-render="{}">
                 <template #edit="{ row }">
                     <vxe-checkbox v-model="row.shipment_suit" size="mini" checked-value="1" unchecked-value="0" style="height:20px"></vxe-checkbox>
                 </template>
             </vxe-column>
-            <vxe-column field="item_no" title="貨品編碼" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
+            <vxe-column field="item_no" title="貨品編碼" width="180" :edit-render="{autofocus: '.vxe-input--inner'}">
                 <template #edit="{ row }">
-                    <vxe-input v-model="row.item_no" style="height:20px;width:98%" @@change="setCurrentRowUpdateState(row)"></vxe-input>
+                    <vxe-input v-model="row.item_no" style="height:20px;width:98%" readonly @@change="setCurrentRowUpdateState(row)"></vxe-input>
                 </template>
             </vxe-column>
-            <vxe-column field="descript" title="貨品名稱" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
+            <vxe-column field="descript" title="貨品名稱" width="220" :edit-render="{autofocus: '.vxe-input--inner'}">
                 <template #edit="{ row }">
                     <vxe-input v-model="row.descript" style="height:20px;width:98%" @@change="setCurrentRowUpdateState(row)"></vxe-input>
                 </template>
             </vxe-column>
-            <vxe-column field="english_goods_name" title="貨品名稱(英文)" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
+            <vxe-column field="english_goods_name" title="貨品名稱(英文)" width="220" :edit-render="{autofocus: '.vxe-input--inner'}">
                 <template #edit="{ row }">
                     <vxe-input v-model="row.english_goods_name" style="height:20px;width:98%" @@change="setCurrentRowUpdateState(row)"></vxe-input>
+                </template>
+            </vxe-column>
+            <vxe-column field="po_no" title="PO/NO" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.po_no" style="height:20px;width:98%" disabled></vxe-input>
+                </template>
+            </vxe-column>
+            <vxe-column field="order_id" title="OC No" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.order_id" style="height:20px;width:98%" disabled></vxe-input>
                 </template>
             </vxe-column>
             <vxe-column field="color" title="顏色" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
@@ -241,7 +248,7 @@
                     <vxe-input v-model="row.color" style="height:20px;width:98%" @@change="setCurrentRowUpdateState(row)"></vxe-input>
                 </template>
             </vxe-column>
-            <vxe-column field="box_no" title="箱號" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
+            <vxe-column field="box_no" title="箱號" width="60" :edit-render="{autofocus: '.vxe-input--inner'}">
                 <template #edit="{ row }">
                     <vxe-input v-model="row.box_no" style="height:20px;width:98%" @@change="setCurrentRowUpdateState(row)"></vxe-input>
                 </template>
@@ -263,14 +270,14 @@
                     <vxe-input v-model="row.sec_unit" style="height:20px" @@change="setCurrentRowUpdateState(row)"></vxe-input>
                 </template>
             </vxe-column>
-            <vxe-column field="symbol" title="符號" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
+            <vxe-column field="symbol" title="符號" width="60" :edit-render="{autofocus: '.vxe-input--inner'}">
                 <template #edit="{ row }">
                     <vxe-input v-model="row.symbol" style="height:20px;width:98%" @@change="setCurrentRowUpdateState(row)"></vxe-input>
                 </template>
             </vxe-column>
-            <vxe-column field="cube_ctn" title="數量/箱" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
+            <vxe-column field="pbox_qty" title="數量/箱" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
                 <template #edit="{ row }">
-                    <vxe-input v-model="row.cube_ctn" style="height:20px;width:98%" @@change="setCurrentRowUpdateState(row)"></vxe-input>
+                    <vxe-input v-model="row.pbox_qty" style="height:20px;width:98%" @@change="setCurrentRowUpdateState(row)"></vxe-input>
                 </template>
             </vxe-column>
             <vxe-column field="box_qty" title="箱數" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
@@ -278,9 +285,11 @@
                     <vxe-input v-model="row.box_qty" style="height:20px;width:98%" @@change="setCurrentRowUpdateState(row)"></vxe-input>
                 </template>
             </vxe-column>
-            <vxe-column field="carton_size" title="紙箱尺寸" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
+            <vxe-column field="carton_size" title="紙箱尺寸" width="120" :edit-render="{}">
                 <template #edit="{ row }">
-                    <vxe-input v-model="row.carton_size" style="height:20px;width:98%" @@change="setCurrentRowUpdateState(row)"></vxe-input>
+                    <vxe-select v-model="row.carton_size" size="mini" @@change="setUnitUpdateState(row)">
+                        <vxe-option v-for="item in cd_carton_size" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                    </vxe-select>
                 </template>
             </vxe-column>
             <vxe-column field="cube_ctn" title="體積/箱" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
@@ -315,7 +324,7 @@
             </vxe-column>
             <vxe-column field="ref_id" title="參考單號" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
                 <template #edit="{ row }">
-                    <vxe-input v-model="row.ref_id" style="height:20px;width:98%" @@change="setCurrentRowUpdateState(row)"></vxe-input>
+                    <vxe-input v-model="row.ref_id" readonly style="height:20px;width:98%" @@change="setCurrentRowUpdateState(row)"></vxe-input>
                 </template>
             </vxe-column>
             <vxe-column field="remark" title="備註" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
@@ -325,11 +334,163 @@
             </vxe-column>
             <vxe-column field="tr_id" title="轉出單" width="120" :edit-render="{autofocus: '.vxe-input--inner'}">
                 <template #edit="{ row }">
-                    <vxe-input v-model="row.tr_id" style="height:20px;width:98%" @@change="setCurrentRowUpdateState(row)"></vxe-input>
+                    <vxe-input v-model="row.tr_id" readonly style="height:20px;width:98%" @@change="setCurrentRowUpdateState(row)"></vxe-input>
+                </template>
+            </vxe-column>
+            <vxe-column title="編輯" width="60" :resizable="false" fixed="right" show-overflow>
+                <template #default="{ row }">
+                    <vxe-button type="text" icon="iconfont icon-edit3" @@click="editRowEvent(row)"></vxe-button>
                 </template>
             </vxe-column>
         </vxe-table>
     </div>
+
+    <!--彈窗編輯明細表記錄-->
+    <vxe-modal ref="xModal" v-model="showEdit" title="编辑&保存" width="800" height="520" destroy-on-close>
+            <template #default>
+                @*<div class="div-cont">*@
+                    <vxe-form :data="editDetails" title-align="right" title-width="100" @@submit="updateEvent" custom-layout style="background-color:#ebf5f8;width:100%;height:100%;margin-top: -10px;">
+                        <vxe-form-item align="left" span="24" style="margin-top:-10px;border-bottom:2px solid;color:#fff;background-color:#d3f1fa;height:45px;">
+                            <template #default>
+                                <vxe-button icon="iconfont icon-file-add1" size="mini" @@click="$refs.xModal.close()" style="margin-left:-2px;">關閉</vxe-button>
+                                <vxe-button icon="iconfont icon-tableaddrows" size="mini" @@click="addNewItem()" style="">項目新增</vxe-button>
+                                <vxe-button icon="iconfont icon-file-add1" size="mini" content="從訂單(整套)" @@click="getDataFromOcInvPk('3','OC1')" style="margin-left:20px;"></vxe-button>
+                                <vxe-button icon="iconfont icon-file-add1" size="mini" content="從訂單(配件)" @@click="getDataFromOcInvPk('3','OC0')" style="margin-left:-2px;"></vxe-button>
+                                <vxe-button icon="iconfont icon-file-add1" size="mini" content="從發票" @@click="getDataFromOcInvPk('3','INV')" style="margin-left:-2px;"></vxe-button>
+                                <vxe-button icon="iconfont icon-file-add1" size="mini" content="從內部裝箱單" @@click="getDataFromOcInvPk('3','PK')" style="margin-left:-2px;"></vxe-button>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="頁數" field="mo_id" span="8" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-input v-model="data.mo_id" class="input-customize" @@blur="mo_idModalEvent()"></vxe-input>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="套件出貨" field="shipment_suit" span="8" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-input v-model="data.shipment_suit" class="input-customize"></vxe-input>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="箱號" field="box_no" span="8" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-input v-model="data.box_no" class="input-customize"></vxe-input>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="貨品編碼" field="item_no" span="8" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-input v-model="data.item_no" readonly class="input-customize"></vxe-input>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="PO/NO" field="po_no" span="8" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-input v-model="data.po_no" readonly class="input-customize"></vxe-input>
+                            </template>
+                        </vxe-form-item>
+                <vxe-form-item title="紙箱尺寸" field="carton_size" :item-render="{}" span="8" class="vxe-form-item-model">
+                    <template #default="{ data }">
+                        <vxe-select v-model="data.carton_size" size="mini">
+                            <vxe-option v-for="item in cd_carton_size" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                        </vxe-select>
+                    </template>
+                </vxe-form-item>
+                        <vxe-form-item title="貨品名稱" field="descript" span="24" :item-render="{}" style="width:750px;margin-top:12px;margin-bottom:-8px">
+                            <template #default="{ data }">
+                                <vxe-textarea v-model="data.descript" rows="3" size="mini" class="input-customize"></vxe-textarea>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="英文名稱" field="english_goods_name" span="24" :item-render="{}" style="width:750px;margin-top:-6px;margin-bottom:-20px">
+                            <template #default="{ data }">
+                                <vxe-textarea v-model="data.english_goods_name" rows="3" size="mini" class="input-customize"></vxe-textarea>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="OC No" field="order_id" span="12" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-input v-model="data.order_id" class="input-customize"></vxe-input>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="參考單號" field="ref_id" span="8" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-input v-model="data.ref_id" class="input-customize"></vxe-input>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="數量" field="pcs_qty" span="8" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-input v-model="data.pcs_qty" class="input-customize"></vxe-input>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="單位" field="unit_code" span="8" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-select v-model="data.unit_code" size="mini">
+                                    <vxe-option v-for="item in QtyUnitList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                                </vxe-select>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="數量/箱" field="pbox_qty" span="8" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-input v-model="data.pbox_qty" class="input-customize"></vxe-input>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="符號" field="symbol" span="8" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-input v-model="data.symbol" class="input-customize"></vxe-input>
+                            </template>
+                        </vxe-form-item>
+
+                        <vxe-form-item title="重量單位" field="sec_unit" span="8" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-input v-model="data.sec_unit" readonly class="input-customize"></vxe-input>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="箱數" field="box_qty" span="8" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-input v-model="data.box_qty" class="input-customize"></vxe-input>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="體積/箱" field="cube_ctn" span="8" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-input v-model="data.cube_ctn" class="input-customize"></vxe-input>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="凈重/箱" field="nw_each" span="8" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-input v-model="data.nw_each" class="input-customize"></vxe-input>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="毛重/箱" field="gw_each" span="8" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-input v-model="data.gw_each" class="input-customize"></vxe-input>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="總體積" field="total_cube" span="8" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-input v-model="data.total_cube" class="input-customize"></vxe-input>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="總凈重" field="tal_nw" span="8" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-input v-model="data.tal_nw" class="input-customize"></vxe-input>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="總毛重" field="tal_gw" span="8" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-input v-model="data.tal_gw" class="input-customize"></vxe-input>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="備註" field="remark" span="24" :item-render="{}" style="width:750px;margin-top:16px;margin-bottom:-20px">
+                            <template #default="{ data }">
+                                <vxe-textarea v-model="data.remark" rows="3" size="mini" class="input-customize"></vxe-textarea>
+                            </template>
+                        </vxe-form-item>
+                        <vxe-form-item title="轉出單" field="tr_id" span="8" :item-render="{}" class="vxe-form-item-model">
+                            <template #default="{ data }">
+                                <vxe-input v-model="data.tr_id" readonly class="input-customize"></vxe-input>
+                            </template>
+                        </vxe-form-item>
+
+                    </vxe-form>
+                @*</div>*@
+        </template>    
+    </vxe-modal>
+
 
 </div>
 

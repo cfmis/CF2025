@@ -396,22 +396,18 @@ namespace CF2025.Sale.DAL
             string check_date = Converter.ConvertFieldToCnDateTimeString(InvMostly.check_date);
             if (InvMostly.EditFlag==1)
             {
-                InvMostly.it_customer_name = InvMostly.it_customer_name.Contains("'") ? InvMostly.it_customer_name.Replace("'", "''") : InvMostly.it_customer_name;
-                InvMostly.address = InvMostly.address.Contains("'") ? InvMostly.address.Replace("'", "''") : InvMostly.address;
-                //fake_bill_address = " " + (drCust["fake_s_address"] != null ? drCust["fake_s_address"].ToString().Trim() : "")
-                //    + (InvMostly.linkman != null ? " ATTN:" + InvMostly.linkman : "")
-                //    + (InvMostly.l_phone != null ? " TEL:" + InvMostly.l_phone : "")
-                //    + (InvMostly.fax != null ? " FAX:" + InvMostly.fax : "")
-                //    + (InvMostly.email != null ? " EMAIL:" + InvMostly.email : "");
-                InvMostly.fake_bill_address = InvMostly.fake_bill_address != null ? InvMostly.fake_bill_address.Contains("'") ? InvMostly.fake_bill_address.Replace("'", "''") : InvMostly.fake_bill_address : "";
-                InvMostly.bill_address = InvMostly.bill_address != null ? InvMostly.bill_address.Contains("'") ? InvMostly.bill_address.Replace("'", "''") : InvMostly.bill_address : "";
-                //cust_address = cust_name + fake_bill_address;
-                //fake_name = drCust["fake_name"] != null ? drCust["fake_name"].ToString().Trim() : "";
-                InvMostly.fake_name = InvMostly.fake_name != null ? InvMostly.fake_name.Contains("'") ? InvMostly.fake_name.Replace("'", "''") : InvMostly.fake_name : "";
-                InvMostly.fake_address = InvMostly.fake_address != null ? InvMostly.fake_address.Contains("'") ? InvMostly.fake_address.Replace("'", "''") : InvMostly.fake_address : "";
+                InvMostly.it_customer_name = Converter.ReplaceSpecChar(InvMostly.it_customer_name);
+                InvMostly.address = Converter.ReplaceSpecChar(InvMostly.address);
+                InvMostly.fake_bill_address = Converter.ReplaceSpecChar(InvMostly.fake_bill_address);
+                InvMostly.bill_address = Converter.ReplaceSpecChar(InvMostly.bill_address);
+                InvMostly.fake_name = Converter.ReplaceSpecChar(InvMostly.fake_name);
+                InvMostly.fake_address = Converter.ReplaceSpecChar(InvMostly.fake_address);
+
                 if (dtMostly.Rows.Count==0)
                 {
-                    ID = InvoiceBase.GenDocNumber("SI01", InvMostly.issues_wh, InvMostly.bill_type_no, InvMostly.oi_date);
+                    UpdateStatusModel mdjID = InvoiceBase.GenDocNumber("SI01", InvMostly.issues_wh, InvMostly.bill_type_no, InvMostly.oi_date);
+                    ID = mdjID.ReturnValue;
+                    strSql1 += mdjID.ReturnValue1;
                     Ver = 0;
                     //DataTable dtCust = GetCustData(InvMostly.it_customer);
                     //DataRow drCust = dtCust.Rows[0];

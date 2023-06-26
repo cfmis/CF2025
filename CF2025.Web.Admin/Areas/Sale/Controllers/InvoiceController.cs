@@ -17,7 +17,7 @@ namespace CF2025.Web.Admin.Areas.Sale.Controllers
         public ActionResult Index(string DocType)
         {
             ViewBag.Title = "銷售發票";
-            ViewBag.DocType = DocType;
+            ViewBag.DocType = DocType == null ? "0" : DocType;
             return View();
         }
         public ActionResult Create()

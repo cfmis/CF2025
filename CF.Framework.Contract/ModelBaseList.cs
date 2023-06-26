@@ -17,5 +17,6 @@ namespace CF.Framework.Contract
         public string Status { get; set; }
         public string Msg { get; set; }
         public string ReturnValue { get; set; }
+        public string ReturnValue1 { get; set; }
     }
 }

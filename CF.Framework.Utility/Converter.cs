@@ -411,5 +411,13 @@ namespace CF.Framework.Utility
             }
             return strDateTime;
         }
+
+        //字符中如果存在 ' 符號，替換成 ''　以便能提交
+        public static string ReplaceSpecChar(string str)
+        {
+            string Result = "";
+            Result = str != null ? str.Contains("'") ? str.Replace("'", "''") : str : "";
+            return Result;
+        }
     }
 }
