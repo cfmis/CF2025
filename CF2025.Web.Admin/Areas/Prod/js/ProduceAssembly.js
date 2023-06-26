@@ -1,6 +1,6 @@
-﻿var main = {
+﻿var main={
     data() {
-        return {  
+        return {
             selectTab: "tab1",
             searchID: "", 
             headEditFlag: "",//主檔為新增或編輯
@@ -111,7 +111,7 @@
             valid_user_id:false,
             unok_status:"1",//檢查移交單是否已批準,如果已批準則返回"1",反批準按鈕不顯示, 當前默認1是不顯示
             ok_status:"0",//控制批準按鈕的顯示, 當前默認0是顯示            
-            temp_goods_id:"",
+            temp_goods_id:"",            
         }
     },    
     created() {
@@ -124,7 +124,7 @@
         this.userId = $("#user_id").val();
         this.tempHeadData = this.headData;
         this.tempTableData1 = this.tableData1;
-        this.tempTableData2 = this.originData2;    
+        this.tempTableData2 = this.originData2;
     },
     methods: {
         //setRefFocus(el)  {
@@ -354,10 +354,10 @@
                                     //重查刷新數據
                                     this.getHead(this.headData.id);
                                     this.$XModal.alert({ content: '當前操作成功!', mask: false });
-                        }else{
+                                }else{
                                     this.$XModal.alert({ content: '當前操作失敗!',status: 'error' , mask: false });
-                        }                              
-                        }
+                                }                              
+                            }
                         ).catch(function (response) {    
                             alert(response);
                         });                        
@@ -1645,7 +1645,9 @@
                 }
             }
         },
-        
+        formatSecQty ({ cellValue }) {            
+            return XEUtils.commafy(XEUtils.toNumber(cellValue), { digits: 2 });           
+        },
        //beforeHideMethod: async () => {
        //    const type = await VXETable.modal.confirm('您确定要关闭吗？')
        //    if (type === 'confirm') {
@@ -1655,8 +1657,8 @@
        //        return new Error()
        //    }
        //}
-
     }, //methods end
+    
     watch: {
         headData:{
             handler (newValue, oldValue){

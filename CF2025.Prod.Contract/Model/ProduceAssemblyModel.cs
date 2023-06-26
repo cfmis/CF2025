@@ -11,6 +11,7 @@ namespace CF2025.Prod.Contract
         public string id { get; set; }
         public string con_date { get; set; }
         public string bill_origin { get; set; }
+        public string bill_type_no { get; set; }
         public string handover_id { get; set; }
         public string out_dept { get; set; }
         public string in_dept { get; set; }
@@ -57,6 +58,7 @@ namespace CF2025.Prod.Contract
         public string aim_jo_sequence { get; set; }        
         public decimal qc_qty { get; set; }
         public string qc_result { get; set; }
+        public string return_reason { get; set; }
         public string row_status { get; set; }
     }
 

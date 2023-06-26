@@ -1,14 +1,19 @@
 ﻿
 @{
-    ViewBag.Title = "ProduceRechange";
+    ViewBag.Title = "ReturnRechange";
 }
 @section PageSpecificStyleSheetIncludes{
-    <style>        
-    </style>
+<style>
+    * {
+        margin: 0px;
+        padding: 0px;
+    }
+</style>
 }
 @section common_item_group{
     <link rel="stylesheet" href="~/Content/Styles/common-item-group.css" />
 }
+
 <div id="app">
     <vxe-toolbar perfect size="small" style="height:30px;margin-bottom:0px;min-width:1024px;">
         <template #buttons style="height:30px;margin-bottom:5px">
@@ -33,7 +38,7 @@
             <vxe-form-item title="編號" :item-render="{}" span="6" class="vxe-form-item-group" style="color:blue">
                 <vxe-input v-model="headData.id" maxlength="13" class="input-customize" readonly></vxe-input>
             </vxe-form-item>
-            <vxe-form-item title="組裝日期" :item-render="{}" :span="6" class="vxe-form-item-group" style="color:blue">
+            <vxe-form-item title="移交日期" :item-render="{}" :span="6" class="vxe-form-item-group" style="color:blue">
                 <vxe-input type="date" v-model="headData.con_date" maxlength="13" class="input-customize" :readonly="isReadOnly"></vxe-input>
             </vxe-form-item>
             <vxe-form-item title="開單來源" :item-render="{}" :span="6" class="vxe-form-item-group">
@@ -41,13 +46,14 @@
                     <vxe-option v-for="item in billOriginList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
                 </vxe-select>
             </vxe-form-item>
-            <vxe-form-item title="類型" :item-render="{}" :span="6" class="vxe-form-item-group">
-                <vxe-input v-model="headData.stock_type" class="input-customize" readonly></vxe-input>
+            <!--stock_type=0-->
+            <vxe-form-item title="單據類型" :item-render="{}" :span="6" class="vxe-form-item-group">
+                <vxe-input v-model="headData.bill_type_no" class="input-customize" readonly></vxe-input>
             </vxe-form-item>
 
             <vxe-form-item title="移交部門" :item-render="{}" :span="6" class="vxe-form-item-group" style="color:blue">
                 <el-select v-model="headData.out_dept"
-                            @@change="getMaxID(headData.out_dept,headData.in_dept,'T')"
+                            @@change="getMaxID(headData.out_dept,headData.in_dept,'R')"
                             @@keydown.enter.native="focusInDept()"
                             filterable clearable default-first-option style="width:100%" :disabled="isDisableGenNo">
                     <el-option v-for="item in deptList" :key="item.value" :value="item.value" :label="item.label" style="height:25px;font-size: 9px" />
@@ -55,7 +61,7 @@
             </vxe-form-item>
             <vxe-form-item title="收貨部門" :item-render="{}" :span="6" class="vxe-form-item-group" style="color:blue">
                 <el-select v-model="headData.in_dept" ref="inDept"
-                            @@change="getMaxID(headData.out_dept,headData.in_dept,'T')"
+                            @@change="getMaxID(headData.out_dept,headData.in_dept,'R')"
                             filterable clearable default-first-option style="width:100%" :disabled="isDisableGenNo">
                     <el-option v-for="item in deptList" :key="item.value" :value="item.value" :label="item.label" style="height:25px;font-size: 9px" />
                 </el-select>
@@ -142,7 +148,7 @@
                     <vxe-input v-model="row.goods_id" type="search" style="height:20px;"
                                 @@change="setUpperCase('goods_id',row.goods_id,'1')"
                                 @@search-click="showItem($event)"
-                                @@blur="checkItem(row.goods_id,'1')">
+                                @@blur="checkItem(row.goods_id)">
                     </vxe-input>
                 </template>
             </vxe-column>
@@ -169,6 +175,11 @@
                     <vxe-input v-model="row.package_num" type="integer" min="0" :controls="false" style="height:20px;" @*type="text" @@change="checkNumber(row,'package_num',row.package_num)"*@></vxe-input>
                 </template>
             </vxe-column>
+            <vxe-column field="return_reason" title="退貨原因" width="130" :edit-render="{}">
+                <template #edit="{ row }">
+                    <vxe-input v-model="row.return_reason" style="height:20px;"></vxe-input>
+                </template>
+            </vxe-column>            
             <vxe-column field="color_name" title="CF顏色名稱" width="120"></vxe-column>
             <vxe-column field="four_color" title="四位顏色" width="100"></vxe-column>
             <vxe-column field="app_supply_side" title="申請供方電鍍廠" width="150"></vxe-column>
@@ -222,11 +233,12 @@
                         <vxe-input v-model="data.color_name" class="input-customize" readonly></vxe-input>
                     </template>
                 </vxe-form-item>
-                <vxe-form-item field="goods_id" title="貨品編號" :span="12" :item-render="{}" class="vxe-form-item-customize">
+
+                <vxe-form-item field="goods_id" title="貨品編碼" :span="12" :item-render="{}" class="vxe-form-item-customize">
                     <template #default="{ data }">
                         <vxe-input v-model="data.goods_id" maxlength="18" class="input-customize my-search" @@change="setUpperCase('goods_id',data.goods_id,'1')" readonly>
                             <template #suffix>
-                                <i class="iconfont icon-search1" @@click="showItem($event,'2')"></i>
+                                <i class="iconfont icon-search1" @@click="showItem($event)"></i>
                             </template>
                         </vxe-input>
                     </template>
@@ -236,6 +248,7 @@
                         <vxe-input v-model="data.goods_name" class="input-customize" readonly></vxe-input>
                     </template>
                 </vxe-form-item>
+
                 <vxe-form-item field="app_supply_side" title="供方電鍍廠" :span="12" :item-render="{}" class="vxe-form-item-customize">
                     <template #default="{ data }">
                         <vxe-input v-model="data.app_supply_side" class="input-customize" readonly></vxe-input>
@@ -246,6 +259,7 @@
                         <vxe-input v-model="data.package_num" type="integer" min="0" max="999" @@change="setCancelStatus()" class="input-customize" :readonly="isReadOnly"></vxe-input>
                     </template>
                 </vxe-form-item>
+
                 <vxe-form-item field="con_qty" title="移交數量" :span="12" :item-render="{name:'input',autoselect:true}" class="vxe-form-item-customize">
                     <template #default="{ data }">
                         <vxe-input v-model="data.con_qty" type="integer" min="1" :controls="false" @@change="setCancelStatus()"
@@ -260,6 +274,7 @@
                         </vxe-select>
                     </template>
                 </vxe-form-item>
+
                 <vxe-form-item field="sec_qty" title="重量" :span="12" :item-render="{name:'input',autoselect:true}" class="vxe-form-item-customize">
                     <template #default="{ data }">
                         <vxe-input v-model="data.sec_qty" type="float" min="0.01" :controls="false" @@change="setCancelStatus()" class="input-customize" :readonly="isReadOnly"></vxe-input>
@@ -272,6 +287,7 @@
                         </vxe-select>
                     </template>
                 </vxe-form-item>
+
                 <vxe-form-item field="return_qty_nonce" title="退回數量" :span="12" :item-render="{}" class="vxe-form-item-customize">
                     <template #default="{ data }">
                         <vxe-input v-model="data.return_qty_nonce" class="input-customize" readonly></vxe-input>
@@ -282,6 +298,15 @@
                         <vxe-input v-model="data.lot_no" class="input-customize" readonly></vxe-input>
                     </template>
                 </vxe-form-item>
+
+                <vxe-form-item title="" span="12" class="vxe-form-item-customize">                 
+                </vxe-form-item>
+                <vxe-form-item field="return_reason" title="退貨原因" :span="12" :item-render="{}" class="vxe-form-item-customize">
+                    <template #default="{ data }">
+                        <vxe-input v-model="data.return_reason" class="input-customize" @@change="setCancelStatus()" :readonly="isReadOnly"></vxe-input>
+                    </template>
+                </vxe-form-item>
+
                 <vxe-form-item field="four_color" title="四位顏色" :span="12" :item-render="{}" class="vxe-form-item-customize">
                     <template #default="{ data }">
                         <vxe-input v-model="data.four_color" class="input-customize" readonly></vxe-input>
@@ -292,6 +317,7 @@
                         <vxe-input v-model="data.free" class="input-customize" readonly></vxe-input>
                     </template>
                 </vxe-form-item>
+
                 <vxe-form-item field="remark" title="備註" :span="24" :item-render="{}" class="vxe-form-item-customize">
                     <template #default="{ data }">
                         <vxe-input v-model="data.remark" class="input-customize" @@change="setCancelStatus()" :readonly="isReadOnly"></vxe-input>
@@ -301,6 +327,7 @@
             </vxe-form>
         </template>
     </vxe-modal>
+
 
     @*彈窗:表格一中根據生產計劃流程,顯示部門相關流程*@
     <vxe-modal v-model="showGoods" title="貨品編碼" width="750" :position="{top: showGoodsY, left: showGoodsX}" :mask="false" resize destroy-on-close>
@@ -378,5 +405,7 @@
 
 
 @section PageSpecificJavascriptIncludes{
-    <script src="~/Areas/Prod/js/ProduceRechange.js?v=@Guid.NewGuid().ToString()"></script>
+    <script src="~/Areas/Prod/js/ReturnRechange.js"></script>
 }
+
+

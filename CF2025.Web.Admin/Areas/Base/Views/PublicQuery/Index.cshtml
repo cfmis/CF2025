@@ -142,7 +142,7 @@
             :row-config="{height: 25}"
             @@cell-click="cellClickResultEvent"
             @@cell-dblclick="cellDBLClickEvent">
-        <vxe-column type="seq" title="#" fixed="left" width="50"></vxe-column>
+        <vxe-column type="seq" title="#" fixed="left" width="45"></vxe-column>
         <template v-for="(item,i) in fieldNameList">
             <!--i=0第一列為空格所以要隱藏-->
             <vxe-column :width="item.col_width>0?item.col_width:90":key="item.value" v-if="i !='0' && item.field_type==='D'" :field="item.value" :title="item.label" :formatter="formatDate"></vxe-column>

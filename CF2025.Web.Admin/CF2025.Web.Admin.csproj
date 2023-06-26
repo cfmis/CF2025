@@ -286,7 +286,10 @@
     <Compile Include="Areas\Base\Controllers\DataComboxListController.cs" />
     <Compile Include="Areas\Prod\Controllers\ProduceAssemblyController.cs" />
     <Compile Include="Areas\Prod\Controllers\ProduceRechangeController.cs" />
+    <Compile Include="Areas\Prod\Controllers\ReturnRechangeController.cs" />
     <Compile Include="Areas\Prod\ProdAreaRegistration.cs" />
+    <Compile Include="Areas\SaleOrder\Controllers\SaleOrderController.cs" />
+    <Compile Include="Areas\SaleOrder\SaleOrderAreaRegistration.cs" />
     <Compile Include="Areas\Sale\Controllers\DealWithInvoiceController.cs" />
     <Compile Include="Areas\Sale\Controllers\InvoiceController.cs" />
     <Compile Include="Areas\Sale\Controllers\OrderController.cs" />
@@ -320,6 +323,7 @@
     <Content Include="Areas\Base\js\publicQuery.js" />
     <Content Include="Areas\Prod\js\ProduceAssembly.js" />
     <Content Include="Areas\Prod\js\ProduceRechange.js" />
+    <Content Include="Areas\Prod\js\ReturnRechange.js" />
     <Content Include="Areas\Sale\js\DealWithInvoice.js" />
     <Content Include="Areas\Sale\js\Invoice.js" />
     <Content Include="Areas\Sale\js\PacklingList.js" />
@@ -398,6 +402,11 @@
     <Content Include="Areas\Sale\Views\DealWithInvoice\ConfirmReceipt.cshtml" />
     <Content Include="Areas\Sale\Views\PackingList\Index.cshtml" />
     <Content Include="Areas\Prod\Views\ProduceRechange\Index.cshtml" />
+    <Content Include="Areas\SaleOrder\Views\web.config" />
+    <Content Include="Areas\SaleOrder\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\SaleOrder\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\SaleOrder\Views\SaleOrder\Index.cshtml" />
+    <Content Include="Areas\Prod\Views\ReturnRechange\Index.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -457,6 +466,8 @@
     <Folder Include="Areas\Base\Views\Public\" />
     <Folder Include="Areas\Base\Views\Unit\" />
     <Folder Include="Areas\Prod\Models\" />
+    <Folder Include="Areas\SaleOrder\js\" />
+    <Folder Include="Areas\SaleOrder\Models\" />
     <Folder Include="Areas\Sale\Models\" />
     <Folder Include="Areas\Store\Models\" />
     <Folder Include="Areas\Sys\js\" />
@@ -464,6 +475,7 @@
     <Folder Include="Images\" />
     <Folder Include="Lib\" />
     <Folder Include="Reports\" />
+    <Folder Include="Views\SaleOrder\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

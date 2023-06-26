@@ -18,10 +18,10 @@
             showGoodsY:0,          
             stateFontColor:"color:black",
             btnItemTitle:"劉覽",
-            headData: { id: "", con_date: "", out_dept: "", in_dept: "",bill_origin:"2",stock_type:"0",handler:"", remark: "", create_by: "", update_by: "", check_by: "", 
+            headData: { id: "", con_date: "", out_dept: "", in_dept: "",bill_origin:"2",bill_type_no:"R",stock_type:"0",handler:"", remark: "", create_by: "", update_by: "", check_by: "", 
                 update_count: "", create_date: "", update_date: "", check_date: "", state: "0",head_status:"" },
             rowDataEdit: {
-                id: '', mo_id: '', goods_id: '', goods_name: '',con_qty: 0,  unit_code: 'PCS', sec_qty: 0.00,sec_unit: 'KG',lot_no:'', package_num: '0',color_name: '', 
+                id: '', mo_id: '', goods_id: '', goods_name: '',con_qty: 0,  unit_code: 'PCS', sec_qty: 0.00,sec_unit: 'KG',lot_no:'',return_reason:'', package_num: '0',color_name: '', 
                 four_color: '', app_supply_side: '', remark: '', return_qty_nonce: '',sequence_id: '', location: '',carton_code:'', prd_id: 0,  jo_id:'',jo_sequence_id:'',
                 qc_qty:0,row_status:'',aim_jo:'',aim_jo_sequence:''
             },
@@ -92,6 +92,7 @@
         this.tempHeadData = this.headData;
         this.tempTableData1 = this.tableData1;
     },
+
     methods: {
         findByID:async function() {
             if(this.isEditHead===true){
@@ -112,10 +113,12 @@
             }, 500);
             //this.ok_status = this.headData.state;//控制批準按鈕的顯示(0:顯示)       ************     
         },
+
         //打開查詢窗體
         showFindWindos(){            
-            comm.openWindos('ProduceRechange');
+            comm.openWindos('ReturnRechange');
         },
+
         //打開物品查詢窗體
         showFindItem(){
             comm.openFindItem();
@@ -124,8 +127,9 @@
         //    await comm.openPassword(this.userId);
         //},
         printEvent(){
-           //
+            //
         },    
+
         focusInDept(){
             this.$refs['inDept'].focus(); //this.$refs包含自定義的引用對象
         },
@@ -210,6 +214,7 @@
             this.$set(this.headData, "bill_origin", '2');  
             this.$set(this.headData, "head_status", this.headEditFlag);           
         },
+
         delHeadEvent() {
             if ((this.headData.id != "") && (this.tableData1.length > 0)) {
                 if(this.headData.state == "2") {
@@ -220,30 +225,31 @@
                     this.$XModal.alert({ content: '批準狀態,當前操作無效!',status: 'info', mask: false });
                     return;
                 }
-                this.$XModal.confirm('請確定是否要注銷此移交單？').then(type => {
+                this.$XModal.confirm('請確定是否要注銷此移交退回單？').then(type => {
                     if (type == 'confirm') {
                         var head = JSON.parse(JSON.stringify(this.headData));
                         var user_id = this.userId;
-                        axios.post("/ProduceRechange/DeleteHead",{head,user_id}).then(
+                        axios.post("/ReturnRechange/DeleteHead",{head,user_id}).then(
                             (response) => {
                                 if(response.data=="OK"){                
                                     this.setStatusHead(false);
                                     //重查刷新數據
                                     this.getHead(this.headData.id);
                                     this.$XModal.alert({ content: '注銷成功!',status: 'success',mask: false });
-                                }else{
+                        }else{
                                     this.$XModal.alert({ content: '注銷失敗!',status: 'error', mask: false });
-                                }
-                            }).catch(function (response) { 
+                        }
+                        }).catch(function (response) { 
                                     alert(response);
-                           });                        
-                    }                    
-                })
-            } else {
+                        });                        
+                        }                    
+                        })
+                        } else {
                 this.$XModal.alert({ content: '主檔編號不可為空,當前操作無效!', status: 'warning', mask: false });
                 return;
-            };
+                        };
         },
+        
         //還原表頭及全部的明細
         revertEvent() {
             this.setStatusHead(false);
@@ -273,6 +279,7 @@
             this.headData.id="",
             this.headData.con_date = "",
             this.headData.bill_origin = "2",
+            this.headData.bill_type_no = "R",
             this.headData.out_dept = "",
             this.headData.in_dept = "",
             this.headData.stock_type ="0",
@@ -289,9 +296,9 @@
             this.headData.head_status ="";
         },
         clearRowDataEdit(){
-            this.rowDataEdit = {id: '', mo_id: '', goods_id: '', goods_name: '',con_qty: 0,  unit_code: 'PCS', sec_qty: 0.00,sec_unit: 'KG',
-                lot_no:'', package_num: '0',color_name: '', four_color: '', app_supply_side: '', remark: '', return_qty_nonce: '',sequence_id: '',
-                location: '',carton_code:'', jo_id:'',jo_sequence_id:'',qc_result:'',row_status:''
+            this.rowDataEdit = {id: '', mo_id: '', goods_id: '', goods_name: '',con_qty: 0,  unit_code: 'PCS', sec_qty: 0.00,sec_unit: 'KG',lot_no:'',
+                return_reason:'', package_num: '0',color_name: '', four_color: '', app_supply_side: '', remark: '', return_qty_nonce: '',sequence_id: '',
+                location: '', carton_code:'', prd_id:0, jo_id:'', jo_sequence_id:'', qc_qty:0, row_status:'', aim_jo:'', aim_jo_sequence:'', qc_result:''
             }
         },
         backupData () {
@@ -305,7 +312,7 @@
                 return;
             }
             if (this.headData.id == "") {              
-                    this.$XModal.alert({ content: '主檔編號不可為空,當前操作無效!',status: 'info', mask: false });
+                this.$XModal.alert({ content: '主檔編號不可為空,當前操作無效!',status: 'info', mask: false });
                 return;
             }; 
             var rowEndIndex = -1;//添加至行尾
@@ -328,7 +335,7 @@
             this.rowDataEdit = row;
             this.isReadOnly = (this.headData.state==='0')?false:true; 
             this.btnItemTitle = (this.isReadOnly)?'劉覽':'修改';
-            this.showEdit = true;           
+            this.showEdit = true;
         },
 
         //項目刪除
@@ -337,7 +344,7 @@
                 this.$XModal.alert({ content: "此單據已批準,當前操作無效!",status: 'info', mask: false });
                 return;
             }
-            let status = await comm.checkApproveState('jo_assembly_mostly',this.headData.id);
+            let status = await comm.checkApproveState('jo_materiel_con_mostly',this.headData.id);
             if(status ==='1'||status ==='2'){
                 let str = (status ==='1')?"批準":"注銷";
                 this.$XModal.alert({ content: `后端數據已是${str}狀態,當前操作無效!`,status: 'info', mask: false });
@@ -348,7 +355,7 @@
                     this.$XModal.alert({ content: "已是最后一行,不可以繼續刪除!",status: 'info', mask: false });
                     return;
                 }
-                this.$XModal.confirm("是否確定要刪除當前行？").then(type => {                    
+                this.$XModal.confirm("是否確定要刪除當前行？").then(type => {
                     if(type ==="confirm"){
                         this.delData1.push(this.selectRow); 
                         this.tableData1.splice(this.curRowIndex,1);//移除表格1刪除的當前行
@@ -379,6 +386,8 @@
                 }
             );
         }, 
+
+        //生成明細序號
         getSequenceId(i){          
             return comm.pad(i + 1,4) +"h";
         },        
@@ -388,53 +397,61 @@
             if(this.isEditHead===true){
                 this.$XModal.alert({ content: "編輯狀態,當前操作無效!", mask: false });
                 return;
-            };
+            } 
+            //批準,反批準都要檢查是否是註銷狀態
+            if(this.headData.state === "2"){
+                this.$XModal.alert({ content: "注銷狀態,當前操作無效!", mask: false });
+                return;
+            }
+            
             if ((this.headData.id != "") && (this.tableData1.length > 0)) {
-                //批準,反批準都要檢查是否是註銷狀態
-                if(this.headData.state === "2"){
-                    this.$XModal.alert({ content: "注銷狀態,當前操作無效!", mask: false });
-                    return;
-                }                
-                var ls_success = (val==='1')?"批準成功!":"反批準成功!";
-                var ls_error = (val==='1')?"批準失敗!":"反準失敗!";
-                var ls_type = (val==='1')?"批準":"反批準";
-                var ls_is_approve = `確定是否要進行【${ls_type}】操作？`;
+                let	ls_id,ls_bill_type_no,is_active_name,ls_success,ls_error,ls_type,ls_approve,status;
+                    
+                ls_id = this.headData.id;
+                ls_bill_type_no = this.headData.bill_type_no;
+                is_active_name = (val==='1')?"pfc_ok":"pfc_unok";
+                ls_success = (val==='1')?"批準成功!":"反批準成功!";
+                ls_error = (val==='1')?"批準失敗!":"反準失敗!";
+                ls_type = (val==='1')?"批準":"反批準";
+                ls_approve = `確定是否要進行【${ls_type}】操作？`;
                 //取后端單據狀態
-                let status = await comm.checkApproveState('jo_materiel_con_mostly',this.headData.id);
+                status = await comm.checkApproveState('jo_materiel_con_mostly',this.headData.id);
                 if(status==='2'){
                     this.$XModal.alert({ content: "后端數據已是注銷狀態,當前操作無效!", mask: false });
                     return;
                 }
-                if(val==='1') {//準備批準時
+                //點擊批準按鈕
+                if(val==='1') {
                     //進行當前批準操作前再次檢查后端是否已被別的用戶批準.
                     if(this.headData.state === "1"){
                         this.$XModal.alert({ content: "已是批准狀態,當前操作無效!", mask: false });
                         return;
                     }
-                    if(status==="1"){
+                    if(status === "1"){
                         //后臺數據已為批準狀態,已被別的用戶批準
                         this.$XModal.alert({ content: "后端數據已是批準狀態,當前操作無效!", mask: false });
                         return;
                     }
                     //批準前檢查庫存                    
                     var strError = await this.checkStock(this.headData.id); //此處必須加await,且checkStock函數也要設置成同步執行                    
-                    if(this.validStockFlag===false){
-                        //檢查庫存不足,返回并放棄當前保存
+                    if(this.validStockFlag === false){
+                        //檢查庫存不足,返回并放棄當前批準操作
                         this.$XModal.alert({ content: strError, mask: false });
                         return;
                     }
                 }
-                if(val==='0'){                    
+                //點擊反批準按鈕
+                if(val === "0") {
                     //進行反批准
                     //進行當前反批準操作前再次檢查后端是否已被別的用戶反批準.
-                    if(status==="0"){
+                    if(status === "0"){
                         //后臺數據已為批準狀態,已被別的用戶批準
                         this.$XModal.alert({ content: "后端數據已是未批準狀態,當前操作無效!", mask: false });
                         return;
-                    }           
+                    }
                     //檢查已批準日期是否為當日?,超過當日則不可反批準
-                    var isApprove = await comm.canApprove(this.headData.id,"w_produce_rechange");//移交單
-                    if(isApprove ==="0"){
+                    var isApprove = await comm.canApprove(this.headData.id,"w_return_rechange");//移交單
+                    if(isApprove === "0"){
                         this.$XModal.alert({ content: "注意:【批準日期】必須為當前日期,方可進行此操作!", mask: false });
                         return;
                     }
@@ -444,56 +461,57 @@
                         this.$XModal.alert({ content: "接收貨部門已簽收,不可以再進行反批準操作!", mask: false });
                         return;
                     }
-                }                
-                this.$XModal.confirm(ls_is_approve).then(type => {
-                    if (type === "confirm") {
-                        this.headData.check_by = this.userId;
-                        var head = JSON.parse(JSON.stringify(this.headData));//深拷貝轉成JSON數據格式
-                        var approve_type = val;
-                        var user_id = this.userId;
-                        this.loading = true;
+                }                  
+                
+                this.$XModal.confirm(ls_approve).then(type => {
+                     if (type === "confirm") {
+                            this.headData.check_by = this.userId;
+                            var head = JSON.parse(JSON.stringify(this.headData));//深拷貝轉成JSON數據格式
+                            var approve_type = val;
+                            var user_id = this.userId;
+                            this.loading = true;
                        
-                        //當前是批準,相反就是反批準,當前是反批準相反就是批準,第二個參數'1'--不顯示,'0'--顯示
-                        this.showButtonApprove(approve_type,"1"); //相反操作的按鈕先不顯示
-                        axios.post("/ProduceRechange/Approve",{head,user_id,approve_type}).then(
-                            (res) => {
-                                if(res.data ==="OK"){
-                                    this.setStatusHead(false);
-                                    //重查刷新數據
-                                    this.getHead(this.headData.id);//刷新表頭即可
-                                    this.$XModal.message({ content: ls_success, status: "success" });  
-                                    this.showButtonApprove(approve_type,"0");//成功則顯示相反操作的按鈕
-                                } else{
-                                    this.$XModal.message({ content: ls_error + res.data,status: "warning" , mask: false });  
-                                    this.showButtonApprove(approve_type,"1");//失敗則禁止顯示相反操作的按鈕
-                                }
+                            //當前是批準,相反就是反批準,當前是反批準相反就是批準,第二個參數'1'--不顯示,'0'--顯示
+                            this.showButtonApprove(approve_type,"1"); //暫不顯示批準或反批準按鈕                            
+                            axios.post("/ReturnRechange/Approve",{head,user_id,approve_type}).then(
+                                (res) => {
+                                    if(res.data ==="OK"){
+                                        this.setStatusHead(false);
+                                        //重查刷新數據
+                                        this.getHead(this.headData.id);//刷新表頭即可
+                                        this.$XModal.message({ content: ls_success, status: "success" });  
+                                        this.showButtonApprove(approve_type,"0");//成功則顯示相反操作的按鈕
+                            } else{
+                                        this.$XModal.message({ content: ls_error + res.data,status: "warning" , mask: false });  
+                                        this.showButtonApprove(approve_type,"1");//失敗則禁止顯示相反操作的按鈕
+                            }
+                                    this.loading = false;
+                            }).catch(function (res) {
                                 this.loading = false;
-                        }).catch(function (res) {
-                            this.loading = false;
-                            this.$XModal.alert({ content: "系統錯誤:" + res,status: "error" , mask: false }); 
-                            this.showButtonApprove(approve_type,"1");//失敗則禁止顯示相反操作的按鈕                          
-                        });
-                    }
+                                this.$XModal.alert({ content: "系統錯誤:" + res,status: "error" , mask: false }); 
+                                this.showButtonApprove(approve_type,"1");//失敗則禁止顯示批準或反批準按鈕
+                            });
+                     }
                 })
-              } else {
-                    this.$XModal.alert({ content: "主檔編號不可為空,當前操作無效!", status: "warning" });
-                    return;
-              };
-       },
+            } else {
+                 this.$XModal.alert({ content: "主檔編號不可為空,當前操作無效!", status: "warning" });
+                 return;
+            };
+        },//end of approveEvent
        
-       //**showButtonApprove(arg1,arg2)控制與當前動作按鈕的相反按鈕的顯示
-       //當按下反批準/批準按鈕立即禁止顯示當前按鈕,當操作失敗時再恢復顯示
-       //動作類型:approve_type:1--批準;0--反批準. 控制按鈕顯示:value: 1--隱藏,0--顯示
-       //當前是批準,相反就是反批準,當前是反批準相反就是批準,第二個參數'1'--不顯示,'0'--顯示
-       showButtonApprove(approve_type,value){
+        //**showButtonApprove(arg1,arg2)控制與當前動作按鈕的相反按鈕的顯示
+        //當按下反批準/批準按鈕立即禁止顯示當前按鈕,當操作失敗時再恢復顯示
+        //動作類型:approve_type:1--批準;0--反批準. 控制按鈕顯示:value: 1--隱藏,0--顯示
+        //當前是批準,相反就是反批準,當前是反批準相反就是批準,第二個參數'1'--不顯示,'0'--顯示
+        showButtonApprove(approve_type,value){
             if(approve_type ==="1"){
                 this.unok_status = value; //反批準按鈕
             }else{
                 this.ok_status = value; //批準按鈕
             }
-       },
-       //雙擊顯示彈窗
-       dbclickEvent(row){
+        },
+        //雙擊顯示彈窗
+        dbclickEvent(row){
             //this.rowDataEdit = row.data[row.$rowIndex]; //此方式是對像,彈窗更改,表格也跟著改
             //this.rowDataEdit = JSON.parse(JSON.stringify(row.data[row.$rowIndex]));
             var rw = row.data[row.$rowIndex];
@@ -501,7 +519,7 @@
             this.selectRow = rw;
             if(this.headData.state==='0'){
                 this.tempSelectRow = JSON.parse(JSON.stringify(this.selectRow));//暫存當前行,以便檢查是否有更改                
-            }
+                        }
             this.isReadOnly = (this.headData.state ==='0')?false:true;//2022/05/30 add
             this.showEdit = true;
         },
@@ -538,11 +556,6 @@
         },
         //弹窗中确认选中的貨品
         cellClickGetItems(row){
-            //this.curChangeItem = row.data[row.$rowIndex].goods_id;
-            //this.curChangeItemName = row.data[row.$rowIndex].goods_name;
-            //this.curJoId = row.data[row.$rowIndex].jo_id;
-            //this.curJoSequenceId = row.data[row.$rowIndex].jo_sequence_id;
-
             this.selectFindItemRow = row.data[row.$rowIndex];
         },
         cellClickGetLotNo(row){
@@ -551,7 +564,7 @@
         //在指定的屏幕位置中顯示貨品編碼列表
         setFindItemPosition(x,y){
             if(this.isEditCell){//單元格為可編輯狀態時
-                                                    //this.curChangeItem = null;
+                //this.curChangeItem = null;
                 //x,y點擊點鼠標的座標
                 this.showGoodsX = x;
                 this.showGoodsY = y;
@@ -564,7 +577,7 @@
         //主檔查詢
         getHead:async function(id) {           
             //此處的URL需指定到祥細控制器及之下的動Action,否則在轉出待確認彈窗中的查詢將數出錯,請求相對路徑的問題
-            await axios.get("/ProduceRechange/GetHeadByID", { params: { id: id }}).then(
+            await axios.get("/ReturnRechange/GetHeadByID", { params: { id: id }}).then(
             //await axios.post("/ProduceAssembly/GetHeadByID", { id: id }).then(
                 (response) => {                
                     this.headData = {
@@ -632,7 +645,7 @@
         //明細查詢,必須同步提取數據
         //否則表格二會出現選執行代碼,取不到數據的情況.
         getDetails:async function(id) {
-            await axios.get("/ProduceRechange/GetDetailsByID", { params: { id: id }  }).then(
+            await axios.get("/ReturnRechange/GetDetailsByID", { params: { id: id }  }).then(
                 (response) => {
                     this.tableData1 = response.data;                   
                     if(this.tableData1.length>0){                                           
@@ -690,12 +703,14 @@
             this.rowDataEdit = rw;
             this.selectRow = rw;         
         },
+
         convertSecQtyByQty: async function(row){
             if(row.row_status ==='EDIT' || row.row_status ==='NEW'){
                 let res = await axios.post("/Base/Common/QtyToSecQty", { within_code: "0000",location_id:this.headData.out_dept,goods_id:row.goods_id,qty:row.con_qty } );
                 this.$set(row, "sec_qty",res.data);
             }
         },
+
         checkMo: async function(mo_id,type){
             if(mo_id !="" && this.headData.state === '0' ){
                 if(this.$utils.getSize(mo_id)<9){
@@ -724,9 +739,10 @@
                 }
             }
         },
-        checkItem:async function(goods_id,type){
+
+        checkItem:async function(goods_id){
             //行處于編輯狀態才進行檢查
-            let status = (type==="1")?this.selectRow.row_status:this.selectRow2.row_status;
+            let status = this.selectRow.row_status;
             if(status===""){
                 return;
             }
@@ -734,11 +750,7 @@
                 //檢查貨品編號,長度小于18位 
                 if(goods_id !="" && this.headData.state === '0' ){
                     await this.$XModal.alert({ content: `貨品編碼【${goods_id}】長度有誤,請返回檢查!`,status: 'warning',mask: true });                    
-                    if(type==='1'){
-                        this.$refs.xTable1.setActiveCell(this.selectRow, "goods_id");
-                    }else{
-                        this.$refs.xTable2.setActiveCell(this.selectRow2, "goods_id");
-                    }
+                    this.$refs.xTable1.setActiveCell(this.selectRow, "goods_id");                    
                 }
             }else{
                 //檢查貨品編號,長度等于18位
@@ -747,33 +759,24 @@
                 goods_name = res.data;
 
                 if(goods_name===""){
-                    await this.$XModal.alert({ content: `貨品編碼(18位長度)【${goods_id}】不存在,請返回檢查!`,status: 'warning',mask: true });
-                    if(type==='1'){                    
-                        this.$refs.xTable1.setActiveCell(this.selectRow, "goods_id");
-                    }else{
-                        this.$refs.xTable2.setActiveCell(this.selectRow2, "goods_id");
-                    }
+                    await this.$XModal.alert({ content: `貨品編碼(18位長度)【${goods_id}】不存在,請返回檢查!`,status: 'warning',mask: true });             
+                    this.$refs.xTable1.setActiveCell(this.selectRow, "goods_id");                    
                 }else{                  
-                    //更改了貨品編碼才更新貨品名稱                    
-                    if(type==='1'){
-                        if(this.selectRow.goods_id === this.temp_goods_id){
-                            this.$set(this.selectRow,"goods_name",goods_name)
-                        }
-                    }else{                     
-                        if(this.selectRow2.goods_id == this.temp_goods_id){
-                            this.$set(this.selectRow2,"goods_name",goods_name)
-                        }
-                    }
+                    //更改了貨品編碼才更新貨品名稱
+                    if(this.selectRow.goods_id === this.temp_goods_id){
+                        this.$set(this.selectRow,"goods_name",goods_name)
+                    }                    
                 }
             }
-        },       
+        }, 
+        //負責部門,接收部門互調換
         getItemData(mo_id,out_dept,in_dept){
             if(this.$utils.isEmpty(mo_id)){
                 this.$refs.xTable1.setActiveCell(this.selectRow, "mo_id");
                 //this.$XModal.alert({ content: '頁數不可以為空!', mask: false });
                 return;
             }
-            axios.get("/ProduceAssembly/GetGoodsId", { params: { mo_id: mo_id,out_dept:out_dept,in_dept:in_dept } }).then(
+            axios.get("/ProduceAssembly/GetGoodsId", { params: { mo_id: mo_id,out_dept:in_dept,in_dept:out_dept } }).then(
                 (response) => {
                     this.goodsPlanList = response.data;
                 }
@@ -781,6 +784,7 @@
                 alert(response);
             });
         },
+        
         //批號下拉列表框
         getLotNoData(goods_id,out_dept,mo_id){
             if(this.$utils.isEmpty(goods_id)){
@@ -803,11 +807,12 @@
                 alert(response);
             });
         },
+
         //確認选中的貨品編碼(更改)
         changeItem() {
             //if(this.curChangeItem){  
             if(this.selectFindItemRow) {
-                if(this.selectRow.goods_id != this.selectFindItemRow.goods_id){//       this.curChangeItem){
+                if(this.selectRow.goods_id != this.selectFindItemRow.goods_id){
                     //貨品編碼被修改時                   
                     this.$set(this.selectRow, "goods_id", this.selectFindItemRow.goods_id);
                     this.$set(this.selectRow, "goods_name", this.selectFindItemRow.goods_name);
@@ -826,6 +831,7 @@
                 this.$XModal.alert({ content: '請指定貨品編碼!', mask: false });
             }
         },
+
         //確認选中的批号
         changeLotNo() {
             if(this.seledtLotNoRow){
@@ -833,7 +839,7 @@
                     this.$set(this.selectRow, "lot_no", this.seledtLotNoRow.lot_no);
                     let isQc = (this.seledtLotNoRow.is_qc)?'1':'0';
                     this.$set(this.selectRow, "qc_result", isQc);
-                    console.log(this.selectRow);
+                    //console.log(this.selectRow);
                 }
                 this.showLot = false;
             }else{
@@ -846,7 +852,8 @@
         activeMethod(){
             this.isEditCell = (this.headData.state ==="0")?true:false;
             return this.isEditCell;
-        },        
+        },
+
         //保存
         saveAllEvent: async function() {
             if(this.headData.id==="" && this.headData.out_dept===""){                
@@ -876,7 +883,7 @@
             await check_tableData1_flag;
             if(!check_tableData1_flag){
                 return;
-            }           
+            }
                  
             //檢查當前用戶是否有負責部門的操作權限
             var userid = this.userId;
@@ -886,36 +893,21 @@
             {                
                 this.$XModal.alert({ content: `當前用戶: 【${userid} 】,無負責部門【${deptid}】操作權限!`,status: 'info' , mask: false });
                 return;
-            }   
+            }
            
             //保存前各项檢查,是否交QC,
             await this.checkPreUpdate();
             if(!this.preUpdateFlag){
                 //各项檢查通不過
                 return;
-            }
-            ////檢查成份庫存是否夠扣減--移至批準
-            ////傳給后端存儲過程的表數據類型參數結構
-            //this.partData = [];
-            //for(let i in this.tableData1){
-            //    this.partData.push(
-            //        {within_code:'0000',out_dept:this.headData.out_dept,upper_sequence:'',sequence_id:this.tableData1[i].sequence_id, mo_id:this.tableData1[i].mo_id,
-            //         goods_id:this.tableData1[i].goods_id,lot_no:this.tableData1[i].lot_no,con_qty:this.tableData1[i].con_qty,sec_qty:this.tableData1[i].sec_qty});
-            //}
-            //var partData = this.partData;
-            //await this.checkStock(partData); //此處必須加await,且checkStock函數也要設置成同步執行
-            //if(this.validStockFlag===false){
-            //    //檢查成份庫存不足,返回放棄當前保存
-            //    return;
-            //}
-            //******以上是數據校驗部分
+            }           
 
             this.headData.head_status = this.headEditFlag;//表頭新增或修改的標識
             var headData = JSON.parse(JSON.stringify(this.headData));
             var lstDetailData1 = this.tableData1;
             var lstDelData1 = this.delData1;            
             var user_id = this.userId;
-            axios.post("/ProduceRechange/Save",{headData,lstDetailData1,lstDelData1,user_id}).then(
+            axios.post("/ReturnRechange/Save",{headData,lstDetailData1,lstDelData1,user_id}).then(
                 (response) => {
                     if(response.data=="OK"){
                         this.setStatusHead(false);
@@ -932,60 +924,58 @@
             });
             this.headEditFlag = "";
             this.delData1 = [];
-        },
+    },
 
-        //檢查控制反批準按鈕的顯示/隱藏.
-        checkRechangeApproveStatus:async function(){           
-            await axios.post("/ProduceAssembly/CheckRechangeStatus",
-                    {within_code:'0000',handover_id:this.headData.handover_id, con_date:this.headData.con_date,id:this.headData.id,state:'1'}
-                  ).then((response) => {
-                    this.unok_status = response.data;                    
-            })
-        },
-        //保存前檢查庫存是否夠扣除
-        checkStock:async function(id){
-            let rtn="";
-            await axios.post("/ProduceRechange/CheckStock",{id}).then((response) => {                
-                    if(response.data.length>0){
-                        //庫存檢查不通過
-                        let seqNo = response.data[0].sequence_id;
-                        let con_qty = response.data[0].con_qty;
-                        let sec_qty = response.data[0].sec_qty;
-                        let mo_id = response.data[0].mo_id;
-                        let goods_id = response.data[0].goods_id;
-                        let row_no=0;
-                        this.validStockFlag = false;                       
-                        for(let i=0;i<this.tableData1.length;i++){
-                            if(this.tableData1[i].sequence_id === seqNo){
-                                row_no = i+1;
-                                let rw = this.tableData1[i];//如果按this.rows.data[i]取值有可能出錯,因些時有可能還未點擊表格而未能觸發cellClick事件.this.rows是空的對象從而引起錯誤
-                                this.tempSelectRow = JSON.parse(JSON.stringify(rw));//暫存當前行,以便監控器監測以后該行是否有改動
-                                this.$refs.xTable1.setCurrentRow(rw);//定位至當前索引所在的行
-                                this.rowDataEdit = rw;
-                                this.selectRow = rw;                               
-                                break;
-                            }
-                        } 
-                        rtn =`第 ${row_no} 行【${mo_id}】【${response.data[0].goods_id}】庫存不足!\n 数量差異: ${con_qty}\n 重量差異: ${sec_qty}`;
-                        //this.$XModal.alert({ content: `第 ${row_no} 行【${this.selectRow.mo_id} -- ${this.selectRow.goods_id}】\n成份:【${response.data[0].goods_id}】庫存不足!\n 数量差異: ${con_qty}\n 重量差異: ${sec_qty}`,status: 'warning' , mask: false });
-                    }else{
-                        this.validStockFlag = true;//庫存檢查通過
-                    }
-            }) 
-            return rtn;
-        },
-        //--start保存前檢查
-        checkPreUpdate:async function() {
-            let li_rtn,li_rc,li_prd_id,li_count,li_row_no,ll_cnt;
-            let	ls_op_dept='',ls_assembly_dept='',ls_sequence_id='',ls_lot_no='',ls_materiel_id='',ls_message='',ls_materiel_mo_id='',ls_parameter='0';          
-            let	ls_mo_id='',ls_goods_id='',ls_id='',ls_in_dept='',ls_id_tmp='';
-            let	lb_pope = false,lb_prompt = false;    
-            let ldc_assembly_qty=0,ldc_qc_qty=0,ldc_qc_sec_qty=0,ldc_sec_qty=0;//old
+    //檢查控制反批準按鈕的顯示/隱藏.
+    checkRechangeApproveStatus:async function(){           
+        await axios.post("/ProduceAssembly/CheckRechangeStatus",
+        {within_code:'0000',handover_id:this.headData.handover_id, con_date:this.headData.con_date,id:this.headData.id,state:'1'}
+              ).then((response) => {
+                this.unok_status = response.data;                    
+        })
+    },
 
-            let	ldc_prod_qty=0,ldc_prod_sec_qty=0,ldc_qty_other=0,ldc_sec_qty_other=0,ldc_color_qty=0,ldc_obligate_qty=0,ldc_con_qty=0;            
-            let ls_org_state,ls_state,ls_popedom,ls_out_dept,ls_dept2,ls_in_dept_sc,ls_sc_state1,ls_sc_state2,ls_user_id,ls_assembly_id,ls_assembly_sequence_id;
-            //start 20120714 wangwei 判断新加的单是否做了QC，和移交QC  
-            //jeff 2012-07-21QC部门不用判断
+    //保存前檢查庫存是否夠扣除
+    checkStock:async function(id){
+        let rtn="";
+        await axios.post("/ReturnRechange/CheckStock",{id}).then((response) => {                
+                if(response.data.length>0){
+                    //庫存檢查不通過
+                    let seqNo = response.data[0].sequence_id;
+                    let con_qty = response.data[0].con_qty;
+                    let sec_qty = response.data[0].sec_qty;
+                    let mo_id = response.data[0].mo_id;
+                    let goods_id = response.data[0].goods_id;
+                    let row_no=0;
+                    this.validStockFlag = false;                       
+                    for(let i=0;i<this.tableData1.length;i++){
+                        if(this.tableData1[i].sequence_id === seqNo){
+                            row_no = i+1;
+                            let rw = this.tableData1[i];//如果按this.rows.data[i]取值有可能出錯,因些時有可能還未點擊表格而未能觸發cellClick事件.this.rows是空的對象從而引起錯誤
+                            this.tempSelectRow = JSON.parse(JSON.stringify(rw));//暫存當前行,以便監控器監測以后該行是否有改動
+                            this.$refs.xTable1.setCurrentRow(rw);//定位至當前索引所在的行
+                            this.rowDataEdit = rw;
+                            this.selectRow = rw;                               
+                            break;
+                        }
+                    } 
+                    rtn =`第 ${row_no} 行【${mo_id}】【${response.data[0].goods_id}】庫存不足!\n 数量差異: ${con_qty}\n 重量差異: ${sec_qty}`;
+                    //this.$XModal.alert({ content: `第 ${row_no} 行【${this.selectRow.mo_id} -- ${this.selectRow.goods_id}】\n成份:【${response.data[0].goods_id}】庫存不足!\n 数量差異: ${con_qty}\n 重量差異: ${sec_qty}`,status: 'warning' , mask: false });
+                }else{
+                     this.validStockFlag = true;//庫存檢查通過
+                }
+        }) 
+        return rtn;
+    },
+    
+    //--start保存前檢查
+    checkPreUpdate:async function() {
+            let	ls_id='',ls_goods_id='',ls_aim_jo_id,ls_dept_id,ls_bill_type_no,ls_error;
+            let	ls_sequence_id='',ls_out_dept,ls_in_dept='',ls_mo_id='',ls_servername='hkserver.cferp.dbo';
+            let	ldt_con_date,ldt_check_date;
+            let	ldec_con_qty=0,ldec_sec_qty=0;
+            let	ll_cnt,ll_cnt_state1,ll_cnt_state3,ll_cnt_state4,li_row_no;
+                    
             ls_out_dept = this.headData.out_dept;
             ls_in_dept = this.headData.in_dept;
             ls_id = this.headData.id;
@@ -994,140 +984,41 @@
                 ls_in_dept = '';
             }    
             if(ls_in_dept===""){
-                //如不輸入接收部門,則不需生成移交單及交QC移交單數據
+                await this.$XModal.alert({ content: `接收部門不可為空!`,status: 'warning' , mask: false });
+                this.preUpdateFlag = false;
                 return;
             }
-           
-            //--是否可超生產數開移交單
-            await axios.post("/ProduceAssembly/CheckParameters",{id:'JO0501'}).then(
-                 (response) => {
-                     ls_parameter = response.data;
-            })               
-            if(ls_parameter === null || ls_parameter.length===0){
-                ls_parameter ='1';
-            }
-            //循環開始            
-            let is_bill_type = 'JO';
+            if(ls_id===""){                
+                await this.$XModal.alert({ content: `編號不可為空!`,status: 'warning' , mask: false });
+                this.preUpdateFlag = false;
+                return;
+            }            
+            ls_bill_type_no = 'R';
+            ldt_check_date = this.headData.check_date;
+            
+            //檢查退貨原因不可為空/退貨流程是否存在
+            let ls_cnt='0'
             for(let li_row=0;li_row<this.tableData1.length;li_row++) {
                 li_row_no = this.$utils.toInteger(li_row)+1;
+                ls_return_reason = this.tableData1[li_row].return_reason;
+                if(this.$utils.getSize(ls_return_reason)<5){
+                    await this.$XModal.alert({ content: `第 ${li_row_no} 行,请填写退货原因,并且不能小于5个字符`,status: 'warning' , mask: false });
+                    this.preUpdateFlag = false;
+                    break;
+                }
                 ls_mo_id = this.tableData1[li_row].mo_id;
                 ls_goods_id = this.tableData1[li_row].goods_id;
-                ls_lot_no = this.tableData1[li_row].lot_no;
-                ldc_con_qty = this.tableData1[li_row].con_qty;
-                
-                //*************************************************
-                if(is_bill_type === 'JO'){//正常移交单时
-                    //--20131210 huangyun Add
-                    ll_cnt = 0
-                    //判断計劃是否批準狀態
-                    ll_cnt = await comm.getPlanApproveState(ls_mo_id);
-                    if(ll_cnt > 0){
-                        await this.$XModal.alert({ content: `第 ${li_row_no} 行,頁數【${ls_mo_id}】\n在生產計劃中還未批準!`,status: 'warning' , mask: false });
-                        this.preUpdateFlag = false;
-                        break;
-                    }                   
-                    //判断工单是否被hold住
-                    ll_cnt = await comm.getPlanHoldState(ls_mo_id,ls_goods_id,ls_out_dept,ls_in_dept);
-                    if(ll_cnt >0){
-                        await this.$XModal.alert({ content: `第 ${li_row_no} 行,頁數【${ls_mo_id}--${ls_goods_id}】\n生產計劃流程已經被Hold,不允許進行后續移交!`,status: 'warning' , mask: false });
-                        this.preUpdateFlag = false;
-                        break;                        
-                    }
-                    //判断OC是否被Hold住
-                    ll_cnt = await comm.getOcHoldState(ls_mo_id);                    
-                    if(ll_cnt >0){
-                        await this.$XModal.alert({ content: `第 ${li_row_no} 行,頁數【${ls_mo_id}】\n订单已经被Hold,不允许进行后续的流程!`,status: 'warning' , mask: false });
-                        this.preUpdateFlag = false;
-                        break;
-                    }
-                    //--
-                    ldc_prod_qty = 0;
-                    ldc_prod_sec_qty = 0;
-                    ldc_color_qty = 0;
-                    ls_sc_state1 = '';
-                    ls_sc_state2 = '';
-                    ldc_obligate_qty = 0;
-                    ldc_qty_other = 0;
-                    ldc_sec_qty_other = 0;
-                    ls_in_dept_sc = '';
-                    //--移交單總數量                    
-                    await axios.post("/ProduceRechange/GetTotalRechange",{id:ls_id,mo_id:ls_mo_id, goods_id:ls_goods_id,out_dept:ls_out_dept,in_dept:ls_in_dept}).then(
-                      (response) => {
-                          ldc_qty_other = parseFloat(response.data[0].con_qty);
-                          ldc_sec_qty_other = parseFloat(response.data[0].sec_qty);
-                      }); 
-                    //--
-                    //批色的时候不要加部门2012-05-14 string out_dept, string mo_id, string goods_id
-                    await axios.post("/ProduceRechange/GetShadingColorData",{out_dept:ls_out_dept,mo_id:ls_mo_id,goods_id:ls_goods_id}).then(
-                      (response) => {
-                          ldc_prod_qty = parseFloat(response.data[0].prod_qty);
-                          ldc_prod_sec_qty = parseFloat(response.data[0].sec_qty);
-                          ldc_color_qty = parseFloat(response.data[0].color_qty);
-                          ls_sc_state1 = response.data[0].shading_color;
-                          ls_sc_state2 = response.data[0].shading_color_state;
-                          ls_in_dept_sc = response.data[0].next_wp_id;
-                          ldc_obligate_qty = parseFloat(response.data[0].obligate_qty);
-                      });
-                    if(ldc_prod_qty === 0 && ldc_obligate_qty ===0){
-                        await this.$XModal.alert({ content: `第 ${li_row_no} 行,頁數【${ls_mo_id}--${ls_goods_id}】\n對應流程生產數量是0,不允許保存!`,status: 'warning' , mask: false });
-                        this.preUpdateFlag = false;
-                        break;
-                    }	
-                    //需要批色，但是批色状态未OK时，而且移交数量大于批色数量时，不允许保存
-                    if(ls_sc_state1 ==='1' && ls_sc_state2==='0' && ls_in_dept_sc !='702'){ //HXL 2013-02-28 P390:先開批色，或者先開QC(702)的移交單,相互不受控制
-                        if(ldc_con_qty > ldc_color_qty){
-                            await this.$XModal.alert({ content: `第 ${li_row_no} 行,頁數【${ls_mo_id}--${ls_goods_id}】\n批色未完成,不能保存![${ldc_color_qty}]`,status: 'warning' , mask: false });
-                            this.preUpdateFlag = false;
-                            break;
-                        }
-                    }
-                    //--判断是否有QC的生产计划
-                    ls_dept2 = ""
-                    await axios.post("/ProduceRechange/CheckPlanQcProcess",{id:ls_id,mo_id:ls_mo_id, goods_id:ls_goods_id,out_dept:ls_out_dept,in_dept:ls_in_dept}).then(
-                      (response) => {
-                          ls_dept2 = response.data;
-                      });
-                    //判斷是否有相開交QC的生產計畫 (如果ls_dept2不為空,其值就是702)
-                    if(ls_dept2 !=""){
-                        //檢查OC中是否有QC流程 (為何要判斷OC不是很明白這個邏輯 Allen2022/12/12)
-                        var ls_cnt="0";
-                        await axios.post("/ProduceRechange/CheckOcQcProcess",{mo_id:ls_mo_id, goods_id:ls_goods_id,out_dept:ls_out_dept,in_dept:ls_in_dept}).then(
-                            (response) => {
-                                ls_cnt = response.data;
-                            });
-                        if(ls_cnt === "0" ){
-                            await axios.post("/ProduceRechange/CheckRechangeQc",{mo_id:ls_mo_id, goods_id:ls_goods_id,out_dept:ls_out_dept,in_dept:ls_in_dept}).then(
-                            (response) => {
-                                ls_cnt = response.data;
-                            });
-                            //判斷對應生產計畫中的QC流程是否已開有移交單
-                            if(ls_cnt==="0"){
-                                await this.$XModal.alert({ content: `第 ${li_row_no} 行,頁數【${ls_mo_id}】貨品【${ls_goods_id}】\n沒有相關QC(或交P10生產部)的移交單！`,status: 'warning' , mask: false });
-                                this.preUpdateFlag = false;
-                                break;
-                            }
-                        }//If ls_cnt === "0" Then
-                    } // If ls_dept2 <>"" Then                    
-                    ////放到保存處理
-                    ////--start 20131017 huangyun不知道为什么保存的组装单号有时候会有错乱,所以重新取一次值
-                    //if( Lower(is_active_name) = 'pfc_save'){//702测试时可以不考虑收货部门的关联条件
-                    //    ls_assembly_id = ''
-                    //    ls_assembly_sequence_id = ''
-                    //    Select		B.id,B.sequence_id
-                    //    Into		:ls_assembly_id,:ls_assembly_sequence_id
-                    //    From		jo_assembly_mostly A,
-                    //                jo_assembly_details B
-                    //    Where	A.within_code = B.within_code And A.id = B.id And A.state <> '2'
-                    //    And B.within_code = :gs_company And A.out_dept = :ls_out_dept And (A.in_dept = :ls_in_dept Or :ls_in_dept = '702')  //舊代碼                        
-                    //    And B.goods_id = :ls_goods_id And B.mo_id = :ls_mo_id And B.lot_no = :ls_lot_no
-                    //    Using Sqlca;
-                    //    dw_detail.SetItem(ll_rc,'assembly_id',ls_assembly_id)
-                    //    dw_detail.SetItem(ll_rc,'assembly_sequence_id',ls_assembly_sequence_id)
-                    //}
-                    ////--end 20131017
-                }//If is_bill_type = 'JO'
-            } // --end for 循環
-            //*************************************************
+                //注意調換部門
+                await axios.post("/ReturnRechange/CheckPlanFlow",{mo_id:ls_mo_id,goods_id:ls_goods_id,out_dept:ls_in_dept,in_dept:ls_out_dept}).then(
+                    (response) => {
+                       ls_cnt = response.data;
+                });
+                if(ls_cnt ==='0'){
+                    await this.$XModal.alert({ content: `第 ${li_row_no} 行,頁數【${ls_mo_id}--${ls_goods_id}】\n對應流程不存在!`,status: 'warning' , mask: false });
+                    this.preUpdateFlag = false;
+                    break;
+                }
+            }
         },//--end 保存前檢查
 
         cellStyle({ row, rowIndex, column }){            
@@ -1150,8 +1041,9 @@
         
 
     }, //methods end
+
     watch: {
-            headData:{
+        headData:{
                 handler (newValue, oldValue){
                     if(this.headEditFlag !="NEW"){
                         let edit_flag = false;
@@ -1169,43 +1061,45 @@
                             }
                         }
                     }
-                },
-                deep: true
             },
-            //監控表格1當前數據行的變化
-            selectRow:{
-                handler (val, oldVal) {
-                    if(this.headData.state ==='0') {
-                        if(this.selectRow===null){
-                            //2022/08/08
-                            return;
-                        }                    
-                        let edit_flag = false;
-                        for (let i in this.selectRow) {
-                            if (this.selectRow[i] != this.tempSelectRow[i]) {                            
-                                edit_flag = true; 
-                                //貨品編號有更改 //2022/11/14 避免貨品名稱與貨品編號不對應的問題
-                                if(this.selectRow.goods_id != this.tempSelectRow.goods_id) {
-                                    //記錄更改的貨品編號
-                                    this.temp_goods_id = this.selectRow.goods_id;
-                                }                                
-                                break;
-                            }
+            deep: true
+        },
+        //監控表格1當前數據行的變化
+        selectRow:{//--start selectRow:
+            handler (val, oldVal) {
+                if(this.headData.state ==='0') {
+                    if(this.selectRow===null){
+                        //2022/08/08
+                        return;
+                    }                    
+                    let edit_flag = false;
+                    for (let i in this.selectRow) {
+                        if (this.selectRow[i] != this.tempSelectRow[i]) {                            
+                            edit_flag = true; 
+                            //貨品編號有更改 //2022/11/14 避免貨品名稱與貨品編號不對應的問題
+                            if(this.selectRow.goods_id != this.tempSelectRow.goods_id) {
+                                //記錄更改的貨品編號
+                                this.temp_goods_id = this.selectRow.goods_id;
+                            }                                
+                            break;
                         }
-                        if(edit_flag){
-                            if(this.headEditFlag==="" || this.headEditFlag===undefined){
-                                this.headEditFlag="EDIT"                            
-                            }
-                            this.setStatusHead(true);//設置工具欄狀態,切換按鈕顯示
+                    }
+                    if(edit_flag){
+                        if(this.headEditFlag==="" || this.headEditFlag===undefined){
+                            this.headEditFlag="EDIT"                            
                         }
-                    } //-- end if(this.headData.state ==='0')
+                        this.setStatusHead(true);//設置工具欄狀態,切換按鈕顯示
+                    }
+                } //-- end if(this.headData.state ==='0')
             }, //-- end handler
             deep: true
         }, // --end selectRow:        
+        
         searchID : function (val) {
             this.searchID = val.toUpperCase();
         },        
     },//-- end of watch
+    
     computed: {
         //
     },
@@ -1216,7 +1110,7 @@
             return (() => {
                 that.tableHeight = $(parent.window).height()-(172+65);               
             })()
-        };         
+        };
     }
 
 } //-- end fo main

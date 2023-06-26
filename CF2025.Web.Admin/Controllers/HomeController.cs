@@ -14,7 +14,7 @@ namespace CF2025.Web.Admin.Controllers
     {
         public ActionResult Index()
         {
-            //return RedirectToAction("Index", "Auth", new { Area = "Account" });
+            //return RedirectToAction("Index", "Auth", new { Area = "Account" });            
             return View();
         }
 
@@ -34,7 +34,7 @@ namespace CF2025.Web.Admin.Controllers
 
         [AuthorizeIgnore]
         public ActionResult Login()
-        {
+        {            
             return View();
         }
 

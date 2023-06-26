@@ -4,6 +4,12 @@
 }
 @section PageSpecificStyleSheetIncludes{
     @*<link rel="stylesheet" href="~/Content/Styles/common.css" />*@
+    <style>
+        * {
+            margin:0px;
+            padding: 0px;       
+        }
+    </style>
 }
 <div id="app">
     <vxe-toolbar perfect size="small" style="height:35px;margin-bottom:5px">
@@ -205,17 +211,17 @@
                 </vxe-form-item>
                 <vxe-form-item field="nwt" title="凈重" :span="12" :item-render="{}" class="vxe-form-item-customize">
                     <template #default="{ data }">
-                        <vxe-input v-model="data.nwt" type="float" min="0.01" max="99999.99" class="input-customize"></vxe-input>
+                        <vxe-input v-model="data.nwt" type="float" min="0.01" max="99999.99" :controls="false" class="input-customize"></vxe-input>
                     </template>
                 </vxe-form-item>
                 <vxe-form-item field="gross_wt" title="毛重" :span="12" :item-render="{}" class="vxe-form-item-customize">
                     <template #default="{ data }">
-                        <vxe-input v-model="data.gross_wt" type="float"  min="0.01" max="99999.99" class="input-customize"></vxe-input>
+                        <vxe-input v-model="data.gross_wt" type="float" min="0.01" max="99999.99" :controls="false" class="input-customize"></vxe-input>
                     </template>
                 </vxe-form-item>
                 <vxe-form-item field="package_num" title="包數" :span="12" :item-render="{}" class="vxe-form-item-customize">
                     <template #default="{ data }">
-                        <vxe-input v-model="data.package_num" type="integer" min="0"  max="999"class="input-customize"></vxe-input>
+                        <vxe-input v-model="data.package_num" type="integer" min="0"  max="999" :controls="false" class="input-customize"></vxe-input>
                     </template>
                 </vxe-form-item>
                 <vxe-form-item field="position_first" title="位置" :span="12" :item-render="{}" class="vxe-form-item-customize">
@@ -230,7 +236,7 @@
                         </vxe-select>
                     </template>*@
                     <template #default="{ data }">
-                        <el-select v-model="data.location_id" @@change="getCartonCodeList(data.location_id)" filterable clearable style="width:100%">
+                        <el-select v-model="data.location_id" @@change="getCartonCodeList(data.location_id)" filterable @*clearable*@ style="width:100%">
                             <el-option v-for="item in locationList" :key="item.value" :value="item.value" :label="item.label"style="height:25px;font-size: 9px"/>
                         </el-select>
                     </template>
@@ -242,7 +248,7 @@
                         </vxe-select>
                     </template>*@
                     <template #default="{ data }">
-                        <el-select v-model="data.shelf" filterable clearable style="width:100%">
+                        <el-select v-model="data.shelf" filterable @*clearable*@ style="width:100%">
                             <el-option v-for="item in cartonCodeList" :key="item.value" :value="item.value" :label="item.label"style="height:25px;font-size: 9px"/>
                         </el-select>
                     </template>

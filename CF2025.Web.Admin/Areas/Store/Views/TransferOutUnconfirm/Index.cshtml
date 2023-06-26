@@ -36,7 +36,7 @@
                           title-width="100px"
                           prevent-submit title-colon custom-layout>
                     <!--行1-->
-                    <vxe-form-item title="頁數" field="mo_id" :item-render="{}" span="8" class="vxe-form-item-customize">
+                    <vxe-form-item title="頁數" field="mo_id" :item-render="{}" :span="8" class="vxe-form-item-customize">
                          <template #default="{ data }">
                              <vxe-input v-model="data.mo_id"
                                         @*@@change="upperCase(data.mo_id,'mo_id')"*@
@@ -48,7 +48,7 @@
                              </vxe-input>
                          </template>
                      </vxe-form-item>
-                     <vxe-form-item title="貨品編碼" field="goods_id" :item-render="{}" span="12" class="vxe-form-item-customize">
+                     <vxe-form-item title="貨品編碼" field="goods_id" :item-render="{}" :span="12" class="vxe-form-item-customize">
                          <template #default="{ data }">
                              <vxe-input v-model="data.goods_id"                                      
                                         @@blur="setToEndValue(data.goods_id,'goods_id_end')"
@@ -60,20 +60,20 @@
                          </template>
                      </vxe-form-item>
                      <!--行2-->
-                     <vxe-form-item title="轉出日期" field="transfer_date" :item-render="{}" span="8" class="vxe-form-item-customize">
+                     <vxe-form-item title="轉出日期" field="transfer_date" :item-render="{}" :span="8" class="vxe-form-item-customize">
                          <template #default="{ data }">
                              <vxe-input type="date" v-model="data.transfer_date"
                                         @@change="setToEndValue(data.transfer_date,'transfer_date_end')" class="input-customize" style="width:40%"></vxe-input> ~
                              <vxe-input type="date" v-model="data.transfer_date_end" class="input-customize" style="width:40%"></vxe-input>
                          </template>
                      </vxe-form-item>
-                     <vxe-form-item title="貨品名稱" field="goods_name" :item-render="{}" span="12" class="vxe-form-item-customize">
+                     <vxe-form-item title="貨品名稱" field="goods_name" :item-render="{}" :span="12" class="vxe-form-item-customize">
                          <template #default="{ data }">
                              <vxe-input v-model="data.goods_name" class="input-customize" style="width:82.3%"></vxe-input>
                          </template>
                      </vxe-form-item>
                     <!--行3-->
-                    <vxe-form-item title="轉出單號" field="id" :item-render="{}" span="8" class="vxe-form-item-customize">
+                    <vxe-form-item title="轉出單號" field="id" :item-render="{}" :span="8" class="vxe-form-item-customize">
                         <template #default="{ data }">
                             <vxe-input v-model="data.id"
                                        @@blur="setToEndValue(data.id,'id_end')" maxlength="12" class="input-customize" style="width:40%">
@@ -81,7 +81,7 @@
                             <vxe-input v-model="data.id_end" maxlength="12" class="input-customize" style="width:40%"></vxe-input>
                         </template>
                     </vxe-form-item>
-                    <vxe-form-item title="轉入倉" field="location_id" :item-render="{}" span="4" class="vxe-form-item-customize" style="color:red">
+                    <vxe-form-item title="轉入倉" field="location_id" :item-render="{}" :span="4" class="vxe-form-item-customize" style="color:red">
                         @*<template #default="{ data }">
                             <vxe-select v-model="data.location_id" @@change="getCartonCodeList(data.location_id)" size="mini">
                                 <vxe-option v-for="item in LocationList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
@@ -97,7 +97,7 @@
                         </template>                 
                     </vxe-form-item>
                     @*<vxe-form-item title="貨架" span="2"style="width:110px"></vxe-form-item>*@
-                    <vxe-form-item title="貨架" field="shelf" :item-render="{}" span="6" class="vxe-form-item-customize" style="color:red">
+                    <vxe-form-item title="貨架" field="shelf" :item-render="{}" :span="6" class="vxe-form-item-customize" style="color:red">
                         <template #default="{ data }">
                             @*<vxe-select v-model="data.shelf" size="mini">
                                 <vxe-option v-for="item in CartonCodeList" :key="item.value" :value="item.value" :label="item.value"></vxe-option>
@@ -110,7 +110,7 @@
                     <vxe-form-item title="" :item-render="{}" span="6" class="vxe-form-item-customize">
                     </vxe-form-item>
                     <!--行4-->
-                    <vxe-form-item title="客戶編號" field="customer_id" :item-render="{}" span="8" class="vxe-form-item-customize">
+                    <vxe-form-item title="客戶編號" field="customer_id" :item-render="{}" :span="8" class="vxe-form-item-customize">
                         <template #default="{ data }">
                             <vxe-input v-model="data.customer_id"
                                        @*@@change="upperCase(data.customer_id,'customer_id')"*@

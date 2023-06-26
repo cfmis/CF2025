@@ -2,7 +2,12 @@
     ViewBag.Title = "ProduceAssembly";
 }
 @section PageSpecificStyleSheetIncludes{ 
-   <style></style>
+    <style>
+        * {
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
 }
 @section common_item_group{
     <link rel="stylesheet" href="~/Content/Styles/common-item-group.css" />
@@ -163,21 +168,27 @@
                 <vxe-column field="con_qty" title="組裝數量" width="110" :edit-render="{name:'input',autoselect:true}" align="right">
                     <template #edit="{ row }">
                         @*<vxe-input v-model="row.con_qty" type="integer" style="height:20px;" min="0" max="99999999"></vxe-input>*@
-                        <vxe-input v-model="row.con_qty" type="text" style="height:20px;" @@change="checkNumber(row,'con_qty',row.con_qty)"></vxe-input>
+                        <vxe-input v-model="row.con_qty" type="integer" min="0" :controls="false" style="height:20px;" @@change="setCancelStatus()"
+                                     @* type="text" @@change="checkNumber(row,'con_qty',row.con_qty)"*@ >
+                        </vxe-input>
                     </template>
                 </vxe-column>
                 <vxe-column field="unit_code" title="單位" width="50"></vxe-column>
-                <vxe-column field="sec_qty" title="重量" width="110" :edit-render="{name:'input',autoselect:true}" align="right">
+                <vxe-column field="sec_qty" title="重量" width="110" :edit-render="{name:'input',autoselect:true}" align="right" :formatter="formatSecQty">
                     <template #edit="{ row }">
                         @*<vxe-input v-model="row.sec_qty" type="float" style="height:20px;" min="0.001" max="99999999.99"></vxe-input>*@
-                        <vxe-input v-model="row.sec_qty" type="text" @@change="checkNumberDec2(row,'sec_qty',row.sec_qty)" style="height:20px;"></vxe-input>                        
+                        <vxe-input v-model="row.sec_qty" type="float" min="0.01" :controls="false" style="height:20px;" @@change="setCancelStatus()"
+                                    @*type="text" @@change="checkNumberDec2(row,'sec_qty',row.sec_qty)"*@ >
+                        </vxe-input>                        
                     </template>
                 </vxe-column>
                 <vxe-column field="sec_unit" title="重量單位" width="80"></vxe-column>
                 <vxe-column field="lot_no" title="批號" width="120"></vxe-column>
                 <vxe-column field="package_num" title="包數" width="75" :edit-render="{name:'input',autoselect:true}">
                     <template #edit="{ row }">
-                        <vxe-input v-model="row.package_num"type="text"style="height:20px;"@@change="checkNumber(row,'package_num',row.package_num)"></vxe-input>
+                        <vxe-input v-model="row.package_num" type="integer" min="0" style="height:20px;" @@change="setCancelStatus()"
+                                     @*@@change="checkNumber(row,'package_num',row.package_num)"*@ >
+                        </vxe-input>
                     </template>
                 </vxe-column>
                 <vxe-column field="color_name" title="CF顏色名稱" width="120"></vxe-column>
@@ -189,7 +200,7 @@
                     </template>
                 </vxe-column>
                 <vxe-column field="return_qty_nonce" title="退回數量" width="80"></vxe-column>
-                <vxe-column title="操作" width="180" fixed="right" show-overflow style="text-align:center">
+                <vxe-column title="操作" width="90" fixed="right" show-overflow style="text-align:center">
                     <template #default="{ row }">
                         <vxe-button type="text" icon="iconfont icon-edit5" @@click="editRowEvent(row)" style="color:blue">{{ btnItemTitle }}</vxe-button>
                         @*<template v-if="row.row_status !='' && cancelButton" >
@@ -261,18 +272,20 @@
                         </vxe-input>
                     </template>
                 </vxe-column>
-                <vxe-column field="con_qty" title="用量" width="100" :edit-render="{name:'input',autoselect:true}">
+                <vxe-column field="con_qty" title="用量" width="100" :edit-render="{name:'input',autoselect:true}" >
                     <template #edit="{ row }">
-                        <vxe-input v-model="row.con_qty" type="text" style="height:20px;" 
-                                   @@change="checkNumberDec2Part(row,'con_qty',row.con_qty)"
+                        <vxe-input v-model="row.con_qty" type="float" min="0.01" :controls="false" style="height:20px;" @@change="setCancelStatus2()"
+                                   @*type="text" @@change="checkNumberDec2Part(row,'con_qty',row.con_qty)"*@
                                    @@blur="convertSecQtyByQty(row)">
                         </vxe-input>
                     </template>
                 </vxe-column>
                 <vxe-column field="unit_code" title="單位" width="50"></vxe-column>
-                <vxe-column field="sec_qty" title="重量" width="100":edit-render="{name:'input',autoselect:true}">
+                <vxe-column field="sec_qty" title="重量" width="100":edit-render="{name:'input',autoselect:true}" :formatter="formatSecQty">
                     <template #edit="{ row }">
-                        <vxe-input v-model="row.sec_qty" type="text" style="height:20px;" @@change="checkNumberDec2Part(row,'sec_qty',row.sec_qty)"></vxe-input>
+                        <vxe-input v-model="row.sec_qty" type="float" min="0.01" :controls="false" style="height:20px;" @@change="setCancelStatus2()"
+                                   @*type="text" @@change="checkNumberDec2Part(row,'sec_qty',row.sec_qty)"*@>
+                        </vxe-input>
                     </template>
                 </vxe-column>
                 <vxe-column field="sec_unit" title="重量單位" width="80"></vxe-column>                
@@ -326,20 +339,20 @@
                     <template #default="{ data }">
                         <vxe-input v-model="data.goods_name" class="input-customize" readonly></vxe-input>
                     </template>
-                 </vxe-form-item>
-                 <vxe-form-item field="app_supply_side" title="供方電鍍廠" :span="12" :item-render="{}" class="vxe-form-item-customize">
+                </vxe-form-item>
+                <vxe-form-item field="app_supply_side" title="供方電鍍廠" :span="12" :item-render="{}" class="vxe-form-item-customize">
                     <template #default="{ data }">
                         <vxe-input v-model="data.app_supply_side" class="input-customize" readonly></vxe-input>
                     </template>
                 </vxe-form-item>
                 <vxe-form-item field="package_num" title="包數" :span="12" :item-render="{}" class="vxe-form-item-customize">
                     <template #default="{ data }">
-                        <vxe-input v-model="data.package_num" type="integer" min="0" max="999" @@change="setCancelStatus()"class="input-customize":readonly="isReadOnly"></vxe-input>                       
+                        <vxe-input v-model="data.package_num" type="integer" min="0" max="999" :controls="false" @@change="setCancelStatus()"class="input-customize":readonly="isReadOnly"></vxe-input>                       
                     </template>
                 </vxe-form-item>
                  <vxe-form-item field="con_qty" title="組裝數量" :span="12" :item-render="{name:'input',autoselect:true}" class="vxe-form-item-customize">
                     <template #default="{ data }">
-                        <vxe-input v-model="data.con_qty" type="integer" min="1" @@change="setCancelStatus()"class="input-customize" :readonly="isReadOnly"></vxe-input>
+                        <vxe-input v-model="data.con_qty" type="integer" min="1" :controls="false" @@change="setCancelStatus()"class="input-customize" :readonly="isReadOnly"></vxe-input>
                     </template>
                 </vxe-form-item>
                 <vxe-form-item field="unit_code" title="單位" :span="12" :item-render="{}" class="vxe-form-item-customize">
@@ -351,7 +364,7 @@
                 </vxe-form-item>
                 <vxe-form-item field="sec_qty" title="重量" :span="12" :item-render="{name:'input',autoselect:true}" class="vxe-form-item-customize">
                     <template #default="{ data }">
-                        <vxe-input v-model="data.sec_qty" type="float" min="0.01" @@change="setCancelStatus()" class="input-customize" :readonly="isReadOnly"></vxe-input>
+                        <vxe-input v-model="data.sec_qty" type="float" min="0.01" :controls="false" @@change="setCancelStatus()" class="input-customize" :readonly="isReadOnly"></vxe-input>
                     </template>
                 </vxe-form-item>               
                 <vxe-form-item field="sec_unit" title="重量單位" :span="12" :item-render="{}" class="vxe-form-item-customize">
@@ -457,5 +470,5 @@
 
 
 @section PageSpecificJavascriptIncludes{    
-    <script src="~/Areas/Prod/js/ProduceAssembly.js?v=@Guid.NewGuid().ToString()"></script>
+    <script src="~/Areas/Prod/js/ProduceAssembly.js?v=@Guid.NewGuid().ToString()"></script>    
 }

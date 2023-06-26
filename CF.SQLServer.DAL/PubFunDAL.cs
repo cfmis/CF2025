@@ -482,10 +482,10 @@ namespace CF.SQLServer.DAL
         {
             int rtn = 0;
             int li_cnt = 0;
-            string strSql =string.Format(
+            string strSql = string.Format(
             @"Select Count(1) as counts 
 		    From st_business_record a WITH (NOLOCK)
-		    Where a.within_code ='{0}' and id ='{1}' And Convert(nvarchar(10),check_date,121)=Convert(nvarchar(10),getdate(),121)",
+		    Where a.within_code ='{0}' And id ='{1}' And Convert(nvarchar(10),check_date,121)=Convert(nvarchar(10),getdate(),121)",
             within_code,as_id);
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             li_cnt = int.Parse(dt.Rows[0]["counts"].ToString());

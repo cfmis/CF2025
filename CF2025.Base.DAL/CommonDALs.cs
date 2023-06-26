@@ -16,7 +16,7 @@ namespace CF2025.Base.DAL
     public class CommonDAL
     {
         private static SQLHelper sh = new SQLHelper(CachedConfigContext.Current.DaoConfig.OA);
-        private static PubFunDAL pubFunction = new PubFunDAL();
+        private static PubFunDAL pubFun = new PubFunDAL();
 
         public static string GeoEncrypt(string strEncrypt)
         {
@@ -133,7 +133,7 @@ namespace CF2025.Base.DAL
         {
             string strSql = string.Format(
             @"SELECT A.id,A.window_id,A.field_name,A.operators,A.field_value,A.logic,A.table_name,A.sequence_id,B.field_type 
-            FROM sys_query_users A LEFT JOIN sys_query_initialize B ON A.field_name=B.field_name AND A.table_name=B.table_name
+            FROM sys_query_users A LEFT JOIN sys_query_initialize B ON A.window_id=B.window_id And A.field_name=B.field_name AND A.table_name=B.table_name
             WHERE A.user_no='{0}' AND A.window_id='{1}' 
             ORDER BY A.sequence_id", user_id, window_id);
             List<ModelQuerySavedList> lst = new List<ModelQuerySavedList>();
@@ -142,7 +142,7 @@ namespace CF2025.Base.DAL
             {
                 DataRow dr = dtSaved.Rows[i];
                 ModelQuerySavedList obj = new ModelQuerySavedList();
-                obj.id = Int32.Parse(dr["id"].ToString());
+                obj.id = int.Parse(dr["id"].ToString());
                 obj.window_id = dr["window_id"].ToString();
                 obj.field_name = dr["field_name"].ToString();
                 obj.operators = dr["operators"].ToString().Trim();
@@ -420,7 +420,7 @@ namespace CF2025.Base.DAL
         public static string CheckCanApprove(string id,string window_id)
         {
             string result = "";
-            int rtn = pubFunction.wf_check_inventory_date(id,window_id);
+            int rtn = pubFun.wf_check_inventory_date(id,window_id);
             result = rtn.ToString();
             return result;
         }
