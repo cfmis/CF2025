@@ -15,8 +15,7 @@ namespace CF2025.Prod.DAL
     public static class ReturnRechangeDAL
     {
         static SQLHelper sh = new SQLHelper(CachedConfigContext.Current.DaoConfig.OA);
-        static PubFunDAL pubFun = new PubFunDAL();
-        //static PubFunDAL pubFunction = new PubFunDAL();
+        static PubFunDAL pubFun = new PubFunDAL();       
         static string within_code = "0000";
         static string ls_servername = "hkserver.cferp.dbo";
         static string ldt_check_date = "";
@@ -61,7 +60,7 @@ namespace CF2025.Prod.DAL
             @"SELECT A.id,A.sequence_id,A.mo_id, A.goods_id, B.name AS goods_name, A.con_qty, A.unit_code,
                 A.sec_qty, A.sec_unit, A.lot_no, A.package_num, A.app_supply_side, A.remark, A.return_qty_nonce,
                 A.location, A.carton_code, A.jo_id,A.jo_sequence_id,A.qc_result,A.aim_jo_id, A.aim_jo_sequence,
-                C.name AS color_name,C.four_color,'' as free
+                A.return_reason,C.name AS color_name,C.four_color,'' as free
             FROM jo_materiel_con_details A with(nolock)
                 INNER JOIN it_goods B ON A.within_code = B.within_code And A.goods_id = B.id
                 LEFT JOIN cd_color C ON B.within_code = C.within_code AND B.color = C.id
@@ -90,9 +89,10 @@ namespace CF2025.Prod.DAL
                 mdjDetail.jo_id = dt.Rows[i]["jo_id"].ToString();
                 mdjDetail.jo_sequence_id = dt.Rows[i]["jo_sequence_id"].ToString();
                 mdjDetail.color_name = dt.Rows[i]["color_name"].ToString();
+                mdjDetail.return_reason = dt.Rows[i]["return_reason"].ToString();
                 mdjDetail.aim_jo_id = "";
                 mdjDetail.aim_jo_sequence = "";
-                mdjDetail.four_color = "";
+                mdjDetail.four_color = "";               
                 mdjDetail.row_status = "";
                 lstDetail.Add(mdjDetail);
             }
@@ -105,7 +105,7 @@ namespace CF2025.Prod.DAL
             string sql = string.Format(
                 @"Select Sum(D.con_qty) AS con_qty,Sum(D.sec_qty) AS sec_qty                
                 From jo_materiel_con_mostly M With(nolock),jo_materiel_con_details D With(nolock)
-                Where M.within_code=D.within_code And M.id=D.id And M.bill_type_no='T' And M.stock_type='0' And M.state<>'2' And D.within_code='{0}'
+                Where M.within_code=D.within_code And M.id=D.id And M.bill_type_no='R' And M.stock_type='0' And M.state<>'2' And D.within_code='{0}'
                 And D.id<>'{1}' And D.mo_id='{2}' And D.goods_id='{3}' And M.out_dept='{4}' And M.in_dept='{5}'", within_code, id, mo_id, goods_id, out_dept, in_dept);
             DataTable dt = sh.ExecuteSqlReturnDataTable(sql);
             List<assembly_qty> lst = new List<assembly_qty>();
@@ -217,7 +217,7 @@ namespace CF2025.Prod.DAL
         //保存
         public static string Save(jo_assembly_mostly headData, List<jo_assembly_details> lstDetailData1, List<jo_assembly_details> lstDelData1, string user_id)
         {
-            string str = "", lot_no = "", ls_servername = "hkserver.cferp.dbo";
+            string str = "", lot_no = "";
             StringBuilder sbSql = new StringBuilder(" SET XACT_ABORT ON ");
             sbSql.Append(" BEGIN TRANSACTION ");
             string id = headData.id;
@@ -258,7 +258,7 @@ namespace CF2025.Prod.DAL
                 int index;
                 if (lstDetailData1.Count > 0)
                 {
-                    //移交單表頭                    
+                    //移交退回單表頭                    
                     str = string.Format(
                     @" Insert Into jo_materiel_con_mostly(within_code,id,con_date,handler, update_count,transfers_state,remark,state,bill_type_no,out_dept,in_dept,
                     con_type,stock_type,bill_origin,create_by,create_date,servername,update_date,update_by) VALUES
@@ -266,7 +266,7 @@ namespace CF2025.Prod.DAL
                     within_code, headData.id, headData.con_date, headData.handler, update_count, transfers_state, headData.remark, headData.state,
                     bill_type_no, headData.out_dept, headData.in_dept, con_type, stock_type, bill_origin, headData.create_by, ls_servername, headData.create_by);
                     sbSql.Append(str);
-                    //移交單明細
+                    //移交退回單明細
                     index = 0;
                     foreach (var item in lstDetailData1)
                     {
@@ -495,7 +495,7 @@ namespace CF2025.Prod.DAL
             string return_value = "", str="", strSql = "";
 
             string ls_id, ls_goods_id, ls_aim_jo_id, ls_dept_id, ls_error="";
-            string ls_sequence_id, ls_out_dept, ls_mo_id, ls_servername= "hkserver.cferp.dbo", is_bill_type = "JO";
+            string ls_sequence_id, ls_out_dept, ls_mo_id, is_bill_type = "JO";
             string ls_con_date = "", ls_check_date = "";
             decimal ldec_con_qty = 0, ldec_sec_qty = 0;
             int ll_cnt = 0, ll_cnt_state1 = 0, ll_cnt_state3 = 0, ll_cnt_state4 = 0;

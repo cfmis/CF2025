@@ -21,9 +21,9 @@
             headData: { id: "", con_date: "", out_dept: "", in_dept: "",bill_origin:"2",bill_type_no:"R",stock_type:"0",handler:"", remark: "", create_by: "", update_by: "", check_by: "", 
                 update_count: "", create_date: "", update_date: "", check_date: "", state: "0",head_status:"" },
             rowDataEdit: {
-                id: '', mo_id: '', goods_id: '', goods_name: '',con_qty: 0,  unit_code: 'PCS', sec_qty: 0.00,sec_unit: 'KG',lot_no:'',return_reason:'', package_num: '0',color_name: '', 
+                id: '', mo_id: '', goods_id: '', goods_name: '',con_qty: 0,  unit_code: 'PCS', sec_qty: 0.00,sec_unit: 'KG',lot_no:'', package_num: '0',color_name: '', 
                 four_color: '', app_supply_side: '', remark: '', return_qty_nonce: '',sequence_id: '', location: '',carton_code:'', prd_id: 0,  jo_id:'',jo_sequence_id:'',
-                qc_qty:0,row_status:'',aim_jo:'',aim_jo_sequence:''
+                qc_qty:0,return_reason:'',row_status:'',aim_jo:'',aim_jo_sequence:'',qc_result:''
             },
             billOriginList:[],
             deptList:[],
@@ -236,18 +236,18 @@
                                     //重查刷新數據
                                     this.getHead(this.headData.id);
                                     this.$XModal.alert({ content: '注銷成功!',status: 'success',mask: false });
-                        }else{
+                                }else{
                                     this.$XModal.alert({ content: '注銷失敗!',status: 'error', mask: false });
-                        }
+                                }
                         }).catch(function (response) { 
-                                    alert(response);
+                               alert(response);
                         });                        
-                        }                    
-                        })
-                        } else {
+                    }                    
+                })
+            } else {
                 this.$XModal.alert({ content: '主檔編號不可為空,當前操作無效!', status: 'warning', mask: false });
                 return;
-                        };
+            };
         },
         
         //還原表頭及全部的明細
@@ -297,8 +297,8 @@
         },
         clearRowDataEdit(){
             this.rowDataEdit = {id: '', mo_id: '', goods_id: '', goods_name: '',con_qty: 0,  unit_code: 'PCS', sec_qty: 0.00,sec_unit: 'KG',lot_no:'',
-                return_reason:'', package_num: '0',color_name: '', four_color: '', app_supply_side: '', remark: '', return_qty_nonce: '',sequence_id: '',
-                location: '', carton_code:'', prd_id:0, jo_id:'', jo_sequence_id:'', qc_qty:0, row_status:'', aim_jo:'', aim_jo_sequence:'', qc_result:''
+                 package_num: '0',color_name: '', four_color: '', app_supply_side: '', remark: '', return_qty_nonce: '',sequence_id: '',
+                location: '', carton_code:'', prd_id:0, jo_id:'', jo_sequence_id:'', qc_qty:0, return_reason:'',row_status:'', aim_jo:'', aim_jo_sequence:'', qc_result:''
             }
         },
         backupData () {
@@ -647,7 +647,9 @@
         getDetails:async function(id) {
             await axios.get("/ReturnRechange/GetDetailsByID", { params: { id: id }  }).then(
                 (response) => {
-                    this.tableData1 = response.data;                   
+                    this.tableData1 = response.data; 
+                    console.log(id);
+                    console.log(response.data);
                     if(this.tableData1.length>0){                                           
                         if(this.headData.state ==='0'){
                             this.tempSelectRow = JSON.parse(JSON.stringify(this.tableData1[0]));//暫存當前行,以便檢查是否有更改                           
@@ -907,6 +909,7 @@
             var lstDetailData1 = this.tableData1;
             var lstDelData1 = this.delData1;            
             var user_id = this.userId;
+            //console.log(lstDetailData1);
             axios.post("/ReturnRechange/Save",{headData,lstDetailData1,lstDelData1,user_id}).then(
                 (response) => {
                     if(response.data=="OK"){
@@ -1104,11 +1107,11 @@
         //
     },
     mounted() {
-        this.tableHeight = $(parent.window).height()-(172+65);        
+        this.tableHeight = $(parent.window).height()-(172+55);        
         let that = this; 
         window.onresize = () => {
             return (() => {
-                that.tableHeight = $(parent.window).height()-(172+65);               
+                that.tableHeight = $(parent.window).height()-(172+55);               
             })()
         };
     }
