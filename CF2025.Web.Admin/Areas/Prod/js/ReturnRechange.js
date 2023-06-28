@@ -647,9 +647,7 @@
         getDetails:async function(id) {
             await axios.get("/ReturnRechange/GetDetailsByID", { params: { id: id }  }).then(
                 (response) => {
-                    this.tableData1 = response.data; 
-                    console.log(id);
-                    console.log(response.data);
+                    this.tableData1 = response.data;                    
                     if(this.tableData1.length>0){                                           
                         if(this.headData.state ==='0'){
                             this.tempSelectRow = JSON.parse(JSON.stringify(this.tableData1[0]));//暫存當前行,以便檢查是否有更改                           
