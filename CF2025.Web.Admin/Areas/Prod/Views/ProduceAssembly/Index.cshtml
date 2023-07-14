@@ -434,7 +434,7 @@
             </template>
         </vxe-modal>
         @*彈窗:批號選擇*@
-        <vxe-modal v-model="showLot" title="批號" width="750" :position="{top: showGoodsY, left: showGoodsX}":mask="false" resize destroy-on-close>
+        <vxe-modal v-model="showLot" title="批號" width="750" :position="{top: showGoodsY, left: showGoodsX}" :mask="false" resize destroy-on-close>
             <template #default>
               <vxe-toolbar perfect size="small" style="height:40px;margin-bottom:0px;background:#F5F7FA">
                     <template #buttons style="height:35px;margin-bottom:0px">
@@ -459,7 +459,8 @@
                 <vxe-column field="sec_qty" title="重量" width="90"></vxe-column>
                 <vxe-column field="mo_id" title="頁數" width="90"></vxe-column>
                 <vxe-column field="vendor_name" title="供應商名稱" width="180"></vxe-column>
-                <vxe-column field="is_qc" title="是否QC" width="70"></vxe-column>                
+                <vxe-column field="is_qc" title="是否QC" width="70"></vxe-column>   
+                <vxe-column field="goods_id" title="貨品編碼" v-if="false" width="100"></vxe-column>             
               </vxe-table>
             </template>
         </vxe-modal>

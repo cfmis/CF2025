@@ -100,6 +100,7 @@ namespace CF2025.Prod.Contract
         public decimal qty { get; set; }
         public decimal sec_qty { get; set; }
         public string mo_id { get; set; }
+        public string goods_id { get; set; }
         public string vendor_name { get; set; }
         public string is_qc { get; set; }
     }

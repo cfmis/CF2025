@@ -606,8 +606,8 @@ namespace CF2025.Prod.DAL
                         strSql = string.Format(
                         @"Select Sum(1) as cnt,
                            Sum(Case When Isnull(D.goods_state, '0') = '1' Then 1 Else 0 End) as cnt_state1,
-                           Sum(Case When Isnull(D.goods_state, '0') = '3' Then 1 Else 0 End) as cnt_state2,
-                           Sum(Case When Isnull(D.goods_state, '0') = '4' Then 1 Else 0 End) as cnt_state3
+                           Sum(Case When Isnull(D.goods_state, '0') = '3' Then 1 Else 0 End) as cnt_state3,
+                           Sum(Case When Isnull(D.goods_state, '0') = '4' Then 1 Else 0 End) as cnt_state4
                         From jo_bill_mostly M WITH(NOLOCK) Inner Join jo_bill_goods_details D WITH(NOLOCK) On M.within_code=D.within_code And M.id=D.id And M.ver=D.ver
                         Where M.within_code ='0000' And M.mo_id='{0}' And M.state Not In('2','V')", ls_mo_id);
                         dtJob = sh.ExecuteSqlReturnDataTable(strSql);

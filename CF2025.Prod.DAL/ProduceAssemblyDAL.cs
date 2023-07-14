@@ -212,6 +212,7 @@ namespace CF2025.Prod.DAL
                 mdjDetail.qty = decimal.Parse(dts.Tables[0].Rows[i]["qty"].ToString());
                 mdjDetail.sec_qty = decimal.Parse(dts.Tables[0].Rows[i]["sec_qty"].ToString());
                 mdjDetail.mo_id = dts.Tables[0].Rows[i]["mo_id"].ToString();
+                mdjDetail.goods_id = dts.Tables[0].Rows[i]["goods_id"].ToString();
                 mdjDetail.vendor_name = dts.Tables[0].Rows[i]["vendor_name"].ToString();
                 mdjDetail.is_qc = dts.Tables[0].Rows[i]["is_qc"].ToString();
                 lstDetail.Add(mdjDetail);
@@ -314,8 +315,17 @@ namespace CF2025.Prod.DAL
                   Values ('{0}','{1}','{2}','{3}','1','0','{4}','0','{5}',getdate(),'C','{6}','{7}','0','0','2','{8}','{9}',getdate(),'{10}')",
                   within_code, headData.id, headData.con_date, headData.handler, headData.remark, headData.create_by, headData.out_dept, headData.in_dept,
                   headData.handover_id, ls_servername, headData.create_by);
-                sbSql.Append(str);
-                //插入明細表一
+                sbSql.Append(str);                
+               
+                //是否有QC數據 start 2023/07/14
+                bool is_exists_qc_data = false;
+                foreach (var item in lstTurnOverQc)
+                {
+                    is_exists_qc_data = string.IsNullOrEmpty(item.mo_id) ? false : true;
+                }
+                //end 2023/07/14               
+
+                //插入明細表一                
                 foreach (var item in lstDetailData1)
                 {                   
                     lot_no = CommonDAL.GetDeptLotNo(headData.out_dept, headData.in_dept); //自動生成批號
@@ -328,21 +338,26 @@ namespace CF2025.Prod.DAL
                             i.lot_no = lot_no;
                         }
                     });
+
                     //历遍QC移交單臨時數組,更改批號與組裝單批號一致
-                    lstTurnOverQc.ForEach(i =>
+                    if (lstTurnOverQc.Count > 0 && is_exists_qc_data) //lstTurnOverQc為null引起出錯,特加lstTurnOverQc.Count>0的判斷
                     {
-                        if (i.id == item.id && i.sequence_id == item.sequence_id)
-                        {
-                            i.lot_no = lot_no;
-                        }
-                    });
+                        lstTurnOverQc.ForEach(i =>
+                        {                           
+                            if (i.id == item.id && i.sequence_id == item.sequence_id)
+                            {
+                                i.lot_no = lot_no;
+                            }
+                        });
+                    }
                     str = string.Format(
                     @" Insert Into jo_assembly_details(within_code,id,sequence_id,jo_id,jo_sequence_id,goods_id,con_qty,unit_code,sec_qty,sec_unit,mo_id,
                     package_num,signfor,location,carton_code,sign_by,sign_date,lot_no,prd_id,qc_qty) Values 
                     ('{0}','{1}','{2}','{3}','{4}','{5}',{6},'{7}',{8},'{9}','{10}','{11}',1,'{12}','{13}','{14}',getdate(),'{15}',{16},{17})",
-                    within_code, headData.id, item.sequence_id, item.jo_id, item.jo_sequence_id, item.goods_id, item.con_qty, item.unit_code, item.sec_qty, item.sec_unit,
-                    item.mo_id, item.package_num, headData.out_dept, headData.out_dept, headData.create_by, lot_no, item.prd_id, item.qc_qty);
-                    sbSql.Append(str);
+                        within_code, headData.id, item.sequence_id, item.jo_id, item.jo_sequence_id, item.goods_id, item.con_qty, item.unit_code, item.sec_qty, item.sec_unit,
+                        item.mo_id, item.package_num, headData.out_dept, headData.out_dept, headData.create_by, lot_no, item.prd_id, item.qc_qty);
+                        sbSql.Append(str);
+                   
                 }
                 //插入明細表二
                 foreach (var item in lstDetailData2)
@@ -390,7 +405,8 @@ namespace CF2025.Prod.DAL
                 }
                 //生成QC移交單
                 string max_handover_id_qc = "";
-                if (lstTurnOverQc.Count > 0)
+                //is_exists_qc_data==true有交QC數據.
+                if (lstTurnOverQc.Count > 0 && is_exists_qc_data)
                 {
                     string in_dept = "702";
                     sql_f = string.Format(@"SELECT dbo.fn_zz_sys_bill_max_jo07('{0}','{1}','{2}') as id", headData.out_dept, in_dept, "T");
@@ -1711,6 +1727,7 @@ namespace CF2025.Prod.DAL
             result = (dt.Rows.Count > 0) ? "1" : "0";            
             return result;
         }
+
 
     } // --end public static class ProduceAssemblyDAL
 }

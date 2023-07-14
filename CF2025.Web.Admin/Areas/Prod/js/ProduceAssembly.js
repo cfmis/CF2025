@@ -1177,12 +1177,12 @@
             }
         },
         //確認选中的批号
-        changeLotNo() {
+        changeLotNo() {           
             if(this.seledtLotNoRow){
                 if(this.selectRow2.lot_no != this.seledtLotNoRow.lot_no){
                     this.$set(this.selectRow2, "mo_id", this.seledtLotNoRow.mo_id);
                     this.$set(this.selectRow2, "lot_no", this.seledtLotNoRow.lot_no);
-                    var strGoodsId=this.seledtLotNoRow.goods_id;
+                    var strGoodsId = this.seledtLotNoRow.goods_id;
                     if(strGoodsId.substring(0,2)==='ML'){
                         this.$set(this.selectRow2, "con_qty", 0.01);//原料數量默認為0.01
                     }
@@ -1326,8 +1326,15 @@
             var headData = JSON.parse(JSON.stringify(this.headData));
             var lstDetailData1 = this.tableData1, lstDetailData2 = this.originData2;
             var lstDelData1 = this.delData1, lstDelData2 = this.delData2;     
-            var lstTurnOver = this.tmp_turn_over, lstTurnOverQc = this.tmp_turn_over_qc;
-            var user_id= this.userId;
+            var lstTurnOver = this.tmp_turn_over;
+            var lstTurnOverQc = this.tmp_turn_over_qc;
+            
+            //當沒有交QC數據時需按如下處理,否則后端判斷將出錯.
+            if(this.tmp_turn_over_qc.length==0){
+                lstTurnOverQc = [{id:"",sequence_id:"",mo_id:""}];
+            }
+            
+            var user_id = this.userId;
             axios.post("/ProduceAssembly/Save",{headData,lstDetailData1,lstDetailData2,lstDelData1,lstDelData2,lstTurnOver,lstTurnOverQc,user_id}).then(
                 (response) => {
                     if(response.data=="OK"){                                  

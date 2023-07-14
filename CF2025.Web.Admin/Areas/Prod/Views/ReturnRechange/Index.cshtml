@@ -35,7 +35,7 @@
     
     <div style="margin:5px 0px;">
         <vxe-form :data="headData" ref="formHead" size="mini" style="min-width:1024px;max-width:1152px" title-align="right" title-width="100px" custom-layout>
-            <vxe-form-item title="編號" :item-render="{}" span="6" class="vxe-form-item-group" style="color:blue">
+            <vxe-form-item title="編號" :item-render="{}" :span="6" class="vxe-form-item-group" style="color:blue">
                 <vxe-input v-model="headData.id" maxlength="13" class="input-customize" readonly></vxe-input>
             </vxe-form-item>
             <vxe-form-item title="移交日期" :item-render="{}" :span="6" class="vxe-form-item-group" style="color:blue">
