@@ -234,8 +234,8 @@
                                 if(response.data=="OK"){                
                                     this.setStatusHead(false);
                                     //重查刷新數據
-                                    this.getHead(this.headData.id);
-                                    this.$XModal.alert({ content: '注銷成功!',status: 'success',mask: false });
+                                    this.getHead(this.headData.id);                                    
+                                    this.$XModal.message({ content: '注銷成功!', status: 'success' });
                                 }else{
                                     this.$XModal.alert({ content: '注銷失敗!',status: 'error', mask: false });
                                 }
@@ -255,7 +255,7 @@
             this.setStatusHead(false);
             this.headData = JSON.parse(JSON.stringify(this.tempHeadData));//還原主表
             this.tableData1 = JSON.parse(JSON.stringify(this.tempTableData1));//還原明細            
-            this.delData1=[];           
+            this.delData1 = [];          
             this.rows = JSON.parse(JSON.stringify(this.tableData1));
             this.isDisableGenNo = this.tempDisableGenNo;
             this.headEditFlag = "";
@@ -1022,6 +1022,7 @@
             }
         },//--end 保存前檢查
 
+        //行的狀態為編輯狀態時黃色背景顯示
         cellStyle({ row, rowIndex, column }){            
             if(row.row_status !=""){
                 return {
