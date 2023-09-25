@@ -63,5 +63,16 @@ namespace CF2025.Web.Admin.Areas.Store.Controllers
             }
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+
+        //注銷
+        [HttpPost]
+        public ActionResult DeleteHead(st_adjustment_mostly head, string user_id)
+        {
+            string result = AdjustmentDAL.DeleteHead(head, user_id);
+            if (result == "")
+                return Json("OK");
+            else
+                return Json("Error");
+        }
     }
 }

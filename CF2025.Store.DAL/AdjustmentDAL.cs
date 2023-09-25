@@ -337,6 +337,18 @@ namespace CF2025.Store.DAL
             return result;
         }
 
+        //注銷
+        public static string DeleteHead(st_adjustment_mostly head, string user_id)
+        {
+            string result = "";
+            string strSql = string.Format(
+                @"UPDATE jo_assembly_mostly with(Rowlock) 
+                SET state='2',update_by='{0}',update_date=getdate() 
+                WHERE within_code='0000' AND id='{1}'", user_id, head.id);
+            result = sh.ExecuteSqlUpdate(strSql);
+            return result;//成功返回空格
+        }
+
 
         /// <summary>
         /// 生成調整單交易數據(返回值為字符串,字串前兩位:-1代表失敗;00:成功)

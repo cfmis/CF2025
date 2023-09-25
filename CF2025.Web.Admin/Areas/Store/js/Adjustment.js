@@ -6,7 +6,7 @@
             curRowIndex: null,
             selectRow: null,
             selectFindItemRow:null, //選擇貨品編號
-            seledtLotNoRow:null,//選擇批號號           
+            seledtLotNoRow:null,//選擇批號           
             headerCellStyle:{background:'#F5F7FA',color:'#606266',height:'25px',padding:'2px'},
             loading: false,
             showEdit: false,
@@ -27,35 +27,22 @@
             wtUnitList:[],
             locationList:[],
             cartonCodeList: [{ label: '', value: '' }],
-            goodsLotNoList:[],
-          
+            goodsLotNoList:[],          
             lotNoList:[],
             tableData1:[],
             delData1:[],
-            formDataFind:{},
+           
             isEditHead: false,//主檔編輯狀態
             isEditDetail: false,//明細編輯狀態
             isReadOnly: true,//主檔明細共用,控制是否可以更改資料
             isDisableDept:true,//是否可以更改部門
             isDisable:true, //主檔下拉表控年是否可編輯
             isEditCell:false,
-            userId:"",            
+            userId:"",     
             tempHeadData: {},
             tempTableData1: {},
-            tempSelectRow:{},       
+            tempSelectRow:{},
             tableHeight :450,
-            tempSaveData:[],
-            
-            findData:[],
-            insertRecords:{}, 
-            removeRecords:{}, 
-            updateRecords:{},            
-            formRules: {
-                id: [{ required: true},{ min: 13, message: '請輸入13个字符長度' }],
-                con_date:[{ required: true, message: '請輸入日期' }],
-                out_dept:[{ required: true, message: '請選擇組裝部門' }],
-                in_dept:[{ required: true, message: '請選擇收貨部門' }]
-            },            
             validRules: {
                 mo_id: [{ required: true, message: '頁數不可為空' }],
                 goods_id: [{ required: true, message: '貨品編碼不可為空'}],
@@ -69,9 +56,7 @@
             div_tab1_height:'300px',
             rows:[],            
             validStockFlag:false,
-            preUpdateFlag:false,
-            tmp_turn_over:[],//移交單臨時數據
-            tmp_turn_over_qc:[],//QC移交單臨時數據
+            preUpdateFlag:false,        
             valid_user_id:false,
             unok_status:"1",//檢查移交單是否已批準,如果已批準則返回"1",反批準按鈕不顯示, 當前默認1是不顯示
             ok_status:"0",//控制批準按鈕的顯示, 當前默認0是顯示            
@@ -100,7 +85,7 @@
                 return;
             }
             if(dept_id != this.selectRow.location){
-                this.$XModal.confirm('更改主表倉庫后,會同時將明細表中的所有數據的倉庫都更改？').then(type => {
+                this.$XModal.confirm('更改主表倉庫后,會同時將明細表中所有數據的倉庫都更改？').then(type => {
                     if (type == 'confirm') {
                         var $table = this.$refs.xTable1;                        
                         for(let i=0;i<this.tableData1.length;i++){
@@ -148,9 +133,9 @@
         
         setUpperCase(strField,value){
             value = comm.stringToUppercase(value);
-            this.$set(this.selectRow, strField, value ); //如字母相同只是大小寫不同,修改狀態合仍然為FALSE
+            this.$set(this.selectRow, strField, value ); //如字母相同只是大小寫不同,修改狀態后仍然為FALSE
             this.setCancelStatus();            
-        },        
+        },
         checkNumber(obj,strField,value) {
             comm.allNumber(obj,strField,value);
             this.setCancelStatus();
@@ -243,7 +228,7 @@
                     if (type == 'confirm') {
                         var head = JSON.parse(JSON.stringify(this.headData));
                         var user_id = this.userId;
-                        axios.post("/ReturnRechange/DeleteHead",{head,user_id}).then(
+                        axios.post("/Adjustment/DeleteHead",{head,user_id}).then(
                             (response) => {
                                 if(response.data=="OK"){                
                                     this.setStatusHead(false);
@@ -319,16 +304,17 @@
         },
         //項目新增1
         insertRowEvent() {
-            if(this.headData.state !="0"){
+            if(this.headData.state !="0"){ //批准或注销状态,不可以新增明细
                 this.$XModal.alert({ content: '非編輯狀態,不可以進行此操作!',status: 'info', mask: false });
                 return;
             }
-            if (this.headData.id == "") {              
+            if (this.headData.id === "") {              
                 this.$XModal.alert({ content: '主檔編號不可為空,當前操作無效!',status: 'info', mask: false });
                 return;
             }; 
             if (this.headData.department_id === "") {
                 //this.$XModal.message({ content: '倉庫必須輸入!', status: 'warning' });
+
                 //elementui中Message消息提示在页面垂直居中
                 this.$message({
                     message: '倉庫必須輸入！',
@@ -338,7 +324,7 @@
                 this.$refs['dept_id'].focus(); //設置焦點, this.$refs是包含自定義的引用對象
                 return;
             }; 
-            var rowEndIndex = -1;//添加至行尾
+            //var rowEndIndex = -1;//添加至行尾
             var $table = this.$refs.xTable1;
             this.clearRowDataEdit();
             this.selectRow = null;    
@@ -352,7 +338,7 @@
             //}
             myArray.forEach((res,index,e)=>ary.push(e[index].sequence_id));
             var seq_id = this.getSequenceId($table.tableData.length);
-            var aryFilter = ary.filter(el=> el===seq_id);
+            var aryFilter = ary.filter(el=> el===seq_id);//是否存在seq_id序号
             if(aryFilter.length>0){
                 //存在序號則加1再重生序號
                 seq_id = this.getSequenceId($table.tableData.length +1);
@@ -364,7 +350,7 @@
             this.$set(this.rowDataEdit, "carton_code", this.headData.department_id);   
             this.$set(this.rowDataEdit, "unit", "PCS"); 
             this.$set(this.rowDataEdit, "sec_unit", "KG"); 
-            this.$set(this.rowDataEdit, "row_status", "NEW");            
+            this.$set(this.rowDataEdit, "row_status", "NEW");              
             this.tableData1.push(this.rowDataEdit);
             this.selectRow = this.rowDataEdit;
             $table.setCurrentRow(this.rowDataEdit);//定位至當前索引所在的行
@@ -572,7 +558,7 @@
             this.showGoodsY = row.$event.clientY-20;
         },
         
-        //查找流程中的货品编码
+        //查找货品编码
         showItem(event,type){
             this.selectFindItemRow = null;
             var x=0,y=0;
@@ -615,7 +601,7 @@
                 //x,y點擊點鼠標的座標
                 this.showGoodsX = x;
                 this.showGoodsY = y;
-                //提取生产流程数据
+                //提取货品仓庫数据
                 this.getItemData(this.headData.department_id,this.selectRow.mo_id);
                 this.showGoods = true;
             }
