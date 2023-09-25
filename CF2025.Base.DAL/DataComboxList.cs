@@ -89,6 +89,9 @@ namespace CF2025.Base.DAL
                 case "cd_carton_size"://裝箱尺寸
                     strSql += "SELECT id,id+'--' + name AS name FROM cd_carton_size WHERE within_code='" + within_code + "' ORDER BY id";
                     break;
+                case "AdjustmentReason"://倉庫調整
+                    strSql += "SELECT id,id+'--' + reason AS name FROM cd_reason WHERE within_code='" + within_code + "' AND state='0' ORDER BY id";
+                    break;
                 default:
                     strSql += "";
                     break;

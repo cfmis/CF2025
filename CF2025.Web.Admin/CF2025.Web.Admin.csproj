@@ -295,6 +295,7 @@
     <Compile Include="Areas\Sale\Controllers\OrderController.cs" />
     <Compile Include="Areas\Sale\Controllers\PackingListController.cs" />
     <Compile Include="Areas\Sale\SaleAreaRegistration.cs" />
+    <Compile Include="Areas\Store\Controllers\AdjustmentController.cs" />
     <Compile Include="Areas\Store\Controllers\TransferInController.cs" />
     <Compile Include="Areas\Store\Controllers\TransferOutController.cs" />
     <Compile Include="Areas\Store\Controllers\TransferOutUnconfirmController.cs" />
@@ -327,6 +328,7 @@
     <Content Include="Areas\Sale\js\DealWithInvoice.js" />
     <Content Include="Areas\Sale\js\Invoice.js" />
     <Content Include="Areas\Sale\js\PacklingList.js" />
+    <Content Include="Areas\Store\js\Adjustment.js" />
     <Content Include="Areas\Store\js\TransferIn.js" />
     <Content Include="Areas\Store\js\TransferOut.js" />
     <Content Include="Areas\Store\js\TransferOutUnconfirm.js" />
@@ -407,6 +409,7 @@
     <Content Include="Areas\SaleOrder\Views\Shared\_Layout.cshtml" />
     <Content Include="Areas\SaleOrder\Views\SaleOrder\Index.cshtml" />
     <Content Include="Areas\Prod\Views\ReturnRechange\Index.cshtml" />
+    <Content Include="Areas\Store\Views\Adjustment\Index.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />

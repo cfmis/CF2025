@@ -16,21 +16,25 @@ namespace CF2025.Web.Admin.Areas.Base.Controllers
             ViewData["user_id"] = user_id;
             return View();
         }
-
+        
+        //取倉庫調整最大單號
+        public ActionResult GetMaxIDStock(string bill_id, int serial_len)
+        {           
+            var result = CommonDAL.GetMaxID(bill_id, serial_len);
+            return Json(result, JsonRequestBehavior.AllowGet);            
+        }
         //取最大單號
         public ActionResult GetMaxID(string bill_id, string dept_id, int serial_len)
         {
             var result = CommonDAL.GetMaxID(bill_id, dept_id, serial_len);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
-
         //取移交單最大單號
         public ActionResult GetMaxIDJo07(string out_dept, string in_dept, string doc_type)
         {
             var result = CommonDAL.GetMaxIDJo07(out_dept, in_dept, doc_type);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
-
         //檢查批準狀態       
         public JsonResult CheckApproveState(string table_name, string id)
         {

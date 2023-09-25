@@ -333,7 +333,15 @@ namespace CF2025.Base.DAL
             }
             return dataTable;
         }
-
+        
+        //倉庫調整最大單據號
+        public static string GetMaxID(string bill_id, int serial_len)
+        {
+            string strSql = string.Format(@"SELECT dbo.fn_zz_sys_bill_max_separate_st('{0}',{1}) as id", bill_id, serial_len);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            string id = dt.Rows[0]["id"].ToString(); // Return value DT10560134510
+            return id;
+        }
 
         //最大單據號
         public static string GetMaxID(string bill_id, string dept_id, int serial_len)
@@ -342,7 +350,7 @@ namespace CF2025.Base.DAL
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             string id = dt.Rows.Count > 0 ? dt.Rows[0]["max_id"].ToString() : "";
             return id;
-        }
+        }       
 
         //移交單最大單據號
         public static string GetMaxIDJo07(string out_dept, string in_dept, string doc_type)
@@ -351,9 +359,9 @@ namespace CF2025.Base.DAL
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             string id = dt.Rows[0]["id"].ToString(); // Return value DT10560134510
             return id;
-        }
+        }        
 
-        //取單據批準狀態
+         //取單據批準狀態
         public static string CheckApproveState(string table_name, string id)
         {
             string strSql = string.Format("Select state From {0} with(nolock) WHERE within_code='0000' and id='{1}'", table_name, id);
