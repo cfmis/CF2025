@@ -126,5 +126,13 @@ namespace CF2025.Web.Admin.Areas.Prod.Controllers
             else
                 return Json("Error");
         }
+
+        //[HttpPost]
+        //public ActionResult Print()
+        //{
+        //    //ViewBag.WebReport = rpt;
+        //    //return View("test.aspx");
+        //    return View();
+        //}
     }
 }

@@ -124,7 +124,19 @@
         //    await comm.openPassword(this.userId);
         //},
         printEvent(){
-           //
+            ////var url= "/ProduceRechange/Print?ID=" + this.headData.id ;
+            ////comm.showMessageDialog(url,'列印',800,600,true);//1024,768     
+            
+            //axios.post("/ProduceRechange/Print" ).then(
+            //    (response) => {
+            //        console.log(response.data);                    
+            //    },
+            //    (response) => {
+            //        alert(response.status);
+            //    }
+            //).catch(function (response) {
+            //    alert(response);
+            //});
         },    
         focusInDept(){
             this.$refs['inDept'].focus(); //this.$refs包含自定義的引用對象
