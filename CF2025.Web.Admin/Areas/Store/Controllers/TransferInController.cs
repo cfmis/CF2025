@@ -11,10 +11,11 @@ namespace CF2025.Web.Admin.Areas.Store.Controllers
 {
     public class TransferInController : Controller
     {
+        //轉入單
         // GET: Store/TransferIn
         public ActionResult Index(string flagChild)
         {
-            string user_id = "";
+            string user_id = string.Empty;
             try
             {
                 user_id = AdminUserContext.Current.LoginInfo.LoginName;
@@ -22,10 +23,9 @@ namespace CF2025.Web.Admin.Areas.Store.Controllers
             catch
             {
                 user_id = "";
-            }            
+            } 
             ViewData["user_id"] = string.IsNullOrEmpty(user_id)?"": user_id;
-            ViewData["flagChild"] = flagChild;
-            //ViewData["server_date"] = DateTime.Now.Date.ToString("yyyy-MM-dd");
+            ViewData["flagChild"] = flagChild;            
             return View();
         }
 

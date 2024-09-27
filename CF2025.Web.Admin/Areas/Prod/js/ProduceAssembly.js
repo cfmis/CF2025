@@ -975,8 +975,8 @@
             }
         },
         //點擊表格一時表格二跟著變化
-        setTableData2ByCurrentMo () {            
-            this.tableData2 =[];            
+        setTableData2ByCurrentMo () {
+            this.tableData2 =[];
             if (this.curRowSeqId !='') {
                 this.tableData2 = this.filterOriginData2();
             }

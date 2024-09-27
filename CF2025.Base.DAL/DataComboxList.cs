@@ -21,7 +21,7 @@ namespace CF2025.Base.DAL
             string strSql = "";
             string LanguageID = sh.ConvertLanguage(language_id);
             switch (SourceType)
-            {
+            {               
                 case "SO01"://單據來源
                     strSql += "Select substring(id,2,1) As id,name,name As english_name From sys_bill_origin Where function_id='SO01' AND language='3' AND state='0' Order By id";
                     break;
@@ -92,8 +92,11 @@ namespace CF2025.Base.DAL
                 case "AdjustmentReason"://倉庫調整
                     strSql += "SELECT id,id+'--' + reason AS name FROM cd_reason WHERE within_code='" + within_code + "' AND state='0' ORDER BY id";
                     break;
-                default:
-                    strSql += "";
+                case "H": //倉庫發料單據來源
+                    strSql += string.Format("SELECT id,name FROM cd_mo_type WHERE within_code='{0}' And mo_type='{1}' And [state]='0'", within_code, SourceType);
+                    break;
+                default: //公用開單來源或單據種類等
+                    strSql += string.Format("SELECT id,name FROM sys_bill_origin WHERE function_id='{0}' And [language]='{1}' And [state]='0'", SourceType,LanguageID);                    
                     break;
             }
             //cd_carton_size

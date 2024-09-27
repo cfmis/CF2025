@@ -514,7 +514,7 @@ namespace CF.SQLServer.DAL
                     break;
                 case "w_st_adjustment": //调整                    
                     break;
-                case "w_changestore_cc":
+                case "w_changestore_cc": //倉庫發料
                 case "w_changestore_cc_lot":
                 case "w_changestore_cj":
                 case "w_changestore_cd":

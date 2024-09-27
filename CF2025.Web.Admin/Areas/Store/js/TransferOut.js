@@ -11,10 +11,25 @@
             showEdit: false,
             submitLoading: false,
             showEditStore: false,
-            isEditHead: false,//主檔編輯狀態
-            headData: {},
-            
-            server_date:"", 
+            isEditHead: false,//主檔編輯狀態           
+            headData: {
+                id: "", transfer_date: "", bill_type_no: "", group_no: "", department_id: "", handler: "", remark: "",
+                update_by: "", state: "0", create_by: "", create_date: "", update_date: "", update_count: "1",remark:"",
+                check_by: "", check_date: "", head_status: ""
+            },
+            gridData: [],
+            gridDataPart:[],
+            rowDataEdit: {
+                mo_id: '', shipment_suit: '0', goods_id: '', goods_name: '', unit: '', transfer_amount: 0, sec_unit: '', sec_qty: 0, package_num: 0,
+                position_first: '', nwt: 0, gross_wt: 0, location_id: '', carton_code: '', inventory_qty: 0, inventory_sec_qty: 0, lot_no: '', remark: '',
+                do_color:'', move_location_id:'', move_carton_code:'', id:'', sequence_id:'', row_status: ''
+            },
+            deptList: [],
+            billTypeList:[],
+            groupNoList: [],
+
+
+            //server_date:"", 
             stateFontColor:"color:black",
         }
     },

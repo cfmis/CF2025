@@ -19,6 +19,7 @@ namespace CF2025.Prod.DAL
         public static string within_code = "0000";
         public static string ls_servername = "hkserver.cferp.dbo";
         public static string ldt_check_date = "";
+        public static StringBuilder sbSql = new StringBuilder();
         //private static string language_id = "1";
         //private static string sequence_id = "";
 
@@ -250,7 +251,8 @@ namespace CF2025.Prod.DAL
                                   List<jo_assembly_details> lstTurnOver, List<jo_assembly_details> lstTurnOverQc,string user_id )
         {
             string str = "", lot_no = "", max_handover_id = "";
-            StringBuilder sbSql = new StringBuilder(" SET XACT_ABORT ON ");
+            sbSql.Clear();
+            sbSql.Append(" SET XACT_ABORT ON ");
             sbSql.Append(" BEGIN TRANSACTION ");
             string id = headData.id;
             string head_insert_status = headData.head_status;
@@ -679,26 +681,21 @@ namespace CF2025.Prod.DAL
             if (result == "")
             {
                 //--start更新PAD生產嗙貨給組裝轉換已入單標識
-                string sql = string.Format(
+                string strSql = string.Format(
                 @"Select Count(1) As cnt 
                 From jo_assembly_mostly A WITH(NOLOCK),jo_assembly_details B WITH(NOLOCK),product_records C WITH(NOLOCK)
                 Where A.within_code=B.within_code And A.id=B.id And B.prd_id=C.prd_id And Isnull(C.imput_flag,'')='' And
                       A.within_code='{0}' And A.id='{1}'", within_code, headData.id);
-                DataTable dt = sh.ExecuteSqlReturnDataTable(sql);
+                DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
                 if (int.Parse(dt.Rows[0]["cnt"].ToString()) > 0)
-                {                    
-                    sbSql.Clear();
-                    sbSql.Append(@" SET XACT_ABORT ON ");
-                    sbSql.Append(@" BEGIN TRANSACTION ");                                            
-                    sql = string.Format(
+                {
+                    strSql = string.Format(
                     @" Update C WITH(ROWLOCK) Set C.imput_flag ='Y',C.imput_time=GetDate()        
                     From jo_assembly_mostly A,jo_assembly_details B,product_records C        
                     Where A.within_code = B.within_code And A.id = B.id And B.prd_id = C.prd_id        
-                            And Isnull(C.imput_flag,'')='' And A.within_code='{0}' And A.id ='{1}'", within_code, headData.id);
-                    sbSql.Append(sql);
-                    sbSql.Append(@" COMMIT TRANSACTION ");
-                    result = sh.ExecuteSqlUpdate(sbSql.ToString());
-                    sbSql.Clear();
+                         And Isnull(C.imput_flag,'')='' And A.within_code='{0}' And A.id ='{1}'", within_code, headData.id);
+                    strSql = RetunSqlString(strSql);
+                    result = sh.ExecuteSqlUpdate(strSql);
                 }
                 //--end 更新PAD生產嗙貨給組裝轉換已入單數據標識
 
@@ -745,8 +742,8 @@ namespace CF2025.Prod.DAL
             {
                 result = "00";
                 return result;
-            }                      
-            StringBuilder sbSql = new StringBuilder();
+            }            
+            sbSql.Clear();
             sbSql.Append(@" SET XACT_ABORT ON ");
             sbSql.Append(@" BEGIN TRANSACTION ");
             str = string.Format(
@@ -774,8 +771,8 @@ namespace CF2025.Prod.DAL
                     {
                         //成功,更新移交單批準狀態 
                         str = string.Format(
-                                @" Update jo_materiel_con_mostly with(Rowlock) SET check_date='{2}',check_by='{3}',state='{4}' WHERE within_code='{0}' and id='{1}'",
-                                within_code, dt.Rows[i]["id"].ToString(), check_date, user_id, "1");
+                        @" Update jo_materiel_con_mostly with(Rowlock) SET check_date='{2}',check_by='{3}',state='{4}' WHERE within_code='{0}' and id='{1}'",
+                        within_code, dt.Rows[i]["id"].ToString(), check_date, user_id, "1");
                         sbSql.Append(str);
                     }
                 }
@@ -790,8 +787,8 @@ namespace CF2025.Prod.DAL
                         */
                         str = string.Format(
                         @" Update jo_assembly_mostly with(Rowlock) 
-                                    SET check_date='{2}',check_by='{3}',state='{4}',handover_id='{5}'
-                                    WHERE within_code='{0}' and id='{1}'",
+                           SET check_date='{2}',check_by='{3}',state='{4}',handover_id='{5}'
+                           WHERE within_code='{0}' and id='{1}'",
                             within_code, headData.id, check_date, user_id, "1", handover_id1);
                         sbSql.Append(str);
                     }
@@ -807,7 +804,7 @@ namespace CF2025.Prod.DAL
                         result = "-1" + result;
                     }
                 }
-            }            
+            }
 
             return result;
         }
@@ -869,9 +866,9 @@ namespace CF2025.Prod.DAL
         {
             string result = ""; 
             string strSql = string.Format(
-                @"Select A.id From jo_assembly_mostly A,jo_assembly_details B
-                Where A.within_code = B.within_code And A.id = B.id And A.state <> '2' And
-                A.within_code='0000' And B.prd_id = {0} And B.id <> '{1}'", prd_id,id);
+            @"Select A.id From jo_assembly_mostly A,jo_assembly_details B
+            Where A.within_code = B.within_code And A.id = B.id And A.state <> '2' And
+            A.within_code='0000' And B.prd_id = {0} And B.id <> '{1}'", prd_id,id);
             DataTable dt = new DataTable();
             dt = sh.ExecuteSqlReturnDataTable(strSql);
             if (dt.Rows.Count > 0)
@@ -885,10 +882,10 @@ namespace CF2025.Prod.DAL
         {
             int result = 0;
             string strSql = string.Format(
-                @"Select Count(1) As rs From jo_bill_mostly A with(nolock),jo_bill_goods_details B with(nolock)
-			    Where A.within_code = B.within_code And A.id = B.id And A.ver = B.ver And A.state Not In('0','2','V')
-				And A.within_code='0000' And A.mo_id='{0}' And B.goods_id='{1}' And B.wp_id='{2}' And B.next_wp_id='{3}'",
-                mo_id, goods_id,wp_id,next_wp_id);
+            @"Select Count(1) As rs From jo_bill_mostly A with(nolock),jo_bill_goods_details B with(nolock)
+			Where A.within_code = B.within_code And A.id = B.id And A.ver = B.ver And A.state Not In('0','2','V')
+			And A.within_code='0000' And A.mo_id='{0}' And B.goods_id='{1}' And B.wp_id='{2}' And B.next_wp_id='{3}'",
+            mo_id, goods_id,wp_id,next_wp_id);
             DataTable dt = new DataTable();
             dt = sh.ExecuteSqlReturnDataTable(strSql);
             if (dt.Rows.Count > 0)
@@ -923,11 +920,11 @@ namespace CF2025.Prod.DAL
         public static List<assembly_qty> GetAssemblyQty(string id,string mo_id, string goods_id, string out_dept) 
         {
             string strSql = string.Format(
-                @"Select Isnull(Sum(D.con_qty),0) As con_qty,Isnull(Sum(D.sec_qty),0) As sec_qty 
-                From jo_assembly_mostly M with(nolock),jo_assembly_details D with(nolock)
-		        Where M.within_code=D.within_code And M.id=D.id And M.state Not In('2','V') And D.within_code='{0}'
-				And D.id <>'{1}' And D.mo_id='{2}' And D.goods_id='{3}' And M.out_dept='{4}'",
-                within_code,id,mo_id,goods_id,out_dept);
+            @"Select Isnull(Sum(D.con_qty),0) As con_qty,Isnull(Sum(D.sec_qty),0) As sec_qty 
+            From jo_assembly_mostly M with(nolock),jo_assembly_details D with(nolock)
+		    Where M.within_code=D.within_code And M.id=D.id And M.state Not In('2','V') And D.within_code='{0}'
+			And D.id <>'{1}' And D.mo_id='{2}' And D.goods_id='{3}' And M.out_dept='{4}'",
+            within_code,id,mo_id,goods_id,out_dept);
             DataTable dt = new DataTable();
             dt = sh.ExecuteSqlReturnDataTable(strSql);           
             List<assembly_qty> lstDetail = new List<assembly_qty>();
@@ -950,10 +947,10 @@ namespace CF2025.Prod.DAL
         public static decimal GetPlanProdQty(string out_dept,string mo_id, string goods_id)
         {
             string strSql = string.Format(
-                @"Select Sum(Isnull(D.prod_qty,0)) As prod_qty From jo_bill_mostly M with(nolock)
-                Inner join jo_bill_goods_details D with(nolock) ON M.within_code=D.within_code And M.id=D.id And M.ver=D.ver
-                Where D.within_code ='{0}' And M.mo_id ='{1}' And M.state Not In('2','V') And D.goods_id ='{2}' And D.wp_id ='{3}'",
-                within_code, mo_id, goods_id, out_dept);
+            @"Select Sum(Isnull(D.prod_qty,0)) As prod_qty From jo_bill_mostly M with(nolock)
+            Inner join jo_bill_goods_details D with(nolock) ON M.within_code=D.within_code And M.id=D.id And M.ver=D.ver
+            Where D.within_code ='{0}' And M.mo_id ='{1}' And M.state Not In('2','V') And D.goods_id ='{2}' And D.wp_id ='{3}'",
+            within_code, mo_id, goods_id, out_dept);
             DataTable dt = new DataTable();
             dt = sh.ExecuteSqlReturnDataTable(strSql);
             decimal result = 0;
@@ -992,8 +989,8 @@ namespace CF2025.Prod.DAL
                 result = dt.Rows[0]["pope"].ToString();
             }
             return result;
-        }
-        
+        }        
+
         /// <summary>
         /// 批準/反批準,生成組裝單,移交單的交易,庫存更新等(失敗返回的字串前兩位是"-1")
         /// </summary>
@@ -1004,7 +1001,7 @@ namespace CF2025.Prod.DAL
         public static string Approve(jo_assembly_mostly head,string user_id, string approve_type)
         {
             string result = "", return_value = "", strSql = "";
-            StringBuilder sbSql = new StringBuilder();
+            //StringBuilder sbSql = new StringBuilder();
             string active_name = approve_type == "1" ? "批準" : "反批準";
             DataTable dt = new DataTable();            
 
@@ -1033,13 +1030,8 @@ namespace CF2025.Prod.DAL
                 Where a.within_code = b.within_code and a.id = b.id and a.within_code ='{0}' and
                         A.within_code = C.within_code And A.out_dept = C.id And a.id ='{1}' and isNull(C.location, '') <> ''",
                 within_code, head.id, user_id, ldt_check_date, ls_servername);
-                sbSql.Clear();
-                sbSql.Append(" SET XACT_ABORT ON ");
-                sbSql.Append(" BEGIN TRANSACTION ");
-                sbSql.Append(strSql);
-                sbSql.Append(@" COMMIT TRANSACTION ");
-                result = sh.ExecuteSqlUpdate(sbSql.ToString());
-                sbSql.Clear();
+                strSql = RetunSqlString(strSql);
+                result = sh.ExecuteSqlUpdate(strSql);                
                 if (result == "")
                 {
                     result = "00";//成功
@@ -1087,13 +1079,8 @@ namespace CF2025.Prod.DAL
                     Where a.within_code = b.within_code and a.id = b.id and a.within_code ='{0}' and
                           a.within_code=C.within_code And a.out_dept=C.id And a.id='{1}' and isNull(C.location,'') <> ''",
                     within_code, head.id, user_id,ldt_check_date, ls_servername);
-                    sbSql.Clear();
-                    sbSql.Append(" SET XACT_ABORT ON ");
-                    sbSql.Append(" BEGIN TRANSACTION ");
-                    sbSql.Append(strSql);
-                    sbSql.Append(@" COMMIT TRANSACTION ");
-                    result = sh.ExecuteSqlUpdate(sbSql.ToString());
-                    sbSql.Clear();
+                    strSql = RetunSqlString(strSql);
+                    result = sh.ExecuteSqlUpdate(strSql);
                     if (result == "")
                     {
                         result = "00";
@@ -1133,13 +1120,8 @@ namespace CF2025.Prod.DAL
                 Where a.within_code = b.within_code and a.id = b.id and a.within_code ='{0}' and
                       a.within_code=C.within_code And a.out_dept=C.id And a.id='{1}' and IsNull(C.location,'')<>'' ",
                 within_code, head.id, user_id,ldt_check_date,ls_servername);
-                sbSql.Clear();
-                sbSql.Append(" SET XACT_ABORT ON ");
-                sbSql.Append(" BEGIN TRANSACTION ");
-                sbSql.Append(strSql);
-                sbSql.Append(@" COMMIT TRANSACTION ");
-                result = sh.ExecuteSqlUpdate(sbSql.ToString());
-                sbSql.Clear();
+                strSql = RetunSqlString(strSql);
+                result = sh.ExecuteSqlUpdate(strSql);
                 if (result == "")
                 {
                     result = "00";
@@ -1212,14 +1194,9 @@ namespace CF2025.Prod.DAL
                     //---
                     //刪除相并交易
                     strSql = string.Format(
-                        @" Delete FROM st_business_record WITH(ROWLOCK) Where within_code='{0}' and id='{1}' And action_id In('31','51','29')",within_code, head.id);
-                    sbSql.Clear();
-                    sbSql.Append(" SET XACT_ABORT ON ");
-                    sbSql.Append(" BEGIN TRANSACTION ");
-                    sbSql.Append(strSql);
-                    sbSql.Append(@" COMMIT TRANSACTION ");
-                    result = sh.ExecuteSqlUpdate(sbSql.ToString());
-                    sbSql.Clear();
+                    @" Delete FROM st_business_record WITH(ROWLOCK) Where within_code='{0}' and id='{1}' And action_id In('31','51','29')",within_code, head.id);
+                    strSql = RetunSqlString(strSql);
+                    result = sh.ExecuteSqlUpdate(strSql);
                     if (result == "")
                     {
                         result = "00";
@@ -1242,8 +1219,20 @@ namespace CF2025.Prod.DAL
 
             return result;
         }//--end 批準/反批準
-        
-        
+
+        public static string RetunSqlString(string strSql)
+        {
+            string str = string.Empty;
+            sbSql.Clear();
+            sbSql.Append(" SET XACT_ABORT ON ");
+            sbSql.Append(" BEGIN TRANSACTION ");
+            sbSql.Append(strSql);
+            sbSql.Append(@" COMMIT TRANSACTION ");
+            str = sbSql.ToString();
+            sbSql.Clear();
+            return str;
+        }
+
         /// <summary>
         /// 反批準
         /// </summary>

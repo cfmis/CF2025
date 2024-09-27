@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IssueAppriseListDAL.cs" />
     <Compile Include="ProduceAssemblyDAL.cs" />
     <Compile Include="ProduceRechangeDAL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

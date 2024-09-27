@@ -844,14 +844,13 @@
                 if(this.selectRow.lot_no != this.seledtLotNoRow.lot_no){
                     this.$set(this.selectRow, "lot_no", this.seledtLotNoRow.lot_no);
                     let isQc = (this.seledtLotNoRow.is_qc)?'1':'0';
-                    this.$set(this.selectRow, "qc_result", isQc);
-                    console.log(this.selectRow);
+                    this.$set(this.selectRow, "qc_result", isQc);                    
                 }
                 this.showLot = false;
             }else{
                 this.$XModal.alert({ content: '請指定批號!', mask: false });
             }
-        },     
+        },
         
         //点击编辑前的逻辑判断
         //activeMethod({ row, rowIndex, column, columnIndex }){ 

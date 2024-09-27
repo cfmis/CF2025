@@ -105,7 +105,12 @@ namespace CF2025.Web.Admin.Areas.Base.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
+        public JsonResult GetStDetailsLotNo(string location_id,string goods_id,string mo_id)
+        {
+            var result = CommonDAL.GetStDetailsLotNo(location_id,goods_id,mo_id);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
 
-       
+
     }
 }

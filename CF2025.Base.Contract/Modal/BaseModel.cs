@@ -45,4 +45,14 @@
         public string small_class { get; set; }
     }
 
+    public class ModelStLotNo
+    {
+        public string lot_no { get; set; }
+        public decimal qty { get; set; }
+        public decimal sec_qty { get; set; }
+        public string mo_id { get; set; }
+        public string vendor_name { get; set; }
+        
+    }
+
 }

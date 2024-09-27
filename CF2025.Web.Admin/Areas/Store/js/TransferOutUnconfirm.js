@@ -121,13 +121,13 @@
         //    }
         //},
         //轉大寫
-        upperCase(val, fieldName) {
+        upperCase(val, fieldName) {           
             if (val) {
                 var strUpper = val.toUpperCase();
                 this.$set(this.formData, fieldName, strUpper);
             }
         },        
-        setToEndValue(val, fieldName) {
+        setToEndValue(val, fieldName) {            
             if (val) {
                 this.$set(this.formData, fieldName, val);
             }

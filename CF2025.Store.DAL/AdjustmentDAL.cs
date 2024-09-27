@@ -48,6 +48,9 @@ namespace CF2025.Store.DAL
         //}
         public static st_adjustment_mostly GetHeadByID(string id)
         {
+            /*批準日期需按這種格式轉換,否則反準比較對不上而出錯
+            *Convert(nvarchar(19),check_date,121) As check_date
+            */
             st_adjustment_mostly mdjHead = new st_adjustment_mostly();
             string strSql = string.Format(
                 @"Select id,Convert(nvarchar(10),date,121) As date,department_id,adjust_reason, handler,remark, create_by,
@@ -312,21 +315,11 @@ namespace CF2025.Store.DAL
 
             if (result.Substring(0, 2) == "00") // SetReturnRechangeStBusiness()執行成功
             {
-                string strSql = "", checkDate = "", checkBy = "", state = "0";
-                if (active_name == "pfc_ok")
-                {
-                    //更新移交單批準狀態 
-                    checkDate = check_date;
-                    checkBy = user_id;
-                    state = "1";
-                }
-                else
-                {
-                    checkDate = "";
-                    checkBy = "";
-                    state = "0";
-                }
-                strSql = string.Format(
+                bool is_pfc_ok = (active_name == "pfc_ok") ? true : false;
+                string checkDate = is_pfc_ok ? ldt_check_date : "";
+                string checkBy = is_pfc_ok ? user_id : "";
+                string state = is_pfc_ok ? "1" : "0";                
+                string strSql = string.Format(
                         @" Update st_adjustment_mostly with(Rowlock) 
                            SET check_date=(Case When '{2}'<>'' Then '{2}' Else null End), check_by='{3}',
                                update_date=(Case When '{2}'<>'' Then '{2}' Else getdate() End),update_by='{4}',state='{5}' 

@@ -534,7 +534,37 @@ namespace CF2025.Base.DAL
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             result = dt.Rows[0]["lot_no"].ToString();
             return result;
-        }       
+        }
 
+        public static List<ModelStLotNo> GetStDetailsLotNo(string location_id,string goods_id,string mo_id )
+        {
+            string strSql = string.Format(
+            @"SELECT a.within_code,a.location_id,a.carton_code,a.mo_id,a.lot_no,a.qty,a.sec_qty,a.vendor_id, 
+	             a.average_cost,b.id,b.name,b.sec_unit,b.unit,b.type,b.datum,b.attribute,b.unit_code,b.spec,
+                 d.name as vendor_name
+            FROM st_details_lot a 
+	            Left Join it_goods b On a.within_code = b.within_code And a.goods_id = b.id
+	            Left Join cd_productline c On a.within_code=c.within_code And a.location_id=c.id
+	            Left Join it_vendor d on a.within_code=d.within_code and a.vendor_id=d.id
+            WHERE a.within_code='0000' And a.location_id='{0}' And a.carton_code<>'ZZZ' And
+	              a.goods_id='{1}' And ('{2}'='*' Or Isnull(a.mo_id,'')='{2}') And a.state<>'2' And
+                  a.qty>0 And c.type<>'07'",location_id, goods_id, mo_id);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            List<ModelStLotNo> lst = new List<ModelStLotNo>();
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                ModelStLotNo mdj = new ModelStLotNo();
+                mdj.lot_no = dt.Rows[i]["lot_no"].ToString();
+                mdj.qty = decimal.Parse(dt.Rows[i]["qty"].ToString());
+                mdj.sec_qty = decimal.Parse(dt.Rows[i]["sec_qty"].ToString());
+                mdj.mo_id = dt.Rows[i]["mo_id"].ToString();
+                mdj.vendor_name = dt.Rows[i]["vendor_name"].ToString();
+                lst.Add(mdj);
+            }
+            return lst;
+        }
+
+
+        
     }
 }

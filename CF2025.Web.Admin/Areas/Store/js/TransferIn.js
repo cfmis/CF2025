@@ -509,7 +509,7 @@
                         var approve_type = val;
                         axios.post("/TransferIn/Approve",{head,approve_type}).then(
                             (response) => {
-                                if(response.data[0].approve_status ==="OK"){response.data[0].ProductMo
+                                if(response.data[0].approve_status ==="OK"){
                                     this.setStatusHead(false);
                                     //重查刷新數據
                                     this.getHead(this.headData.id);                                   
