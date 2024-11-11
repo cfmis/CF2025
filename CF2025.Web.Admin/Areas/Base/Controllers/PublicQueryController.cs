@@ -11,19 +11,30 @@ namespace CF2025.Web.Admin.Areas.Base.Controllers
 {
     public class PublicQueryController : Controller
     {
-        string language_id = AdminUserContext.Current.LoginInfo.LanguageID;
+        string language_id = "0";
         // GET: Base/PublicQuery
         public ActionResult Index(string window_id)
-        {
+        {           
+            var logininfo = AdminUserContext.Current.LoginInfo;
             string user_id = "";
-            try
+            if (logininfo != null)
             {
                 user_id = AdminUserContext.Current.LoginInfo.LoginName;
+                language_id= AdminUserContext.Current.LoginInfo.LanguageID;
             }
-            catch
+            else
             {
                 user_id = "";
-            }
+                language_id = "0";
+            }            
+            //try
+            //{
+            //    user_id = AdminUserContext.Current.LoginInfo.LoginName;
+            //}
+            //catch
+            //{
+            //    user_id = "";
+            //}
             ViewData["user_id"] = string.IsNullOrEmpty(user_id) ? "" : user_id;
             ViewData["window_id"] = window_id;
             return View();

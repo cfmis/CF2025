@@ -1,0 +1,47 @@
+--查找測試項目,可改成自定義函數
+Select stuff((Select '; '+ltrim(S.test_item) 
+From (select b.test_item_id+' '+c.test_item_name as test_item,b.sequence_id
+	from so_order_details a,so_order_special_qc b,cd_qc_test_item c
+	where a.within_code=b.within_code and a.id=b.id and a.ver=b.ver and a.sequence_id=b.upper_sequence and 
+	b.within_code=c.within_code and b.test_item_type=c.test_item_type and b.test_item_id=c.test_item_id and
+	a.within_code='0000' AND a.mo_id='GKS003983' --ORDER BY b.sequence_id 
+	) S
+ORDER BY S.sequence_id For xml path('')),1,1,'')
+
+
+主檔 st_transfer_mostly
+declare @type char(1)
+set @type='0'
+declare @transfers_state char(1)
+set @transfers_state='0'
+declare @update_count char(1)
+set @update_count='1'
+declare @origin char(1)
+set @origin='1'
+declare @servername  varchar(30)
+set @servername='hkserver.cferp.dbo'
+INSERT INTO st_transfer_mostly(within_code,id,type,transfer_date,handler,remark,state,transfers_state,update_count,department_id,origin,bill_type_no,group_no,servername,create_by,create_date) 
+values(within_code,id,@type,transfer_date,handler,remark,state,@transfers_state,@update_count,department_id,@origin,bill_type_no,group_no,@servername,create_by,getdate() )
+
+明細 st_transfer_detail
+mo_id,shipment_suit,goods_id,goods_name,unit,transfer_amount,sec_unit,sec_unit,package_num,position_first,
+nwt,gross_wt,location_id,inventory_qty,lot_no,remark
+
+
+declare @base_unit varchar(10)
+set @base_unit='PCS'
+declare @inventory_qty float
+set @inventory_qty=0
+declare @state varchar(10)
+set @state='0'
+declare @transfers_state varchar(10)
+set @transfers_state='0'
+declare @taccount_weight float
+set @taccount_weight=0
+declare @inventory_sec_qty float
+set @inventory_sec_qty=0
+
+INSERT INTO st_transfer_detail(within_code,id,sequence_id,goods_id,goods_name,base_unit,unit,rate,inventory_qty,transfer_amount,location_id,carton_code,
+lot_no,state,remark,transfers_state,account_weight,sec_unit,sec_qty,mo_id,nwt,gross_wt,package_num,shipment_suit,position_first,inventory_sec_qty,move_location_id,move_carton_code)
+values(within_code,id,sequence_id,goods_id,goods_name,@base_unit,unit,rate,@inventory_qty,transfer_amount,location_id,carton_code,
+lot_no,@state,remark,@transfers_state,@account_weight,sec_unit,sec_qty,mo_id,nwt,gross_wt,package_num,shipment_suit,position_first,@inventory_sec_qty,move_location_id,move_carton_code)

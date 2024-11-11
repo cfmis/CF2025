@@ -320,7 +320,48 @@ namespace CF.SQLServer.DAL
             return jsonString.ToString(); 
         }
 
-        
+        /// <summary>
+        /// 執行SQL 語句，返回string
+        /// </summary>
+        /// <param name="strSQL"></param>
+        /// <returns></returns>
+        public String ExecuteSqlReturnObject(string strSQL)
+        {
+            string objStrValue = "";
+            try
+            {
+                DataTable dts = GetDataTable(strSQL);
+                if (dts.Rows.Count > 0)
+                {
+                    objStrValue = dts.Rows[0][0].ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                objStrValue = ex.Message;
+            }
+            return objStrValue;
+        }
+
+        public DataTable GetDataTable(string strSQL)
+        {
+            DataTable dtData = new DataTable();          
+            using (SqlConnection conn = new SqlConnection(strCon))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                cmd.CommandType = CommandType.Text;
+                cmd.CommandTimeout = 2400;//連接20分鐘
+                cmd.CommandText = strSQL;
+                SqlDataAdapter sda = new SqlDataAdapter(cmd);
+                sda.Fill(dtData);
+                sda.Dispose();
+            }
+            return dtData;
+        }
+
+
 
     }
 }

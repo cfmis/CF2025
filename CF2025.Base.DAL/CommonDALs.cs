@@ -350,7 +350,16 @@ namespace CF2025.Base.DAL
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             string id = dt.Rows.Count > 0 ? dt.Rows[0]["max_id"].ToString() : "";
             return id;
-        }       
+        }
+
+        //轉出單最大單據號
+        public static string GetMaxID(string billId, string billType,string groupNo,int serialLen)
+        {
+            string strSql = string.Format("Select dbo.fn_zz_sys_bill_max_separate_out('{0}','{1}','{2}',{3}) as max_id", billId, billType, groupNo, serialLen);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            string id = dt.Rows.Count > 0 ? dt.Rows[0]["max_id"].ToString() : "";
+            return id;
+        }        
 
         //移交單最大單據號
         public static string GetMaxIDJo07(string out_dept, string in_dept, string doc_type)
@@ -564,7 +573,21 @@ namespace CF2025.Base.DAL
             return lst;
         }
 
+        public static decimal ReturnFloat2(string pValue)
+        {
+            float fResult;
+            fResult= (!string.IsNullOrEmpty(pValue))? float.Parse(pValue): 0.00f;
+            fResult = (fResult > 0) ? (float)Math.Round(fResult, 2) : 0.00f;            
+            return decimal.Parse(fResult.ToString());
+        }
 
-        
+        public static decimal ReturnFloat4(string pValue)
+        {
+            float fResult;
+            fResult = (!string.IsNullOrEmpty(pValue)) ? float.Parse(pValue) : 0.0000f;
+            fResult = (fResult > 0) ? (float)Math.Round(fResult, 4) : 0.0000f;
+            return decimal.Parse(fResult.ToString());
+        }
+
     }
 }

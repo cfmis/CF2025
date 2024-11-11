@@ -12,10 +12,11 @@ namespace CF2025.Web.Admin.Controllers
 {
     public class HomeController : AdminControllerBase//: Controller//
     {
+       
         public ActionResult Index()
         {
-            //return RedirectToAction("Index", "Auth", new { Area = "Account" });            
-            return View();
+            //return RedirectToAction("Index", "Auth", new { Area = "Account" });             
+            return View();           
         }
 
         public ActionResult About()
@@ -84,6 +85,7 @@ namespace CF2025.Web.Admin.Controllers
         }
         public ActionResult Top()
         {
+            //添加頂部菜單導航
             var LoginName = AdminUserContext.Current.LoginInfo.LoginName;//.BusinessPermissionList.Select(p => p.ToString());
             var LanguageID = AdminUserContext.Current.LoginInfo.LanguageID;
             GenAdminiMenu ga = new GenAdminiMenu();
@@ -94,6 +96,7 @@ namespace CF2025.Web.Admin.Controllers
         }
         public ActionResult Left()
         {
+            //添加左邊欄菜單導航
             //getAdminMenuDetailsList()
             var LoginName = AdminUserContext.Current.LoginInfo.LoginName;//.BusinessPermissionList.Select(p => p.ToString());
             var LanguageID = AdminUserContext.Current.LoginInfo.LanguageID;
@@ -125,6 +128,12 @@ namespace CF2025.Web.Admin.Controllers
             }
             //var LanguageID = AdminUserContext.Current.LoginInfo.LanguageID;
             return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult Test()
+        {
+            //return RedirectToAction("Index", "Auth", new { Area = "Account" });            
+            return View();
         }
     }
 }

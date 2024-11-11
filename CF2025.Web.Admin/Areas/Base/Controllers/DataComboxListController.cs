@@ -10,15 +10,16 @@ namespace CF2025.Web.Admin.Areas.Base.Controllers
 {
     public class DataComboxListController : AdminControllerBase 
     {
-        // GET: Base/DataComboxList
-        string language_id = AdminUserContext.Current.LoginInfo.LanguageID;
+        // GET: Base/DataComboxList        
         public ActionResult Index()
         {
             return View();
         }
 
         public JsonResult GetComboxList(string SourceType)
-        {           
+        {
+            var loginInfo = AdminUserContext.Current.LoginInfo;
+            string language_id = loginInfo != null ? AdminUserContext.Current.LoginInfo.LanguageID : "0";
             var result = DataComboxList.GetComboxList(SourceType,language_id);           
             return Json(result, JsonRequestBehavior.AllowGet);
         }

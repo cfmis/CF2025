@@ -95,6 +95,9 @@ namespace CF2025.Base.DAL
                 case "H": //倉庫發料單據來源
                     strSql += string.Format("SELECT id,name FROM cd_mo_type WHERE within_code='{0}' And mo_type='{1}' And [state]='0'", within_code, SourceType);
                     break;
+                case "BillTypeOut"://轉出單
+                    strSql += "SELECT id,id+'--' + name as name FROM cd_mo_type WHERE within_code='" + within_code + "' And id>'' And mo_type='4' And state='0' ORDER BY id";
+                    break;
                 default: //公用開單來源或單據種類等
                     strSql += string.Format("SELECT id,name FROM sys_bill_origin WHERE function_id='{0}' And [language]='{1}' And [state]='0'", SourceType,LanguageID);                    
                     break;

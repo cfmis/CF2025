@@ -1,0 +1,73 @@
+﻿using CF.Core.Config;
+using CF.SQLServer.DAL;
+using CF2025.Prod.Contract.Model;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CF2025.Prod.DAL
+{
+    public static class IssueAppriseListDAL
+    {
+        public static SQLHelper sh = new SQLHelper(CachedConfigContext.Current.DaoConfig.OA);
+        public static PubFunDAL pubFunction = new PubFunDAL();
+        public static string within_code = "0000";
+        public static string ls_servername = "hkserver.cferp.dbo";
+
+        public static List<query_data> QueryData(query_condition query)
+        {
+            string strSql = string.Format(
+               @"SELECT A.id,A.sequence_id,A.mo_id, A.goods_id, B.name AS goods_name, A.con_qty, A.unit_code,
+                sec_qty, A.sec_unit, A.lot_no, A.package_num, A.app_supply_side, A.remark, A.return_qty_nonce,
+                A.sign_by, A.sign_date, A.location, A.carton_code,ISNULL(A.prd_id,0) as prd_id, A.jo_id,
+                ISNULL(A.qc_qty,0) as qc_qty,A.jo_sequence_id, C.name AS color_name
+                FROM jo_assembly_details A with(nolock)
+                INNER JOIN it_goods B ON A.within_code = B.within_code AND A.goods_id = B.id
+                LEFT JOIN cd_color C ON B.within_code = C.within_code AND B.color = C.id
+                Where A.within_code='{0}' AND A.id='{1}' Order by A.id,A.sequence_id", within_code, id);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);          
+            List<query_data> lstDetail = new List<query_data>();
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                query_data mdj = new query_data();
+                mdj.id = dt.Rows[i]["id"].ToString();
+                mdj.ver = dt.Rows[i]["ver"].ToString();
+                mdj.materiel_id = dt.Rows[i]["materiel_id"].ToString();
+                mdj.goods_id = dt.Rows[i]["goods_id"].ToString();
+                mdj.name = dt.Rows[i]["name"].ToString();
+                mdj.location = dt.Rows[i]["location"].ToString();
+                mdj.carton_code = dt.Rows[i]["carton_code"].ToString();               
+                mdj.unit = dt.Rows[i]["unit"].ToString();
+                mdj.sec_unit = dt.Rows[i]["sec_unit"].ToString();
+                mdj.fl_qty = decimal.Parse(dt.Rows[i]["fl_qty"].ToString());
+                mdj.issues_qty = decimal.Parse(dt.Rows[i]["issues_qty"].ToString());
+                mdj.sec_qty = decimal.Parse(dt.Rows[i]["sec_qty"].ToString());
+                mdj.already_sec_qty = decimal.Parse(dt.Rows[i]["already_sec_qty"].ToString());                
+                mdj.color = dt.Rows[i]["color"].ToString();
+                mdj.mo_id = dt.Rows[i]["mo_id"].ToString();
+                mdj.dept_id = dt.Rows[i]["dept_id"].ToString();
+                mdj.upper_sequence = dt.Rows[i]["upper_sequence"].ToString();
+                mdj.plate_effect = dt.Rows[i]["plate_effect"].ToString();
+                mdj.outer_layer = dt.Rows[i]["outer_layer"].ToString();
+                mdj.color_effect = dt.Rows[i]["color_effect"].ToString();
+                mdj.mrp_id = dt.Rows[i]["mrp_id"].ToString();
+                mdj.location_name = dt.Rows[i]["location_name"].ToString();
+                mdj.carton_name = dt.Rows[i]["carton_name"].ToString();
+                mdj.dept_name = dt.Rows[i]["dept_name"].ToString();
+                mdj.dept_name_en = dt.Rows[i]["dept_name_en"].ToString();
+                mdj.color_name = dt.Rows[i]["color_name"].ToString();
+                mdj.unit_name = dt.Rows[i]["unit_name"].ToString();
+                mdj.plate_name = dt.Rows[i]["plate_name"].ToString();
+                mdj.outer_name = dt.Rows[i]["outer_name"].ToString();
+                mdj.color_effect_name = dt.Rows[i]["color_effect_name"].ToString();
+                mdj.SPID = dt.Rows[i]["spid"].ToString();
+                lstDetail.Add(mdj);
+            }
+            return lstDetail;
+        }
+
+    }
+}

@@ -143,7 +143,7 @@
             //selectTab: "tab2",
             this.loading = true;
             //同步優先執行,因setTimeout()中的異步執行要依賴同步執行的結果
-            await this.getHead(this.searchID); //
+            await this.getHead(this.searchID);
             await this.getDetails(this.searchID);
             //異步執行 
             setTimeout(() => {               
