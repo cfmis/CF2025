@@ -244,7 +244,7 @@ var comm= {
              })
         return result;
     },
-    /*生產計劃是否已批準
+    /**生產計劃是否已批準
     * 返回值: "0"--未批準 ;"1"--已批準;
     * Allen_Leung 2022/12/09
     */
@@ -280,9 +280,30 @@ var comm= {
              })
         return result;
     },
-    
-
-
+    /**
+    *權限檢查
+    */
+    checkPermission:async function (user_id,menu_id,func_name){    
+        //var user_id = $("#user_id").val();
+        //user_id = document.getElementById("user_id").value;
+        var isCan = await comm.checkAuthority(user_id, menu_id, func_name);
+        if (isCan === "0") {
+            $.messager.alert('提示信息', "注意:當前操作權限不足!", 'warning');          
+            return '0';
+        }
+        return "1";
+    },
+    /**
+    *檢查用戶是否有某按鈕的操作權限.
+    */
+    checkAuthority:async function(user_id,menu_id,func_name){    
+       let result = "0";
+       await axios.get("/Base/RoleAuthorityPowers/CheckAuthority?user_id=" + user_id + "&menu_id=" + menu_id+ "&func_name=" + func_name).then(            
+         (res) => {
+             result = res.data;
+         })    
+       return result;
+    }, 
 
     //獲取當前日期時間
     getWipID: async  function() {

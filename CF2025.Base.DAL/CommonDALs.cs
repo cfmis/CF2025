@@ -15,7 +15,8 @@ namespace CF2025.Base.DAL
 {
     public class CommonDAL
     {
-        private static SQLHelper sh = new SQLHelper(CachedConfigContext.Current.DaoConfig.OA);
+        private static SQLHelper sh = new SQLHelper(CachedConfigContext.Current.DaoConfig.OA);//DGERP4
+        private static SQLHelper sh2 = new SQLHelper(CachedConfigContext.Current.DaoConfig.Crm);//DaoConfig.OA:DGERP4;DaoConfig.CRM:CF2025
         private static PubFunDAL pubFun = new PubFunDAL();
 
         public static string GeoEncrypt(string strEncrypt)
@@ -588,6 +589,110 @@ namespace CF2025.Base.DAL
             fResult = (fResult > 0) ? (float)Math.Round(fResult, 4) : 0.0000f;
             return decimal.Parse(fResult.ToString());
         }
+
+        public static string CheckAuthority(string user_id, string menu_id, string func_name)
+        {
+            string result = "0";
+            string strSql = string.Format(
+            @"SELECT '1' as result FROM v_powers WHERE LoginName='{0}' and AuthorityID='{1}' and Powers='{2}'", user_id, menu_id, func_name);
+            DataTable dt = sh2.ExecuteSqlReturnDataTable(strSql);
+            if (dt.Rows.Count > 0)
+            {
+                result = "1";
+            }
+            return result;
+        }
+
+        //角色所擁有的權限
+        public static List<RoleAuthorityPowersModels> GetRoleAuthorityPowers(RoleAuthorityPowersModels searchParams)
+        {
+            string strSql = @"Select Distinct ID,RoleID,RoleName,AuthorityID,AuthorityName,PowersID,Powers,PowersDesc,Remark FROM v_powers WHERE RoleID>0 ";
+            if (searchParams.RoleID > 0)
+            {
+                strSql += string.Format(" AND RoleID={0}", searchParams.RoleID);
+            }
+            if (searchParams.AuthorityID > 0)
+            {
+                strSql += string.Format(" AND AuthorityID={0}", searchParams.AuthorityID);
+            }
+            if (searchParams.PowersID > 0)
+            {
+                strSql += string.Format(" AND PowersID={0}", searchParams.PowersID);
+            }
+            strSql += " Order by RoleID,AuthorityID,PowersID";
+            DataTable dt = sh2.ExecuteSqlReturnDataTable(strSql);
+            List<RoleAuthorityPowersModels> lst = DataTableToList<RoleAuthorityPowersModels>(dt);
+            return lst;
+        }
+
+        public static string UpdateRoleAuthorityPowers(string user_id,RoleAuthorityPowersModels updateParams)
+        {           
+            string strSql = "";           
+            if (updateParams.ID == 0)
+                strSql = string.Format(" Insert Into RoleAuthorityPowers(RoleID,AuthorityID,PowersID,Remark,CreateBy,CreateAt) Values ('{0}','{1}','{2}','{3}','{4}',getdate())"
+                    , updateParams.RoleID, updateParams.AuthorityID, updateParams.PowersID, updateParams.Remark, user_id);
+            else
+                strSql = string.Format(" Update RoleAuthorityPowers Set RoleID={0},AuthorityID={1},PowersID={2},Remark='{3}',UpdateBy='{4}',UpdateAt=getdate() Where ID={5}"
+                    , updateParams.RoleID, updateParams.AuthorityID, updateParams.PowersID, updateParams.Remark, user_id, updateParams.ID);
+            string result = sh2.ExecuteSqlUpdate(strSql);
+            return result;
+        }
+        public static string DelRoleAuthorityPowersByID(int ID)
+        {
+            string result = "";
+            string strSql = "";
+            if (ID > 0)
+            {
+                strSql = string.Format("Delete FROM RoleAuthorityPowers WHERE ID={0}", ID);
+                result = sh2.ExecuteSqlUpdate(strSql);
+            }
+            return result;
+        }
+
+        public static List<PermissonModels> GetPermission(string UserName, string AuthorityID)
+        {
+            string strUserName = UserName;//  AdminUserContext.Current.LoginInfo.LoginName;
+            string strSql = string.Format(@"Select Powers AS PermissionID From v_powers Where LoginName ='{0}' and AuthorityID='{1}'", strUserName, AuthorityID);
+            DataTable dt = sh2.ExecuteSqlReturnDataTable(strSql);
+            List<PermissonModels> lstPermission = new List<PermissonModels>();
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                DataRow dr = dt.Rows[i];
+                PermissonModels mdj = new PermissonModels();
+                mdj.PermissionID = dr["PermissionID"].ToString();
+                lstPermission.Add(mdj);
+            }
+            return lstPermission;
+        }
+        public static List<ListDataModels> GetBasePermissionList(string TableName)
+        {
+            string strSql = "";
+            switch (TableName)
+            {
+                case "Role":
+                    strSql = @"Select ID as value,name as label From Role Order by ID";
+                    break;
+                case "Authority":
+                    strSql = @"Select AuthorityID as value,AuthorityName as label 
+                            From Authority WHERE ISNULL(WebUrl,'')<>'' Order by AuthorityID";
+                    break;
+                case "sy_Powers":
+                    strSql = @"Select ID as value,Powers+' ('+PowersDesc+')' As label From sy_Powers Order by Powers";
+                    break;
+            }
+            DataTable dt = sh2.ExecuteSqlReturnDataTable(strSql);
+            List<ListDataModels> lst = new List<ListDataModels>();
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                DataRow dr = dt.Rows[i];
+                ListDataModels mdj = new ListDataModels();
+                mdj.value = dr["value"].ToString();
+                mdj.label = dr["label"].ToString();
+                lst.Add(mdj);
+            }
+            return lst;
+        }
+
 
     }
 }

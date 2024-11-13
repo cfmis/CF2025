@@ -4,7 +4,7 @@
 }
 <div id="app">
 
-        <vxe-form :data="formData" size="mini"  title-align="right" style="min-width: 300px;max-width:300px" title-width="100px" prevent-submit title-colon custom-layout>@**@
+        <vxe-form :data="formData" size="mini"  title-align="right" style="min-width: 300px;max-width:300px" title-width="100px" prevent-submit title-colon custom-layout>
                 <vxe-form-item title="賬號" field="UserName" :item-render="{}" span="24" class="vxe-form-item-group">
                     <template #default="{ data }">
                         <vxe-input v-model="data.UserName" class="input-customize"></vxe-input>

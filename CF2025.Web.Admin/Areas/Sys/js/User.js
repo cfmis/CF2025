@@ -8,12 +8,11 @@ var Main = {
 				Pwd:'',
 				ConfPwd: '',
 			},
-    }
+        }
     },
     created() {
-
 		// this.getComboxList("issues_state_list");
-		this.getComboxList("set_state_list");
+		//this.getComboxList("set_state_list");
     },
     methods: {
 

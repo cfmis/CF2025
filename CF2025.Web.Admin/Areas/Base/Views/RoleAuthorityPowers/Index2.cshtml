@@ -1,0 +1,485 @@
+﻿
+@{
+    ViewBag.Title = "Index2";
+}
+
+@*<script src="~/Scripts/vue.js"></script>
+<link rel="stylesheet" href="~/Content/ElementUI/css/element-ui.css" />
+<script src="~/Content/ElementUI/js/element-ui.js"></script>*@
+
+@*@Scripts.Render("~/bundles/vue")
+@Scripts.Render("~/bundles/element")
+@Styles.Render("~/Content/elementcss")*@
+
+@section PageSpecificStyleSheetIncludes{
+    <style>
+        /* el-divider 修改高度實線效果,自動覆蓋原樣式 */
+        .el-divider--horizontal {
+            margin: 8px 0;
+            background: 0 0;
+            border-top: 0px solid #e8eaec;
+        }
+        /*避免el-select控件寬度與input控件寬度不一致 */
+        .el-form .el-select{
+            width: 100%;
+        }
+        /* 塊中包含的文字居中 */
+        /*.fy{
+            text-align:center;
+            margin-top:30px;
+        }*/
+        /*只讀控件背景色,且文本居中*/
+        .readonly-background .el-input__inner { 
+            width:100%; 
+            background-color: #e8e8e8; 
+            text-align: center; 
+            border-color: #c0c4cc; 
+            color:#000
+        }
+    
+    </style>
+}
+
+
+<div id="app">         
+        <template>
+            @*<div>*@
+            <el-form :model="searchParas" ref="searchForm" label-width="80px" size="small">
+                <template>
+                    <el-button type="primary" @@click="searchClick" icon="el-icon-search" size="small" plain>查詢</el-button>
+                    <el-button type="success" @@click="resetClick('searchForm')" icon="el-icon-refresh-left" size="small" plain>重置</el-button>
+                    <el-button type="primary" @@click="addRow" size="small" plain>項目新增</el-button>  
+                </template>
+                <p></p>               
+                <el-row>
+                    <el-col :span="8" style="width:20%">
+                        <el-form-item prop="RoleID" label="角色">
+                            <el-select v-model="searchParas.RoleID" filterable clearable placeholder="请选择">
+                                <el-option v-for="item in roleDatas"
+                                           :key="item.value"
+                                           :label="item.label"
+                                           :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8" style="width:20%">
+                        <el-form-item prop="AuthorityID" label="菜單">
+                            <el-select v-model="searchParas.AuthorityID" filterable clearable placeholder="请选择">
+                                <el-option v-for="item in menuDatas"
+                                           :key="item.value"
+                                           :label="item.label"
+                                           :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8" style="width:20%">
+                        <el-form-item prop="PowersID" label="操作權限">
+                            <el-select v-model="searchParas.PowersID" filterable clearable placeholder="请选择">
+                                <el-option v-for="item in powerDatas"
+                                           :key="item.value"
+                                           :label="item.label"
+                                           :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>                    
+                </el-row>
+            </el-form>
+            @*</div>*@
+        </template>
+        <el-divider></el-divider>
+    
+        <!--內容過多時對el-form-item,el-table-column的設置
+            設置容過長時鼠標移動彈框是示:
+                表格列內<el-table-column show-overflow-tooltip=true>;
+                el-form-item:<el-form-item :show-overflow-tooltip=true>
+                配合樣式:宽度属性设置： .el-tooltip__popper{
+                                        max-width:30%
+                                        }
+        -->       
+
+        <template>
+            <el-table :data="tableData"                     
+                      @*height="250"*@
+                      :row-style="{height:'20px'}"
+                      :cell-style="{padding:'0px'}"                
+                      border                      
+                      highlight-current-row
+                      stripe
+                      style="font-size: 12px;width: 100%"
+                      @*:default-sort="{prop:'RoleID',order:'descending'}"*@                     
+                      :header-cell-style="handerMethod" @*隱藏表頭的第二行*@
+
+                      v-loading = "isLoading"
+	                  element-loading-background = "rgba(255, 255, 255, .5)"
+	                  element-loading-text = "加载中，请稍后..."
+	                  element-loading-spinner = "el-icon-loading"
+                      >                
+                <el-table-column prop="ID" label="編號" width="50"></el-table-column>
+                <el-table-column prop="RoleID" label="角色編號" width="70"></el-table-column>
+                <el-table-column prop="RoleName" label="角色名稱" width="120"></el-table-column>
+                <el-table-column prop="AuthorityID" label="菜單編號" width="80"></el-table-column>
+                <el-table-column prop="AuthorityName" label="菜單名稱" width="120"></el-table-column>
+                <el-table-column prop="PowersID" label="權限編號" width="80"></el-table-column>
+                <el-table-column prop="Powers" label="操作權限" width="120"></el-table-column>
+                <el-table-column prop="PowersDesc" label="操作描述" width="100"></el-table-column>
+                <el-table-column prop="Remark" label="備註" width="300"></el-table-column>
+                
+                <el-table-column label="操作" width="100" align="center">
+                    <el-table-column width="50" align="center">
+                        <template slot-scope="scope">
+                            <el-button type="text" @@click="editRow(scope.row)" size="mini">編輯</el-button>
+                        </template>
+                    </el-table-column>
+                    <el-table-column width="50">
+                        <template slot-scope="scope">
+                            <el-button type="text" @@click="delRow(scope.$index,scope.row)" size="mini"><span style="color: red">刪除</span></el-button>
+                        </template>
+                    </el-table-column>
+                </el-table-column>         
+            </el-table>  
+            <!--分頁簡單-->
+            @*<div class="block" style="margin-top:0px">
+                <el-pagination align="center"
+                       background
+                       layout="prev, pager, next"
+                       @@current-change="handleCurrentChange"
+                       :total="tablePage.totalResult">
+                </el-pagination>
+            </div>*@
+            <!--分頁全功能-->
+            <div class="block">                
+                <el-pagination align="center"
+                               background
+                               @@size-change="handleSizeChange"
+                               @@current-change="handleCurrentChange"
+                               :current-page="tablePage.currentPage"
+                               :page-sizes="[10, 20, 30, 40]"
+                               :page-size="tablePage.pageSize"
+                               layout="total, sizes, prev, pager, next, jumper"
+                               :total="tablePage.totalResult">
+                </el-pagination>
+            </div>            
+        </template>
+        
+       
+        <!--新增或編輯共用對話框-->
+        <el-dialog :title="titleMap[dialogStatus]"
+                   :visible.sync="showDialog"
+                   :close-on-click-modal="false" 
+                   width="40%">
+            <el-form :model="newData" ref="formInfo" :rules="rules" label-position="labelPosition" label-width="80px" size="small" style="width:70%">
+                <!--el-form-item label="No." prop="ID"-->
+                <!--el-input class="readonly-background" v-model="newData.ID" /><!--:readonly="true" :disabled="true"-->
+                <!--/el-form-item-->
+                <el-form-item label="角色" prop="RoleID">
+                    <el-select v-model="newData.RoleID" placeholder="请选择">
+                        <el-option v-for="item in roleDatas" :key="item.value" :label="item.label" :value="item.value" />
+                    </el-select>
+                </el-form-item>
+
+                <el-form-item label="菜單" prop="AuthorityID">
+                    <el-select v-model="newData.AuthorityID" placeholder="请选择">
+                        <el-option v-for="item in menuDatas" :key="item.value" :label="item.label" :value="item.value" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="操作權限" prop="PowersID">
+                    <el-select v-model="newData.PowersID" placeholder="请选择">
+                        <el-option v-for="item in powerDatas" :key="item.value" :label="item.label" :value="item.value" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="備註" prop="Remark">
+                    <el-input v-model="newData.Remark"></el-input>
+                </el-form-item>
+
+                <!--el-form-item align="right"-->
+                <!--template-->
+                <!--el-button type="primary" @@click="saveRow('form')" size="small" plian>保 存</el-button-->
+                <!--el-button @@click="showDialog = false" size="small" plian>取 消</el-button-->
+                <!--/template-->
+                <!--/el-form-item-->
+            </el-form>
+
+            <el-divider></el-divider>
+            <div style="text-align: center">
+                <span slot="footer" class="dialog-footer">
+                    <el-button type="primary" @@click="saveRow('formInfo')" size="small" plian>保存</el-button>
+                    <el-button @@click="closeDialog(1)" size="small" plian>取消</el-button>
+                </span>
+            </div>
+        </el-dialog>
+
+</div>
+
+
+@section PageSpecificJavascriptIncludes{
+<script>
+        var vm = new Vue({
+            el: "#app",
+            data: {
+                labelPosition: 'right',
+                showDialog:false,
+                isLoading:false,                
+                searchParas: { RoleID: '', AuthorityID: '', PowersID: '' },//查詢條件數組
+                //查詢下拉框數據源
+                //roleDatas: [{ value: 1, label: '系统管理员' }, { value: 2, label: '高级工程师' }, { value: 3, label: '测试工程师' }],
+                roleDatas: [],
+                menuDatas: [{ value: 20025, label: "test" }, { value: 20026, label: "test2" }],
+                powerDatas: [{ value: 1, label: 'Common_Add' }, { value: 5, label: 'Common_Find' }],
+                tableData: [],
+                newData: {ID:null,RoleID:null,RoleName:'',AuthorityID:null,AuthorityName:'',PowersID:null,Powers:'',PowersDesc:'',Remark:'',CreateBy:'',CreateAt:null,UpdateBy:'',UpdateAt:null},                
+                tableTempList: [],//權限臨時數組                
+                //定義分頁參數                
+                tablePage: {
+                    currentPage: 1,
+                    pageSize: 10,//每頁的數據條數
+                    totalResult: 100
+                },               
+                //新增和编辑弹框显示不同标题
+                dialogStatus: "",
+                titleMap: {
+                    byAdd:"Add Item",
+                    byEdit: "Edit Item"
+                },
+                //輸入有效性檢查
+                rules: {
+                    RoleID: [
+                      { required: true, message: '請选择角色!', trigger: 'change'}
+                      //,{ min: 1, max: 999, message: '請輸入1至999的自然數!', trigger: 'change' ,type:'number'}
+                    ],
+                    AuthorityID: [
+                      { required: true, message: '请选择角色所擁有的菜單!', trigger: 'change' }
+                      //,{ min: 20001, max: 99999, message: '20001至99999的自然數', trigger: 'change',type:'number' }
+                    ],
+                    PowersID:[
+                      { required: true, message: '请选择角色菜單所擁有的操作權限!', trigger: 'change'}
+                      //,{ min: 1, max: 999, message: '1至99的自然數', trigger: 'change',type:'number' }
+                    ]       
+                }
+            },
+            
+            created: function () {
+                this.InIt();
+                this.tablePage.totalResult = this.tableData.length;                
+            },
+
+            methods: {
+                InIt() {//初始下拉框                    
+                    axios.get("GetBasePermission?TableName=Role").then(
+                        (response) => {
+                            this.roleDatas = [];                            
+                            for (var i = 0; i < response.data.length; i++) {
+                                //console.log(response.data[i]);
+                                this.roleDatas.push(response.data[i]);
+                            }                        
+                        },
+                        (response) => {
+                            alert(response.status);
+                        }
+                    ).catch(function (response) {
+                        alert(response);
+                    });
+
+                    axios.get("GetBasePermission?TableName=Authority").then(
+                        (response) => {
+                            this.menuDatas = [];                            
+                            for (var i = 0; i < response.data.length; i++) {
+                                this.menuDatas.push(response.data[i]);
+                            }                        
+                        }
+                    ).catch(function (response) {
+                        alert(response);
+                    });
+
+                    axios.get("GetBasePermission?TableName=sy_Powers").then(
+                        (response) => {
+                            this.powerDatas = [];                            
+                            for (var i = 0; i < response.data.length; i++) {                                
+                                this.powerDatas.push(response.data[i]);
+                            }                        
+                        }
+                    ).catch(function (response) {
+                        alert(response);
+                    });
+
+                    //axios.all([getRoleInfo()]).then(                         
+                    //     axios.spread(function (aryRole) {
+                    //     this.roleDatas = [];                             
+                    //     for (var i = 0; i < aryRole.data.length; i++) { 
+                    //         //console.log(aryRole.data[i]);
+                    //         this.roleDatas.push(aryRole.data[i]);
+                    //     } 
+                    // }));
+                    
+                },                
+                handleCurrentChange: function (val) {
+                    this.tablePage.currentPage = val;
+                    this.fillData();
+                },
+                handleSizeChange(val) {
+                    this.tablePage.pageSize = val;
+                },                
+                fillData: function () {
+                    this.tableData = [];
+                    this.tablePage.totalResult = this.tableTempList.length;
+                    this.tableData = this.tableTempList.slice((this.tablePage.currentPage - 1) * this.tablePage.pageSize, this.tablePage.currentPage * this.tablePage.pageSize);
+                    this.isLoading = false;
+                },                
+                searchClick: function () {//查詢
+                    this.isLoading = true
+                    this.tableTempList = [];
+                    var searchParams = {
+                        RoleID: this.searchParas.RoleID,
+                        AuthorityID: this.searchParas.AuthorityID,
+                        PowersID: this.searchParas.PowersID
+                    }
+                    //axios.get("GetGoodsDetails", { params: { goods_id: _id, } })//也可以將參數寫在這裡
+                    axios.get("SearchRoleAuthorityPowers", { params: searchParams }).then(
+                        (response) => {
+                            //this.contactsList = [];
+                            for (var i = 0; i < response.data.length; i++) {
+                                this.tableTempList.push(response.data[i]);
+                            }
+                            //_self.goodsList.push({ goods_id:"",goods_cname:"" });
+                            this.fillData();
+                        },
+                        (response) => {
+                            alert(response.status);
+                        }
+                    ).catch(function (response) {
+                        this.isLoading = false;
+                        alert(response);
+                    });
+                },
+                addRow() {//新增
+                    this.dialogStatus = "byAdd";
+                    this.showDialog = true;
+                    //重置表单数据
+                    //this.$refs["formInfo"].resetFields(); //因出錯2023/09/04 cancel
+                },
+                editRow(row) {//編輯
+                    this.dialogStatus = "byEdit";
+                    this.showDialog = true;
+                    //重置表单数据
+                    //this.newDate={ID:row.ID, RoleID: row.RoleID};//這樣的形式賦值取不到值   
+                    var role_id=row.RoleID;
+                    var authority_id=row.AuthorityID;
+                    var powers_id=row.PowersID;
+                    this.newData.ID = row.ID;
+                    this.newData.RoleID = role_id.toString(); //需轉字符型,與原始下拉框返值類型一致,否則el-select下拉框默認顯示不了lable              
+                    this.newData.AuthorityID = authority_id.toString();                    
+                    this.newData.PowersID = powers_id.toString();
+                   
+                },
+                delRow(index,row) {//刪除
+                    this.$confirm('此操作將删除ID:'+row.ID +'的資料, 是否繼續?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {                        
+                        axios.post("DelRoleAuthorityPowers", {ID: row.ID}).then(
+                                (response) => {
+                                    this.$message({message: "刪除操作成功！",type: "success"});
+                                }
+                            ).catch(function (response) {
+                                alert(response);
+                            });
+                        this.tableData.splice(index,1);
+                    })
+                },                
+                saveRow(formName) {//保存
+                    this.$refs[formName].validate((valid) => {
+                        if (valid) {  
+                            var updateParams={
+                                ID:this.newData.ID,
+                                RoleID:this.newData.RoleID,
+                                AuthorityID:this.newData.AuthorityID,
+                                PowersID:this.newData.PowersID, 
+                                Remark:""
+                                //Remark:this.newData.RoleName +'.' + this.newData.AuthorityName + '.'+ this.newData.PowersDesc                               
+                            }
+                            axios.post("AddRoleAuthorityPowers", { updateParams }).then(
+                                (response) => {                                                                                                
+                                    this.$message({
+                                        message: "操作成功！",
+                                        type: "success",
+                                    });
+                                    //this.tableData.push({ RoleID: this.newData.RoleID,AuthorityID:this.newData.AuthorityID,PowersID:this.newData.PowersID,remark:this.newData.Remark})
+                                    this.searchClick();
+                                    this.closeDialog(1);
+                                }
+                            ).catch(function (response) {
+                                alert(response);
+                            });
+                                                       
+                        } else {
+                            //alert('Error Submit!!');
+                            this.$message({
+                                message: "請檢查數據完整性！",
+                                type: "warning",
+                            });
+                            return false;
+                       }
+                    });
+                },
+                //重置查找條件
+                resetClick(formName) {
+                    this.$refs[formName].resetFields();                    
+                },                
+                //resetForm2(formName) {
+                //    this.$refs[formName].resetFields();
+                //},
+                // 关闭弹框
+                closeDialog(flag) {
+                    //備用參數flag
+                    this.$refs["formInfo"].resetFields();
+                    this.showDialog = false;
+                    this.$emit("closeDialog", flag);
+                },
+
+                //隐藏表头
+                handerMethod({rowIndex}){
+                    if (rowIndex === 1) {
+                        //这里为了是将第二列的表头隐藏，就形成了合并表头的效果
+                        return {display: 'none'}
+                    }
+                },
+
+               
+
+            }//methods  
+    
+
+        })//vue
+
+        //function getRoleInfo(){
+        //    return axios.get('/BaseData/GetBasePermission?TableName=Role');
+        //}
+       
+        function dateFormat(fmt, date) {
+            let ret;
+            const opt = {
+                "Y+": date.getFullYear().toString(),        // 年
+                "m+": (date.getMonth() + 1).toString(),     // 月
+                "d+": date.getDate().toString(),            // 日
+                "H+": date.getHours().toString(),           // 时
+                "M+": date.getMinutes().toString(),         // 分
+                "S+": date.getSeconds().toString()          // 秒
+                // 有其他格式化字符需求可以继续添加，必须转化成字符串
+            };
+            for (let k in opt) {
+                ret = new RegExp("(" + k + ")").exec(fmt);
+                if (ret) {
+                    fmt = fmt.replace(ret[1], (ret[1].length == 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
+                };
+            };
+            return fmt;
+        }
+        
+       
+
+</script>
+
+}

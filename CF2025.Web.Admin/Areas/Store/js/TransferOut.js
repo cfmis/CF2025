@@ -196,7 +196,13 @@
             });
         },
         //主檔新增
-        insertEvent() {
+        insertEvent:async function() {
+            //--權限檢查            
+            var power = await comm.checkPermission(this.userId,"20067","Common_Add");
+            if (power === "0") {
+                return;
+            }  
+            //--
             this.setStatusHead(true);
             this.backupData();//編輯前首先暫存主檔/明細臨時數據
             this.headStatus ="NEW";
