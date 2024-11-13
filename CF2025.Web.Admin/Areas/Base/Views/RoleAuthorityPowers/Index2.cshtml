@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Index2";
 }
 
@@ -50,7 +49,7 @@
                     <el-button type="success" @@click="resetClick('searchForm')" icon="el-icon-refresh-left" size="small" plain>重置</el-button>
                     <el-button type="primary" @@click="addRow" size="small" plain>項目新增</el-button>  
                 </template>
-                <p></p>               
+                <p></p>
                 <el-row>
                     <el-col :span="8" style="width:20%">
                         <el-form-item prop="RoleID" label="角色">
@@ -92,10 +91,10 @@
         <el-divider></el-divider>
     
         <!--內容過多時對el-form-item,el-table-column的設置
-            設置容過長時鼠標移動彈框是示:
-                表格列內<el-table-column show-overflow-tooltip=true>;
-                el-form-item:<el-form-item :show-overflow-tooltip=true>
-                配合樣式:宽度属性设置： .el-tooltip__popper{
+            設置容過長時鼠標移動彈框提示:
+            表格列內<el-table-column show-overflow-tooltip=true>;
+            el-form-item:<el-form-item :show-overflow-tooltip=true>
+            配合樣式:宽度属性设置： .el-tooltip__popper{
                                         max-width:30%
                                         }
         -->       
@@ -104,14 +103,13 @@
             <el-table :data="tableData"                     
                       @*height="250"*@
                       :row-style="{height:'20px'}"
-                      :cell-style="{padding:'0px'}"                
-                      border                      
+                      :cell-style="{padding:'0px'}"
+                      border
                       highlight-current-row
                       stripe
                       style="font-size: 12px;width: 100%"
                       @*:default-sort="{prop:'RoleID',order:'descending'}"*@                     
                       :header-cell-style="handerMethod" @*隱藏表頭的第二行*@
-
                       v-loading = "isLoading"
 	                  element-loading-background = "rgba(255, 255, 255, .5)"
 	                  element-loading-text = "加载中，请稍后..."
@@ -162,8 +160,7 @@
                                :total="tablePage.totalResult">
                 </el-pagination>
             </div>            
-        </template>
-        
+        </template>        
        
         <!--新增或編輯共用對話框-->
         <el-dialog :title="titleMap[dialogStatus]"
@@ -179,7 +176,6 @@
                         <el-option v-for="item in roleDatas" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
                 </el-form-item>
-
                 <el-form-item label="菜單" prop="AuthorityID">
                     <el-select v-model="newData.AuthorityID" placeholder="请选择">
                         <el-option v-for="item in menuDatas" :key="item.value" :label="item.label" :value="item.value" />
@@ -193,7 +189,6 @@
                 <el-form-item label="備註" prop="Remark">
                     <el-input v-model="newData.Remark"></el-input>
                 </el-form-item>
-
                 <!--el-form-item align="right"-->
                 <!--template-->
                 <!--el-button type="primary" @@click="saveRow('form')" size="small" plian>保 存</el-button-->
@@ -201,7 +196,6 @@
                 <!--/template-->
                 <!--/el-form-item-->
             </el-form>
-
             <el-divider></el-divider>
             <div style="text-align: center">
                 <span slot="footer" class="dialog-footer">
@@ -259,12 +253,10 @@
                     ]       
                 }
             },
-            
             created: function () {
                 this.InIt();
                 this.tablePage.totalResult = this.tableData.length;                
             },
-
             methods: {
                 InIt() {//初始下拉框                    
                     axios.get("GetBasePermission?TableName=Role").then(
@@ -303,7 +295,6 @@
                     ).catch(function (response) {
                         alert(response);
                     });
-
                     //axios.all([getRoleInfo()]).then(                         
                     //     axios.spread(function (aryRole) {
                     //     this.roleDatas = [];                             
@@ -312,7 +303,6 @@
                     //         this.roleDatas.push(aryRole.data[i]);
                     //     } 
                     // }));
-                    
                 },                
                 handleCurrentChange: function (val) {
                     this.tablePage.currentPage = val;
@@ -371,7 +361,6 @@
                     this.newData.RoleID = role_id.toString(); //需轉字符型,與原始下拉框返值類型一致,否則el-select下拉框默認顯示不了lable              
                     this.newData.AuthorityID = authority_id.toString();                    
                     this.newData.PowersID = powers_id.toString();
-                   
                 },
                 delRow(index,row) {//刪除
                     this.$confirm('此操作將删除ID:'+row.ID +'的資料, 是否繼續?', '提示', {
@@ -401,19 +390,15 @@
                                 //Remark:this.newData.RoleName +'.' + this.newData.AuthorityName + '.'+ this.newData.PowersDesc                               
                             }
                             axios.post("AddRoleAuthorityPowers", { updateParams }).then(
-                                (response) => {                                                                                                
-                                    this.$message({
-                                        message: "操作成功！",
-                                        type: "success",
-                                    });
+                                (response) => {
+                                    this.$message({message: "操作成功！",type: "success",});
                                     //this.tableData.push({ RoleID: this.newData.RoleID,AuthorityID:this.newData.AuthorityID,PowersID:this.newData.PowersID,remark:this.newData.Remark})
                                     this.searchClick();
                                     this.closeDialog(1);
                                 }
                             ).catch(function (response) {
                                 alert(response);
-                            });
-                                                       
+                            });                                                       
                         } else {
                             //alert('Error Submit!!');
                             this.$message({
@@ -427,10 +412,7 @@
                 //重置查找條件
                 resetClick(formName) {
                     this.$refs[formName].resetFields();                    
-                },                
-                //resetForm2(formName) {
-                //    this.$refs[formName].resetFields();
-                //},
+                },
                 // 关闭弹框
                 closeDialog(flag) {
                     //備用參數flag
@@ -438,7 +420,6 @@
                     this.showDialog = false;
                     this.$emit("closeDialog", flag);
                 },
-
                 //隐藏表头
                 handerMethod({rowIndex}){
                     if (rowIndex === 1) {
@@ -446,7 +427,6 @@
                         return {display: 'none'}
                     }
                 },
-
                
 
             }//methods  
