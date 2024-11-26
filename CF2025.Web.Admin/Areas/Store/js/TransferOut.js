@@ -197,7 +197,7 @@
         },
         //主檔新增
         insertEvent:async function() {
-            //--權限檢查            
+            //--權限檢查,20067為模塊對應菜單的代碼,例子為轉出單            
             var power = await comm.checkPermission(this.userId,"20067","Common_Add");
             if (power === "0") {
                 return;
@@ -990,6 +990,11 @@
                 let status = comm.checkApproveState('st_transfer_mostly',this.headData.id);               
                 if(status==='2'){
                     this.$XModal.alert({ content: "后端數據已是注銷狀態,當前操作無效!", mask: false });
+                    return;
+                }
+                //--批準/反批準權限檢查,20067為模塊對應菜單的代碼,例子為轉出單            
+                var power = await comm.checkPermission(this.userId,"20067","Common_Approve");
+                if (power === "0") {
                     return;
                 }
                 if(approveType==='1') {//準備批準時
