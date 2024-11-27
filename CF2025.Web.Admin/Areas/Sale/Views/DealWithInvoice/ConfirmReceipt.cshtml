@@ -17,7 +17,7 @@
     <!--表頭記錄-->
 
     <div>
-        <vxe-form :data="formData" size="mini"  title-align="right" style="min-width: 1024px;" title-width="100px" prevent-submit title-colon custom-layout>@* style="width:350px"*@
+        <vxe-form :data="formData" size="mini" style="min-width: 1024px;" title-align="right" title-width="100px" prevent-submit title-colon custom-layout>@* style="width:350px"*@
                  <vxe-form-item title="發票日期" field="oi_date_from" :item-render="{}" class="vxe-form-item-group-search" span="8">
                     <template #default="{ data }" class="aa">
                         <vxe-input type="date" v-model="data.oi_date_from" class="vxe-form-item-input-search"></vxe-input>

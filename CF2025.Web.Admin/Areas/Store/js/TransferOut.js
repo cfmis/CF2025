@@ -198,7 +198,7 @@
         //主檔新增
         insertEvent:async function() {
             //--權限檢查,20067為模塊對應菜單的代碼,例子為轉出單            
-            var power = await comm.checkPermission(this.userId,"20067","Common_Add");
+            var power = await comm.checkPermission(this.userId,"20067","pubAdd");
             if (power === "0") {
                 return;
             }  
@@ -993,7 +993,7 @@
                     return;
                 }
                 //--批準/反批準權限檢查,20067為模塊對應菜單的代碼,例子為轉出單            
-                var power = await comm.checkPermission(this.userId,"20067","Common_Approve");
+                var power = await comm.checkPermission(this.userId,"20067","pubApprove");
                 if (power === "0") {
                     return;
                 }
