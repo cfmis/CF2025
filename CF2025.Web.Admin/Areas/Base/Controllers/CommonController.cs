@@ -75,9 +75,9 @@ namespace CF2025.Web.Admin.Areas.Base.Controllers
         }
 
         //檢查移交單是否已簽收
-        public JsonResult CheckSignfor(string id)
+        public JsonResult CheckSignfor(string id,string bill_id_type)
         {
-            var result = CommonDAL.CheckSignfor(id);
+            var result = CommonDAL.CheckSignfor(id, bill_id_type);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 

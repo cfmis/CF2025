@@ -168,8 +168,8 @@
                     <vxe-column field="vendor_id" title="供應商編號" width="100"></vxe-column>
                     <vxe-column field="vendor_name" title="供應商名稱" width="100"></vxe-column>
                     <vxe-column field="row_status" title="行編輯狀態" width="60" v-if="false"></vxe-column>
-                    <vxe-column field="id" title="id" width="60"></vxe-column>
-                    <vxe-column field="sequence_id" title="sequence_id" width="60"></vxe-column>
+                    <vxe-column field="id" title="id" width="60" v-if="false"></vxe-column>
+                    <vxe-column field="sequence_id" title="sequence_id" width="60" v-if="false"></vxe-column>
                     <vxe-column title="操作" width="140" fixed="right" show-overflow style="text-align:center">
                         <template #default="{ row }">
                             <vxe-button type="text" icon="iconfont icon-edit5" @@click="editRowEvent1(row)" style="color:blue">{{ btnItemTitle }}</vxe-button>                            

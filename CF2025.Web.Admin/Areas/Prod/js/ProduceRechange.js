@@ -451,7 +451,7 @@
                         return;
                     }
                     //對方已经签收了的单据不能再反批准
-                    var signFor = await comm.checkSignfor(this.headData.id);
+                    var signFor = await comm.checkSignfor(this.headData.id,"ProduceRechange");
                     if(signFor != "0"){
                         this.$XModal.alert({ content: "接收貨部門已簽收,不可以再進行反批準操作!", mask: false });
                         return;

@@ -3,8 +3,7 @@
         return {            
             searchID:"", 
             headStatus:"",//主檔為新增或編輯
-            tableData:[],
-           
+            tableData:[],           
             curRowIndex:null,
             selectRow: null,
             selectRow2:null,
@@ -73,7 +72,6 @@
             gridData2: [],
             delData1:[],
             delData2:[],
-            tempSaveData:[],
             curRowSeqId:"",
             Rows:[],
             tempSelectRow1:{},
@@ -82,8 +80,7 @@
             showLot:false,
             validStockFlag:true,
             showGoodsX:0,
-            showGoodsY:0,  
-            
+            showGoodsY:0,
             
             formDataFind:{},
             isEditHead: false,//主檔編輯狀態
@@ -527,7 +524,7 @@
                
         //項目刪除
         tempDelRowEvent:async function(){
-            if(this.headData.headStatus !='0'){
+            if(this.headData.state !='0'){
                 this.$XModal.alert({ content: "此單據已批準,當前操作無效!", mask: false });
                 return;
             }
@@ -538,7 +535,9 @@
                 return;
             }
             if(this.curDelRow){
-                if(this.gridData1.length===1){
+                var $table = this.$refs.xTable1;
+                if($table.tableData.length===1){
+                    //if(this.gridData1.length===1){
                     this.$XModal.alert({ content: "已是最后一行,不可以繼續刪除!", mask: false });
                     return;
                 }
@@ -565,7 +564,8 @@
                             //記錄需刪除表格1的后臺數據
                             this.delData1.push(this.selectRow);         
                         }
-                        this.gridData1.splice(this.curRowIndex,1);//移除表格1刪除的當前行
+                        //this.gridData1.splice(this.curRowIndex,1);//移除表格1刪除的當前行
+                        $table.tableData.splice(this.curRowIndex,1);//移除表格1刪除的當前行
                         this.isEditHead = true;
                         this.curDelRow = null;
                     }
@@ -646,9 +646,15 @@
                     //    return;
                     //}
                     //檢查已批準日期是否為當日,超過當日則不可反批準
-                    var isApprove = await comm.canApprove(this.headData.id,"w_changestore_cc");//領料單
+                    var isApprove = await comm.canApprove(this.headData.id,"w_changestore_cc");//倉庫發料
                     if(isApprove ==="0"){
                         this.$XModal.alert({ content: "注意:【批準日期】必須為當前日期,方可進行此操作!", mask: false });
+                        return;
+                    }
+                    //對方已经签收了的单据不能再反批准
+                    var signFor = await comm.checkSignfor(this.headData.id,"ChangeStore");
+                    if(signFor != "0"){
+                        this.$XModal.alert({ content: "接收貨部門已簽收,不可以再進行反批準操作!", mask: false });
                         return;
                     }
                 }
@@ -688,6 +694,11 @@
             if(this.rowDataEdit1.row_status != 'NEW'){
                 this.rowDataEdit1.row_status='EDIT';//編輯標記
             }
+            let strItem = this.rowDataEdit1.goods_id;           
+            if(strItem.substring(0, 2)==='ML'){
+                this.$set(this.rowDataEdit1,"unit","KG");
+                this.$set(this.rowDataEdit1,"base_unit","KG");
+            }            
             Object.assign(this.selectRow, this.rowDataEdit1);
             this.showEdit = false;
         },
@@ -836,6 +847,7 @@
                   return;
               }
 
+              /*
               //檢查成份庫存是否夠扣減
               //傳給后端存儲過程的表數據類型參數結構
               this.partData = [];
@@ -851,7 +863,8 @@
                   //檢查成份庫存不足,返回放棄當前保存
                   this.$XModal.alert({ content: strError, mask: false });
                   return;
-              }
+              }*/
+
               //START 2024/03/01              
               this.tempSaveData=[];
               var items_update=null;
@@ -921,10 +934,11 @@
                         let goods_id = response.data[0].goods_id;
                         let row_no=0;
                         this.validStockFlag = false;                       
-                        for(let i=0;i<this.tableData1.length;i++){
-                            if(this.tableData1[i].sequence_id === seqNo){
+                        this.tableData = JSON.parse(JSON.stringify(this.gridData1));
+                        for(let i=0;i<this.tableData.length;i++){
+                            if(this.tableData[i].sequence_id === seqNo){
                                 row_no = i+1;
-                                let rw = this.tableData1[i];//如果按this.rows.data[i]取值有可能出錯,因些時有可能還未點擊表格而未能觸發cellClick事件.this.rows是空的對象從而引起錯誤
+                                let rw = this.tableData[i];//如果按this.rows.data[i]取值有可能出錯,因些時有可能還未點擊表格而未能觸發cellClick事件.this.rows是空的對象從而引起錯誤
                                 this.tempSelectRow = JSON.parse(JSON.stringify(rw));//暫存當前行,以便監控器監測以后該行是否有改動
                                 this.$refs.xTable1.setCurrentRow(rw);//定位至當前索引所在的行
                                 this.rowDataEdit = rw;
@@ -967,7 +981,6 @@
                 return this.originData2 || [];
             }
         },
-
         showLotNo:async function(event){           
             if(this.headData.state==='0') {//單元格為可編輯狀態時
                 let location_id = this.selectRow2.inventory_issuance;

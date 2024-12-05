@@ -236,9 +236,9 @@ var comm= {
     *返回值: "1"--已有簽收;"0"--未簽收
     *  Allen 2022/12/07
     */
-    checkSignfor:async function(id){
+    checkSignfor:async function(id,bill_id_type){
         let result = "1";
-        await axios.get("/Base/Common/CheckSignfor", { params: { id: id }}).then(
+        await axios.get("/Base/Common/CheckSignfor", { params: { id: id,bill_id_type:bill_id_type}}).then(
              (res) => {
                  result = res.data ;
              })

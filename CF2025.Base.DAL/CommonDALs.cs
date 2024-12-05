@@ -472,11 +472,22 @@ namespace CF2025.Base.DAL
         }
 
         //檢查移交單是否已簽收
-        public static string CheckSignfor(string id)
+        public static string CheckSignfor(string id,string bill_id_type)
         {
-            string result = "0";
-            string sql = string.Format(
-                @"Select Count(1) as cnt From jo_materiel_con_details WITH(NOLOCK) Where within_code='0000' and id='{0}' and Isnull(signfor,'0')='1'", id);
+            string result = "0", sql ="";
+            switch (bill_id_type)
+            {
+                case "ProduceRechange":
+                    //移交單
+                    sql = string.Format(
+                    @"Select Count(1) as cnt From jo_materiel_con_details WITH(NOLOCK) Where within_code='0000' And id='{0}' And Isnull(signfor,'0')='1'", id);
+                    break;
+                case "ChangeStore":
+                    //倉庫轉倉單、倉庫發料單
+                    sql = string.Format(
+                    @"Select Count(1) as cnt From st_i_subordination WITH(NOLOCK) Where id='{0}' And within_code='0000' And Isnull(signfor,'0')='1'", id);
+                    break;
+            }            
             DataTable dt = sh.ExecuteSqlReturnDataTable(sql);
             result = dt.Rows[0]["cnt"].ToString();
             return result;
