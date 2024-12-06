@@ -89,7 +89,17 @@ namespace CF2025.Web.Admin.Areas.Store.Controllers
             var DataDetail = ChangeStoreDAL.GetPlanItemListByMo(mo_id);
             return Json(DataDetail, JsonRequestBehavior.AllowGet);
         }
-       
+             
+        public JsonResult CheckMo(string mo_id)
+        {
+            string result = ChangeStoreDAL.CheckMo(mo_id);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
 
+        public JsonResult CheckGoodsID(string goods_id)
+        {
+            var result = ChangeStoreDAL.CheckGoodsID(goods_id);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
     }
 }

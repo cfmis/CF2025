@@ -1093,6 +1093,36 @@ namespace CF2025.Store.DAL
             return lstDetail;
         }
 
+        public static string CheckMo(string mo_id)
+        {
+            string result = "";
+            string strSql = string.Format(
+               @"SELECT TOP 1 mo_id FROM st_details_lot with(nolock) WHERE within_code='{0}' And mo_id='{1}'", within_code,mo_id);
+            result = sh.ExecuteSqlReturnObject(strSql);
+            return result;
+        }
+
+        public static StDetailsGoods CheckGoodsID(string goods_id)
+        {           
+            string strSql = string.Format(
+               @"SELECT id as goods_id,name as goods_name,do_color FROM it_goods with(nolock) WHERE within_code='{0}' And id='{1}'", within_code, goods_id);
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            StDetailsGoods lst = new StDetailsGoods();
+            if (dt.Rows.Count > 0)
+            {
+                lst.goods_id = dt.Rows[0]["goods_id"].ToString();
+                lst.goods_name = dt.Rows[0]["goods_name"].ToString();
+                lst.vendor_name = dt.Rows[0]["do_color"].ToString();
+            }
+            else
+            {
+                lst.goods_id = "";
+                lst.goods_name = "";
+                lst.vendor_name = "";
+            } 
+            return lst;
+        }
+
 
     }
 }

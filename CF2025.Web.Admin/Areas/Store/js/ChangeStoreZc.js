@@ -389,21 +389,70 @@
             this.showEdit = false;
         },    
         //**取頁數對應計劃中的貨品編號資料
-        getPlanItemList(mo_id) {
-            this.$set(this.rowDataEdit1, "obligate_mo_id", mo_id);//頁數與庫存頁數保持一致  
+        getPlanItemList:async function(mo_id) {            
+            //檢查頁數是否合法
+            if(mo_id===""){
+                return;
+            }
+            if(mo_id.length !=9)
+            {
+                return;
+            }
+            let returnMoId ="";
+            await axios.get("/ChangeStoreZc/CheckMo?mo_id=" + mo_id).then(
+                (response) => { 
+                    returnMoId = response.data;
+                }
+            ).catch(function (response) {
+                returnMoId = "";
+                //alert(response);
+            });             
+            if(returnMoId ===""){
+                this.$XModal.alert({ content: `當前頁數:【${mo_id}】不存在，請返回檢查！`, mask: false });
+                this.$set(this.rowDataEdit1,"mo_id","");
+                this.$set(this.rowDataEdit1, "obligate_mo_id", ""); 
+                return;
+            }
+            this.$set(this.rowDataEdit1, "obligate_mo_id", mo_id);//頁數與庫存頁數保持一致   
+            //獲得頁數對應的流程
             axios.get("/ChangeStoreZc/GetPlanItemList?mo_id=" + mo_id).then(
                 (response) => {
-                    //this.$set(this.rowDataEdit, "shelf", "");//貨架 賦值給下拉列表框前將值清空
                     this.changeStoreGoodsList = response.data;
-                    //this.$set(this.rowDataEdit, "carton_code", location_id);//倉位默認與倉庫保持一致    
-                    //this.$set(this.rowDataEdit, "shelf", location_id)
-                },
-                (response) => {
-                    alert(response.status);
-                }
+                }                
             ).catch(function (response) {
                 alert(response);
             });
+        },
+        //**檢查貨品編號是否存在
+        checkGoodsId:async function(goods_id) {            
+            if(goods_id ===""){
+                return;
+            }
+            if(goods_id.length <14)
+            {
+                return;
+            }
+            await axios.get("/ChangeStoreZc/CheckGoodsID?goods_id=" + goods_id).then(
+                (response) => { 
+                    if(response.data.goods_id != ""){
+                        this.$set(this.rowDataEdit1,"goods_id",response.data.goods_id);
+                        this.$set(this.rowDataEdit1, "goods_name", response.data.goods_name);
+                        //this.$set(this.rowDataEdit1, "color", response.data.vendor_name);//暫時用vendor_name代替
+                    }else{
+                        this.$set(this.rowDataEdit1,"goods_id","");
+                        this.$set(this.rowDataEdit1, "goods_name","");
+                        //this.$set(this.rowDataEdit1, "color", "");
+                    }
+                }
+            ).catch(function (response) {
+                this.$set(this.rowDataEdit1,"goods_id","");
+                //alert(response);
+            });             
+            if(this.rowDataEdit1.goods_id ===""){
+                this.$XModal.alert({ content: `當前貨品編碼:【${goods_id}】不存在，請返回檢查！`, mask: false });                
+                this.$set(this.rowDataEdit1, "goods_name", "");
+                //this.$set(this.rowDataEdit1, "color", "");
+            } 
         },
         //**項目刪除
         tempDelRowEvent:async function(){
