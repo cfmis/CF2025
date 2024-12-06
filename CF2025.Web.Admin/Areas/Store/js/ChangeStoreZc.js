@@ -269,11 +269,6 @@
             this.isReadOnlyHead = !(blValue); //設置對象可編輯狀態
             this.isDisableDropBoxHead = !(blValue); //設置下拉列表框可編輯狀態
             this.btnItemTitle = (blValue)?"修改":"劉覽";
-            //if(blValue){
-            //    this.btnItemTitle="修改";
-            //}else{
-            //    this.btnItemTitle="劉覽";
-            //}
         },
         clearHeadData(){
             this.headData.id="",
@@ -678,8 +673,7 @@
             comm.showMessageDialog(url, "查詢", 1024, 768, true);
         },
         //**保存
-        saveAll: async function() {
-            debugger;
+        saveAll: async function() {            
             const $table = this.$refs.xTable1;
             const errMap = $table.fullValidate().catch(errMap => errMap);
             let check_tableData1_flag = true;
@@ -694,6 +688,34 @@
             if(!check_tableData1_flag){
                 return;
             }
+
+            //start 檢查當前用戶是否有負責部門的操作權限
+            let depArr = [];
+            let obj = {};
+            let items = $table.tableData;
+            items.forEach(p => {
+                if(!obj[p.inventory_issuance]){
+                    depArr.push(p.inventory_issuance);
+                    obj[p.inventory_issuance] = true;
+                }
+            })           
+            let user = this.userId;
+            let deptId = "";
+            let rights = "";            
+            for (let i = 0; i < depArr.length; i++) {
+                deptId = depArr[i] ;
+                rights = await comm.checkUserDeptRights(user,deptId);
+                if(rights != "1")
+                {
+                    break;//终止循环
+                }
+            }           
+            if(rights != "1"){
+                this.$XModal.alert({ content: `當前用戶: 【${user} 】,無負責部門【${deptId}】操作權限!`,status: 'info' , mask: false });
+                return;
+            }
+            //end
+
             //START 2024/03/01              
             this.tempSaveData=[];
             var items_update=null;
@@ -876,7 +898,7 @@
     }, //END OF METHOND
 
    
-        watch: {
+    watch: {
             searchID : function (val) {
                 this.searchID = val.toUpperCase();
             },

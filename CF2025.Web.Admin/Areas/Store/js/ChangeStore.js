@@ -846,6 +846,33 @@
                   this.$XModal.alert({ content: `注意:表格一第${upperSequence}行對應明細表二的數據不完整,請返回檢查!`, mask: false });
                   return;
               }
+              
+              //start 檢查當前用戶是否有負責部門的操作權限
+              let depArr = [];
+              let obj = {};
+              let items = $table.tableData;
+              items.forEach(p => {
+                  if(!obj[p.inventory_issuance]){
+                      depArr.push(p.inventory_issuance);
+                      obj[p.inventory_issuance] = true;
+                  }
+              })           
+              let user = this.userId;
+              let deptId = "";
+              let rights = "";            
+              for (let i = 0; i < depArr.length; i++) {
+                  deptId = depArr[i] ;
+                  rights = await comm.checkUserDeptRights(user,deptId);
+                  if(rights != "1")
+                  {
+                      break;//终止循环
+                  }
+              }           
+              if(rights != "1"){
+                  this.$XModal.alert({ content: `當前用戶: 【${user} 】,無負責部門【${deptId}】操作權限!`,status: 'info' , mask: false });
+                  return;
+              }
+              //end
 
               /*
               //檢查成份庫存是否夠扣減
@@ -866,8 +893,8 @@
               }*/
 
               //START 2024/03/01              
-              this.tempSaveData=[];
-              var items_update=null;
+              this.tempSaveData = [];
+              var items_update = null;
               for(var i=0;i<$table.tableData.length;i++){
                   items_update = $table.tableData[i];
                   if(items_update.row_status==='NEW' || items_update.row_status==='EDIT'){
@@ -917,9 +944,7 @@
               ).catch(function (response) {
                  alert(response);
               });
-              this.headStatus = "";
-                  
-              
+              this.headStatus = "";              
         },        
         //批準前檢查庫存是否夠扣除
         checkStock:async function(id){
