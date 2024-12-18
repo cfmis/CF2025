@@ -516,9 +516,9 @@ namespace CF.SQLServer.DAL
                     break;
                 case "w_changestore_cc": //倉庫發料
                 case "w_changestore_cc_lot":
-                case "w_changestore_cj":
+                case "w_changestore_cj": //R單轉正單
                 case "w_changestore_cd":
-                case "w_changestore_ce": //仓库转仓                   
+                case "w_changestore_ce": //倉庫轉倉
                     break;
                 case "w_transfer_out":  //转出单                    
                     break;

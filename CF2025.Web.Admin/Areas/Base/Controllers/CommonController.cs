@@ -110,7 +110,12 @@ namespace CF2025.Web.Admin.Areas.Base.Controllers
             var result = CommonDAL.GetStDetailsLotNo(location_id,goods_id,mo_id);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
-       
 
+        //R單轉正單
+        public JsonResult GetStockLotNo(string location_id, string goods_id)
+        {
+            var result = CommonDAL.GetStockLotNo(location_id, goods_id);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
     }
 }

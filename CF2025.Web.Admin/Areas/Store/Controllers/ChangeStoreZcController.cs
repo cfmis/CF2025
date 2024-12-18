@@ -30,30 +30,30 @@ namespace CF2025.Web.Admin.Areas.Store.Controllers
 
         //保存
         [HttpPost]
-        public JsonResult Save(st_inventory_mostly headData, List<st_i_subordination> lstDetailData1, List<st_i_subordination> lstDelData1, string user_id)
+        public JsonResult Save(st_inventory_mostly headData, List<st_i_subordination> lstDetailData1, List<st_i_subordination> lstDelData1, string user_id,string moduleType)
         {
-            var result = ChangeStoreDAL.SaveCe(headData, lstDetailData1, lstDelData1, user_id);
+            var result = ChangeStoreDAL.SaveCeCj(headData, lstDetailData1, lstDelData1, user_id, moduleType);
             if (result.Substring(0, 2) == "00")
                 result = "OK";
             else
                 result = "Error";
             return Json(result, JsonRequestBehavior.AllowGet);
-        }       
+        }
 
         //批準前檢查的庫存
         [HttpPost]
-        public JsonResult CheckStock(string id)
+        public JsonResult CheckStock(string id, string moduleType)
         {
-            var result = ChangeStoreDAL.CheckStorageCe(id);
+            var result = ChangeStoreDAL.CheckStorageCe(id, moduleType);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
         //批準/反準
         [HttpPost]
-        public JsonResult Approve(st_inventory_mostly head, string user_id, string approve_type)
+        public JsonResult Approve(st_inventory_mostly head, string user_id, string approve_type,string moduleType)
         {
             var result = "";
-            result = ChangeStoreDAL.Approve(head, user_id, approve_type,"B");
+            result = ChangeStoreDAL.Approve(head, user_id, approve_type, moduleType);//B,C
             if (result.Substring(0, 2) == "00")
             {
                 result = "OK";
@@ -72,9 +72,9 @@ namespace CF2025.Web.Admin.Areas.Store.Controllers
                 return Json("Error");
         }
 
-        public JsonResult GetHeadByID(string id)
+        public JsonResult GetHeadByID(string id, string moduleType)
         {
-            var DataHead = ChangeStoreDAL.GetHeadByID(id,"B");
+            var DataHead = ChangeStoreDAL.GetHeadByID(id, moduleType); //B,C
             return Json(DataHead, JsonRequestBehavior.AllowGet);
         }
 

@@ -179,9 +179,9 @@
             //this.$refs["formHead"].resetFields();//清空所有對象值
             this.gridData = [];//清空明細表格數據            
             //新增后初始化相關對象的初始值            
-            var d = new Date();//生成日期對象:Fri Oct 15 2021 17:51:20 GMT+0800
-            var date = comm.getDate(d, 0);//轉成年月日字符串格式            
-            var dateTime = comm.datetimeFormat(d, "yyyy-MM-dd hh:mm:ss");
+            let d = new Date();//生成日期對象:Fri Oct 15 2021 17:51:20 GMT+0800
+            let date = comm.getDate(d, 0);//轉成年月日字符串格式            
+            let dateTime = comm.datetimeFormat(d, "yyyy-MM-dd hh:mm:ss");
             this.$set(this.headData, "transfer_date", date);
             this.$set(this.headData, "create_by", this.userId);
             this.$set(this.headData, "create_date", dateTime);           
@@ -220,7 +220,7 @@
                 }
                 this.$XModal.confirm('請確定是否要注銷此轉入單？').then(type => {
                     if (type == 'confirm') {                        
-                        var head = JSON.parse(JSON.stringify(this.headData));                        
+                        let head = JSON.parse(JSON.stringify(this.headData));                        
                         axios.post("/TransferIn/DeleteHead",{head}).then(
                             (response) => {
                                 if(response.data=="OK"){                                  
@@ -325,8 +325,8 @@
             //this.selectRow = null;
             //this.showEdit = true;
             //-------------
-            var rowEndIndex = -1;//添加至行尾
-            var $table = this.$refs.xTableIn;
+            let rowEndIndex = -1;//添加至行尾
+            let $table = this.$refs.xTableIn;
             this.clearRowDataEdit();
             this.selectRow = null;
             this.$set(this.rowDataEdit, "id", this.headData.id);  
@@ -339,9 +339,9 @@
 
             //顯示彈窗
             this.cartonCodeList=null;
-            var index = $table.tableData.length-1;//新增的行號索引
+            let index = $table.tableData.length-1;//新增的行號索引
             this.curRowIndex = index; //記錄新增的行號索引
-            var rw = $table.tableData[index];  //取新增行對象值
+            let rw = $table.tableData[index];  //取新增行對象值
             this.setRowDataEdit(rw);            
             this.selectRow = rw; //將當前行賦值給彈窗
             this.showEdit = true;
@@ -415,12 +415,12 @@
         },
         getMaxID(bill_id, dept_id) {           
             //請求后臺Action并传多個參數,多個參數傳值方法:第一參數用url..."?id="++value,后面的參數用+"&Ver="+value
-            var $table = this.$refs.xTableIn;            
+            let $table = this.$refs.xTableIn;            
             axios.get("/Base/Common/GetMaxID?bill_id=" + bill_id + "&dept_id=" + dept_id + "&serial_len=3").then(
                 (response) => {
                     this.headData.id = response.data;
                     //直接更改表格中某單元格的值,不可以直接更改綁定數組的方式,否則將取不到數據的更改狀態
-                    for (var i = 0; i < $table.tableData.length; i++) {
+                    for (let i = 0; i < $table.tableData.length; i++) {
                         this.$set($table.tableData[i], "id", this.headData.id );
                         this.$set($table.tableData[i], "sequence_id", this.getSequenceId(i));
                     }
@@ -454,10 +454,10 @@
                     this.$XModal.alert({ content: '注銷狀態,當前操作無效!', mask: false });
                     return;
                 }
-                var ls_success= (val==='1')?"批準成功!":"反批準成功!";
-                var ls_error= (val==='1')?"批準失敗!":"反準失敗!";
-                var ls_type = (val==='1')?"批準":"反批準";
-                var ls_is_approve = `確定是否要進行【${ls_type}】操作？`;
+                let ls_success= (val==='1')?"批準成功!":"反批準成功!";
+                let ls_error= (val==='1')?"批準失敗!":"反準失敗!";
+                let ls_type = (val==='1')?"批準":"反批準";
+                let ls_is_approve = `確定是否要進行【${ls_type}】操作？`;
                 //取后端單據狀態
                 let status = comm.checkApproveState('st_transfer_mostly',this.headData.id);
                 if(status==='2'){
@@ -488,15 +488,15 @@
                     //this.getDateServer();
                     ////檢查已批準日期是否為當日,超過當日則不可反批準                  
                     ////將批準日期(字符串)轉換為對象
-                    //var objCheckDate = new Date(this.headData.check_date);
+                    //let objCheckDate = new Date(this.headData.check_date);
                     ////再格式化為統一的日期字符串格式(yyyy-MM-dd)
-                    //var check_date = comm.getDate(objCheckDate, 0);
+                    //let check_date = comm.getDate(objCheckDate, 0);
                     //if(check_date != this.server_date){
                     //    this.$XModal.alert({ content: '注意:【批準日期】必須為當前日期,方可進行此操作!', mask: false });
                     //    return;
                     //}
                     //檢查已批準日期是否為當日,超過當日則不可反批準
-                    var isApprove = await comm.canApprove(this.headData.id,"w_transfer_in");//转入單
+                    let isApprove = await comm.canApprove(this.headData.id,"w_transfer_in");//转入單
                     if(isApprove ==="0"){
                         this.$XModal.alert({ content: "注意:【批準日期】必須為當前日期,方可進行此操作!", mask: false });
                         return;
@@ -505,8 +505,8 @@
                 this.$XModal.confirm(ls_is_approve).then(type => {
                     if (type == "confirm") {
                         this.headData.check_by = this.userId;
-                        var head = JSON.parse(JSON.stringify(this.headData));
-                        var approve_type = val;
+                        let head = JSON.parse(JSON.stringify(this.headData));
+                        let approve_type = val;
                         axios.post("/TransferIn/Approve",{head,approve_type}).then(
                             (response) => {
                                 if(response.data[0].approve_status ==="OK"){
@@ -550,7 +550,7 @@
             //console.log(row.data[row.$rowIndex]);//取得行對象
             //this.rowDataEdit = row.data[row.$rowIndex]; //此方式是對像,彈窗更改,表格也跟著改
             //this.rowDataEdit = JSON.parse(JSON.stringify(row.data[row.$rowIndex]));
-            var rw = row.data[row.$rowIndex];
+            let rw = row.data[row.$rowIndex];
             this.setRowDataEdit(rw);            
             this.selectRow = rw;
             this.showEdit = true;
@@ -608,7 +608,7 @@
         },
         //開啟公共查詢頁面
         showQueryEvent(id) {            
-            var url = "/Base/PublicQuery?window_id=" + id;
+            let url = "/Base/PublicQuery?window_id=" + id;
             comm.showMessageDialog(url, "查詢", 1024, 768, true);
         },        
         saveAll: async function() {
@@ -622,8 +622,8 @@
                       this.$XModal.alert({ content: '注意:明細數據不完整,請返回檢查!', mask: false });
                       return;
                   }else{                      
-                      var items_update=null;
-                      for(var i=0;i<$table.tableData.length;i++){
+                      let items_update = null;
+                      for(let i=0;i<$table.tableData.length;i++){
                           items_update = $table.tableData[i];                
                           if(items_update.row_status==='EDIT'){
                               this.tempSaveData.push(items_update);
@@ -631,20 +631,20 @@
                       }            
                       const items= { insertRecords, removeRecords} = $table.getRecordset();
                       if(items.insertRecords.length>0){
-                          for(var i=0;i<items.insertRecords.length;i++){
+                          for(let i=0;i<items.insertRecords.length;i++){
                               this.$set(items.insertRecords[i], "row_status", "NEW" );
                               this.tempSaveData.push(items.insertRecords[i]);
                           }
                       }
                       if(items.removeRecords.length>0){
-                          for(var i=0;i<items.removeRecords.length;i++){
+                          for(let i=0;i<items.removeRecords.length;i++){
                               this.$set(items.removeRecords[i], "row_status", "DEL" );
                               this.tempSaveData.push(items.removeRecords[i]);
                           }
                       }
                       this.headData.head_status = this.headStatus;//表頭是新增或者修改
-                      var head = JSON.parse(JSON.stringify(this.headData));
-                      var detailData = this.tempSaveData; 
+                      let head = JSON.parse(JSON.stringify(this.headData));
+                      let detailData = this.tempSaveData; 
                       axios.post("/TransferIn/Save",{head,detailData }).then(
                           (response) => {
                               if(response.data=="OK"){                                  
@@ -667,7 +667,7 @@
         },
         //服務器端日期
         getDateServer: async function() {
-            var res= await axios.get("/Base/DataComboxList/GetDateServer");
+            let res= await axios.get("/Base/DataComboxList/GetDateServer");
             this.server_date = res.data;
         }        
     },
@@ -694,9 +694,9 @@
     mounted() {        
         if(this.flagChild ==="1"){  
             this.tableHeight=$(window).height()-150;
-            var $table = this.$refs.xTableIn;
+            let $table = this.$refs.xTableIn;
             //-1 為添加至行尾            
-            for (var i = 0; i < this.confirmData.length; i++) {
+            for (let i = 0; i < this.confirmData.length; i++) {
                 this.clearRowDataEdit();      
                 this.setRowDataEdit(this.confirmData[i]);
                 this.rowDataEdit.location_id = this.locationId;

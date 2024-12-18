@@ -87,7 +87,7 @@
             if(dept_id != this.selectRow.location){
                 this.$XModal.confirm('更改主表倉庫后,會同時將明細表中所有數據的倉庫都更改？').then(type => {
                     if (type == 'confirm') {
-                        var $table = this.$refs.xTable1;                        
+                        let $table = this.$refs.xTable1;                        
                         for(let i=0;i<this.tableData1.length;i++){
                             this.$set($table.tableData[i], "location", dept_id );
                         }
@@ -205,9 +205,9 @@
             this.tableData1 = [];//清空明細表格數據   
             this.getMaxID();
             //新增后初始化相關對象的初始值            
-            var d = new Date();//生成日期對象:Fri Oct 15 2021 17:51:20 GMT+0800
-            var date = comm.getDate(d, 0);//轉成年月日字符串格式            
-            var dateTime = comm.datetimeFormat(d, "yyyy-MM-dd hh:mm:ss");
+            let d = new Date();//生成日期對象:Fri Oct 15 2021 17:51:20 GMT+0800
+            let date = comm.getDate(d, 0);//轉成年月日字符串格式            
+            let dateTime = comm.datetimeFormat(d, "yyyy-MM-dd hh:mm:ss");
             this.$set(this.headData, "date", date);
             this.$set(this.headData, "create_by", this.userId);
             this.$set(this.headData, "create_date", dateTime);            
@@ -226,8 +226,8 @@
                 }
                 this.$XModal.confirm('請確定是否要注銷此移交退回單？').then(type => {
                     if (type == 'confirm') {
-                        var head = JSON.parse(JSON.stringify(this.headData));
-                        var user_id = this.userId;
+                        let head = JSON.parse(JSON.stringify(this.headData));
+                        let user_id = this.userId;
                         axios.post("/Adjustment/DeleteHead",{head,user_id}).then(
                             (response) => {
                                 if(response.data=="OK"){                
@@ -267,7 +267,7 @@
                 this.tempSelectRow = JSON.parse(JSON.stringify(this.rows[0]));
                 this.selectRow = this.rows[0];//JSON.parse(JSON.stringify(this.rows[0]));/;////this.rows.data[0];//當前行
                 //this.selectRow = this.tableData1[0];
-                var $table = this.$refs.xTable1;
+                let $table = this.$refs.xTable1;
                 $table.setCurrentRow(this.selectRow);//定位至當前索引所在的行
                 $table.setActiveCell(this.selectRow, "mo_id");//設置單元格焦點
             }
@@ -324,21 +324,21 @@
                 this.$refs['dept_id'].focus(); //設置焦點, this.$refs是包含自定義的引用對象
                 return;
             }; 
-            //var rowEndIndex = -1;//添加至行尾
-            var $table = this.$refs.xTable1;
+            //let rowEndIndex = -1;//添加至行尾
+            let $table = this.$refs.xTable1;
             this.clearRowDataEdit();
             this.selectRow = null;    
             
             //------------2023/09/19
             //避免用戶增記錄再刪除t,再新增,可能存在重復的序號
-            var myArray = this.tableData1;
-            var ary=[];
+            let myArray = this.tableData1;
+            let ary=[];
             //for (let i = 0; i < myArray.length; i++) {
             //    ary.push(myArray[i].sequence_id);
             //}
             myArray.forEach((res,index,e)=>ary.push(e[index].sequence_id));
-            var seq_id = this.getSequenceId($table.tableData.length);
-            var aryFilter = ary.filter(el=> el===seq_id);//是否存在seq_id序号
+            let seq_id = this.getSequenceId($table.tableData.length);
+            let aryFilter = ary.filter(el=> el===seq_id);//是否存在seq_id序号
             if(aryFilter.length>0){
                 //存在序號則加1再重生序號
                 seq_id = this.getSequenceId($table.tableData.length +1);
@@ -397,7 +397,7 @@
         },
         //取最大單據號
         getMaxID() {
-            var $table = this.$refs.xTable1;
+            //var $table = this.$refs.xTable1;
             axios.get("/Base/Common/GetMaxIDStock?bill_id=" + 'ST02' + "&serial_len=4" ).then(
                 (response) => {
                     this.headData.id = response.data;
@@ -475,7 +475,7 @@
                         return;
                     }
                     //檢查已批準日期是否為當日?,超過當日則不可反批準
-                    var isApprove = await comm.canApprove(this.headData.id,"w_st_adjustment");//倉庫調整
+                    let isApprove = await comm.canApprove(this.headData.id,"w_st_adjustment");//倉庫調整
                     if(isApprove === "0"){
                         this.$XModal.alert({ content: "注意:【批準日期】必須為當前日期,方可進行此操作!", mask: false });
                         return;
@@ -485,9 +485,9 @@
                 this.$XModal.confirm(ls_approve).then(type => {
                      if (type === "confirm") {
                             this.headData.check_by = this.userId;
-                            var head = JSON.parse(JSON.stringify(this.headData));//深拷貝轉成JSON數據格式
-                            var approve_type = val;
-                            var user_id = this.userId;
+                            let head = JSON.parse(JSON.stringify(this.headData));//深拷貝轉成JSON數據格式
+                            let approve_type = val;
+                            let user_id = this.userId;
                             this.loading = true;
                        
                             //當前是批準,相反就是反批準,當前是反批準相反就是批準,第二個參數'1'--不顯示,'0'--顯示
@@ -533,7 +533,7 @@
         dbclickEvent(row){
             //this.rowDataEdit = row.data[row.$rowIndex]; //此方式是對像,彈窗更改,表格也跟著改
             //this.rowDataEdit = JSON.parse(JSON.stringify(row.data[row.$rowIndex]));
-            var rw = row.data[row.$rowIndex];
+            let rw = row.data[row.$rowIndex];
             this.rowDataEdit = rw;//2022.05.24 add
             this.selectRow = rw;
             if(this.headData.state==='0'){
@@ -561,7 +561,7 @@
         //查找货品编码
         showItem(event,type){
             this.selectFindItemRow = null;
-            var x=0,y=0;
+            let x=0,y=0;
             //event.clientY有些不准确,改为取cellClickEvent的Y座标(this.showGoodsY).
             //x = event.clientX; //2023/07/26 CANCEL
             x = this.showGoodsX ;//2023/07/26 ADD            
@@ -685,7 +685,7 @@
                         }
                         this.selectRow = this.tableData1[0];
                         //this.selectRow = JSON.parse(JSON.stringify(this.tableData1[0]));//this.tableData1[0];     
-                        var $table = this.$refs.xTable1;
+                        let $table = this.$refs.xTable1;
                         $table.setCurrentRow(this.selectRow);//定位至當前索引所在的行
                         $table.setActiveCell(this.selectRow, "mo_id");//設置單元格焦點
                     }
@@ -698,7 +698,7 @@
 
         //開啟公共查詢頁面
         showQueryEvent(id) {            
-            var url = "/Base/PublicQuery?window_id=" + id;
+            let url = "/Base/PublicQuery?window_id=" + id;
             comm.showMessageDialog(url, "查詢", 1024, 768, true);
         }, 
         //动态改变样式,更改第一頁DIV邊框高度
@@ -711,7 +711,7 @@
 
         //記錄前后定位
         handlerNextOrPrev(type){
-            var curIndex=0;
+            let curIndex=0;
             if(type==="Next"){
                 if(this.curRowIndex < this.rows.data.length-1){
                     curIndex = this.curRowIndex + 1;//定位至下一條記錄
@@ -728,7 +728,7 @@
                     curIndex = 0;
                 }
             }
-            var rw = this.rows.data[curIndex];//取當前索引對應的行對象            
+            let rw = this.rows.data[curIndex];//取當前索引對應的行對象            
             this.tempSelectRow = JSON.parse(JSON.stringify(rw));//暫存當前行,以便檢查是否有更改            
             this.$refs.xTable1.setCurrentRow(rw);//定位至當前索引所在的行
             this.rowDataEdit = rw;
@@ -827,7 +827,7 @@
                 (response) => {
                     this.lotNoList = response.data;
                     ////要對checkbox綁定的對應字段值轉換成布尔型值,否则不会出现打勾的效果
-                    //for (var i = 0; i < this.lotNoList.length; i++) {
+                    //for (let i = 0; i < this.lotNoList.length; i++) {
                     //    if(this.lotNoList[i].is_qc==='1'){
                     //        this.$set(this.lotNoList[i], "is_qc", true );
                     //    }else{
@@ -918,9 +918,9 @@
             }
                  
             //檢查當前用戶是否有負責部門的操作權限
-            var userid = this.userId;
-            var deptid = this.headData.out_dept;
-            var rights = await comm.checkUserDeptRights(userid,deptid);
+            let userid = this.userId;
+            let deptid = this.headData.out_dept;
+            let rights = await comm.checkUserDeptRights(userid,deptid);
             if(rights !="1")
             {                
                 this.$XModal.alert({ content: `當前用戶: 【${userid} 】,無負責部門【${deptid}】操作權限!`,status: 'info' , mask: false });
@@ -935,10 +935,10 @@
             }           
 
             this.headData.head_status = this.headEditFlag;//表頭新增或修改的標識
-            var headData = JSON.parse(JSON.stringify(this.headData));
-            var lstDetailData1 = this.tableData1;
-            var lstDelData1 = this.delData1;            
-            var user_id = this.userId;
+            let headData = JSON.parse(JSON.stringify(this.headData));
+            let lstDetailData1 = this.tableData1;
+            let lstDelData1 = this.delData1;            
+            let user_id = this.userId;
            
             axios.post("/Adjustment/Save",{headData,lstDetailData1,lstDelData1,user_id}).then(
                 (response) => {

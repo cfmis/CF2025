@@ -55,7 +55,7 @@ namespace CF2025.Web.Admin.Areas.Store.Controllers
         public JsonResult Approve(st_inventory_mostly head, string user_id, string approve_type)
         {
             var result = "";
-            result = ChangeStoreDAL.Approve(head, user_id, approve_type,"A"); //倉庫發料與倉庫轉倉共用
+            result = ChangeStoreDAL.Approve(head, user_id, approve_type,"A"); //倉庫發料/倉庫轉倉共用
             if (result.Substring(0, 2) == "00")
             {
                 result = "OK";

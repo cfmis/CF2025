@@ -1,27 +1,27 @@
 ﻿
 @{
-    ViewBag.Title = "ChangeStore倉庫發料";
+    ViewBag.Title = "R單轉正單";
 }
 @section PageSpecificStyleSheetIncludes{
     @*<link rel="stylesheet" href="~/Content/Styles/common.css" />*@
     <style lang="scss" scoped>
         * {
             margin:0px;
-            padding: 0px;       
+            padding: 0px;
         }
         .my-dropdown4 {
             width: 600px;
             height: 300px;
             background-color: #fff;
             box-shadow: 0 0 6px 2px rgba(0, 0, 0, 0.1);
-        }
-    </style>
-    
+        }        
+    </style>    
 }
+
 <div id="app">
     <vxe-toolbar perfect size="small" style="height:35px;margin-bottom:5px">
         <template #buttons style="height:35px;margin-bottom:10px">
-            <vxe-button type="text" status="danger" icon="iconfont icon-cancel5" v-if="(flagChild==='1')" @@click="closePage()">關閉</vxe-button>
+            @*<vxe-button type="text" status="danger" icon="iconfont icon-cancel5" v-if="(flagChild==='1')" @@click="closePage()">關閉</vxe-button>*@
             <vxe-button type="text" icon="iconfont icon-file-add1" v-if="!(isEditHead)" @@click="insertEvent()">新增</vxe-button>
             <vxe-button type="text" status="danger" icon="iconfont icon-delete2" v-if="!(isEditHead)"@@click="delHeadEvent()" style="margin-left: -2px">注銷</vxe-button>
             <vxe-button type="text" icon="iconfont icon-edit2" v-if="!(isEditHead)" style="margin-left: -2px" @@click="editHeadEvent()">修改</vxe-button>
@@ -32,13 +32,13 @@
             <vxe-button type="text" icon="iconfont icon-confirm4" v-if="headData.state=='0' && !(isEditHead)" @@click="approveEvent('1')">批準</vxe-button>
             <vxe-button type="text" icon="iconfont icon-cancel7" v-if="headData.state=='1' && !(isEditHead)" @@click="approveEvent('0')" style="margin-left: -2px">反批準</vxe-button>
             <vxe-button type="text" icon="iconfont icon-print" v-if="!(isEditHead)" @@click="printEvent">列印</vxe-button>
-            <input v-model="searchID" maxlenth="13" style="outline-style:none;margin-left: 20px" v-if="flagChild=='' && !(isEditHead)" @@keyup.enter="findByID()" placeholder="編號搜索">
-            <vxe-button type="text" icon="iconfont icon-search1" v-if="flagChild=='' && !(isEditHead)" @@click="showFindWindos()" style="margin-left: -2px">查找</vxe-button>
+            <input v-model="searchID" maxlenth="13" style="outline-style:none;margin-left: 20px" v-if="!(isEditHead)" @@keyup.enter="findByID()" placeholder="編號搜索">
+            <vxe-button type="text" icon="iconfont icon-search1" v-if="!(isEditHead)" @@click="showFindWindos()" style="margin-left: -2px">查找</vxe-button>
         </template>
     </vxe-toolbar>
     <div style="margin:5px 0px;">
         <div @*:style="getStyle()"*@>
-            <div class="my-div-header">
+            <div class="my-div-header" @*style="margin-bottom:20px; border: 1px solid #dcdfe6;"*@>
                 <vxe-form :data="headData"
                           ref="formHead"
                           @*:rules="formRules"*@
@@ -107,12 +107,10 @@
                         <vxe-input v-model="headData.update_date" class="input-customize" readonly></vxe-input>
                     </vxe-form-item>
                     @*row4*@
-                </vxe-form>
-              
-                <input class="" type="hidden" name="isChild" value="@ViewBag.flagChild" id="isChild" />
+                </vxe-form> 
                 <input class="" type="hidden" name="user_id" value="@ViewBag.user_id" id="user_id" />                
             </div>
-
+            <!--表格1-->
             <div style="float:left;width:100%;">       
                 <vxe-table border
                            show-overflow
@@ -120,16 +118,15 @@
                            ref="xTable1"
                            @*設置最大高度*@
                            @*max-height="450"*@
-                           :height="tableHeight1" 
-                           @*:height="tableHeight"*@
+                           :height="tableHeight1"
                            size="small"
                            @*欄寬度可調*@
                            resizable
                            show-header-overflow
                            :header-cell-style="headerCellStyle"
                            highlight-hover-row
-                           highlight-current-row                  
-                           @*loading3顯示查詢動畫*@
+                           highlight-current-row
+                           @*loading顯示查詢動畫*@
                            :loading="loading"
                            @*:sync-resize="selectTab"*@
                            @*選中時highlight*@
@@ -153,10 +150,10 @@
                     <vxe-column field="inventory_receipt" title="轉入倉" width="80"></vxe-column>
                     <vxe-column field="ir_code" title="倉位" v-if="false" width="80"></vxe-column>
                     <vxe-column field="ii_lot_no" title="轉出批號" width="80"></vxe-column>
-                    <vxe-column field="ref_lot_no" title="參考批號" width="100"></vxe-column>
                     <vxe-column field="color" title="顏色" width="100"></vxe-column>
-                    <vxe-column field="ib_qty" title="轉出倉存數量" width="100"></vxe-column>
-                    <vxe-column field="ib_weight" title="轉出倉存重量" width="100"></vxe-column>
+                    <vxe-column field="ref_lot_no" title="參考批號" width="100"></vxe-column>                    
+                    <vxe-column field="ib_qty" title="轉出倉倉存數量" width="100"></vxe-column>
+                    <vxe-column field="ib_weight" title="轉出倉倉存重量" width="100"></vxe-column>
                     <vxe-column field="unit" title="單位" width="50"></vxe-column>
                     <vxe-column field="remark" title="備註" width="150"></vxe-column>                    
                     <vxe-column field="ref_id" title="參考單號" v-if="false" width="100"></vxe-column>
@@ -178,128 +175,13 @@
                 </vxe-table>
                 <!--表格1-->
 
-                <!--表格2-->
-                <div style="float:left;width:100%;">
-                    <vxe-table border
-                                show-overflow
-                                :data="gridData2"
-                                ref="xTable2"                                
-                                keep-source
-                                @*動態設置表格高度*@
-                                :height="tableHeight2"
-                                size="small"
-                                @*欄寬度可調*@
-                                resizable
-                                show-header-overflow
-                                :header-cell-style="headerCellStyle"                                
-                                @*:cell-style="cellStyle"*@
-                                highlight-hover-row
-                                highlight-current-row
-                                :loading="loading2" 
-                                @*選中時highlight*@
-                                :checkbox-config="{highlight: true, range: true}"
-                                @*:edit-rules="validRules2"*@
-                                :mouse-config="{selected:true}"
-                                :keyboard-config="{isArrow: true,isTab:true,isEnter:true,enterToTab:true}"                       
-                                :edit-config="{trigger: 'click', mode: 'cell',activeMethod:activeMethod,showIcon:true,showStatus: true}"
-                                :row-config="{height: 25}" 
-                                @@cell-click="cellClickEvent2">
-                        <vxe-column type="seq" title="#" fixed="left" width="30"></vxe-column>
-                        <vxe-column field="mo_id" title="頁數" fixed="left"width="90"></vxe-column>
-                        <vxe-column field="goods_id" title="貨品編碼" width="160"></vxe-column>
-                        <vxe-column field="goods_name" title="貨品名稱" width="260"></vxe-column>
-                        <vxe-column field="color" title="顏色" width="60"></vxe-column>
-                        <vxe-column field="unit" title="單位" width="50"></vxe-column>
-                        <vxe-column field="inventory_issuance" title="轉出倉" width="70"></vxe-column>
-                        <vxe-column field="ii_code" title="交易倉位" width="70"></vxe-column>  
-                                                  
-                        <vxe-column field="i_amount" title="轉倉數量" width="90" :edit-render="{name:'input',autoselect:true}" align="right">
-                             <template #edit="{ row }">                    
-                                <vxe-input v-model="row.i_amount" type="integer" min="1" :controls="false" style="height:20px;"></vxe-input>
-                            </template>
-                        </vxe-column>
-                        <vxe-column field="i_weight" title="轉倉重量" width="90" :edit-render="{name:'input',autoselect:true}" align="right">
-                            <template #edit="{ row }">
-                                <vxe-input v-model="row.i_weight" type="float" min="0.01" :controls="false" style="height:20px;"></vxe-input>
-                            </template>
-                        </vxe-column>
-                       
-                        <!--彈出多列下拉框,下拉容器-->
-                        <vxe-column field="ir_lot_no" title="批號" width="120" :edit-render="{}">
-                            <template #edit="{ row }">
-                              <div>                                  
-                                <vxe-pulldown ref="pulldownRef" transfer >
-                                  <template #default>
-                                      <vxe-input v-model="row.ir_lot_no" type="search" @@search-click="showLotNo($event)" style="height :25px;"></vxe-input>                                     
-                                  </template>
-                                  <template #dropdown>
-                                    <div class="my-dropdown4">
-                                      <vxe-grid
-                                        border
-                                        auto-resize
-                                        height="auto"
-                                        :row-config="{isHover: true}"
-                                        :data="tableLotNoList"
-                                        :columns="tableColumn"
-                                        @@cell-click="cellLotNoClick"                                        
-                                        >
-                                      </vxe-grid>
-                                    </div>
-                                  </template>
-                                </vxe-pulldown>
-                              </div>
-                            </template>
-                        </vxe-column>
-                        @*--vxe-grid config--*@
-                        @*:pager-config="pagerConfig"*@
-                        @*@@page-change="pageChangeEvent"*@
-
-                        @*:row-config="{height: 15, isCurrent: true, isHover: true}"*@
-                        @*:loading="loading"*@
-                        <vxe-column field="obligate_mo_id" title="庫存頁數" width="100"></vxe-column>
-                        <vxe-column field="inventory_receipt" title="轉入倉" width="70"></vxe-column>
-                        <vxe-column field="ir_code" title="對應倉位" width="70"></vxe-column>
-                        <vxe-column field="remark" title="備注" width="120"></vxe-column>
-                        <vxe-column field="ref_id" title="參考單號" width="90"></vxe-column>                            
-                        <vxe-column field="ref_lot_no" title="參考批號" width="90"></vxe-column>
-                        <vxe-column field="so_no" title="銷售單號" width="100"></vxe-column>
-                        <vxe-column field="contract_cid" title="PO/NO" width="90"></vxe-column>
-                        <vxe-column field="mrp_id" title="Mrp Id" width="150"></vxe-column>                            
-                        <!--隱藏欄位-->
-                        <vxe-column field="id" title="id" width="60" @*v-if="false"*@></vxe-column>
-                        <vxe-column field="upper_sequence" title="upper_sequence" width="60" @*v-if="false"*@></vxe-column>
-                        <vxe-column field="sequence_id" title="sequence_id" width="60" @*v-if="false"*@></vxe-column>
-                        <vxe-column field="basic_unit" title="basic_unit" width="62" v-if="false"></vxe-column>
-                        <vxe-column field="rate" title="rate" width="60" v-if="false"></vxe-column>
-                        <vxe-column field="ib_qty" title="ib_qty" width="60" v-if="false"></vxe-column>
-                        <vxe-column field="order_qty" title="order_qty" width="60" v-if="false"></vxe-column>
-                        <vxe-column field="ii_lot_no" title="ii_lot_no" width="60" v-if="false"></vxe-column>
-                        <vxe-column field="average_cost" title="average_cost" width="60" v-if="false"></vxe-column>
-                        <vxe-column field="state" title="state" width="60" v-if="false"></vxe-column>
-                        <vxe-column field="transfers_state" title="transfers_state" width="60" v-if="false"></vxe-column>
-                        <vxe-column field="ib_weight" title="ib_weight" width="60" v-if="false"></vxe-column>
-                        <vxe-column field="order_sec_qty" title="order_sec_qty" width="60" v-if="false"></vxe-column>
-                        <vxe-column field="so_sequence_id" title="so_sequence_id" width="60" v-if="false"></vxe-column>
-                        <vxe-column field="ref_sequence_id" title="ref_sequence_id" width="60" v-if="false"></vxe-column>
-                        <vxe-column field="inventory_date" title="inventory_date" width="60" v-if="false"></vxe-column>
-                        <vxe-column field="department_id" title="department_id" width="60" v-if="false"></vxe-column>
-                        <vxe-column field="only_detail" title="only_detail" width="60" v-if="false"></vxe-column>
-                        <vxe-column field="vendor_id" title="vendor_id" width="60" v-if="false"></vxe-column>
-                        <vxe-column field="servername" title="servername" width="60" v-if="false"></vxe-column>
-                        <vxe-column field="row_status" title="行編輯狀態" width="60" v-if="false" ></vxe-column>
-                        
-                    </vxe-table>
-                </div>
-                <!--表格2-->
-
-
                 <!--表格1新增&编辑彈窗-->
                 <vxe-modal v-model="showEdit" :title="btnItemTitle" width="800" min-width="600" min-height="300" :loading="submitLoading" resize destroy-on-close>
                   <template #default>
                     <vxe-form :data="rowDataEdit1" :rules="rulesRowEdit1" title-align="right" title-width="100" @*@@submit="submitEvent"*@ style="height:400px" custom-layout >
                         <vxe-form-item field="mo_id" title="頁數" span="12" :item-render="{}" class="vxe-form-item-customize">
                             <template #default="{ data }">
-                                <vxe-input v-model="data.mo_id" maxlength="9" class="input-customize"></vxe-input>
+                                <vxe-input v-model="data.mo_id" maxlength="9" class="input-customize" @@change="getPlanItemList(data.mo_id)"></vxe-input>
                             </template>
                         </vxe-form-item>
                         <vxe-form-item field="obligate_mo_id" title="庫存頁數" span="12" :item-render="{}" class="vxe-form-item-customize">
@@ -308,13 +190,34 @@
                             </template>
                         </vxe-form-item>                        
                         <vxe-form-item field="goods_id" title="貨品編碼" span="12" :item-render="{}" class="vxe-form-item-customize">
+                            <!--彈出多列下拉框,下拉容器 -->
                             <template #default="{ data }">
-                                <vxe-input v-model="data.goods_id" maxlength="18" class="input-customize my-search"readonly>
-                                    <template #suffix>
-                                        <i class="iconfont icon-search1" @*@@click="submitEvent"*@></i>
-                                    </template>
-                                </vxe-input>
-                            </template>
+                                    @*<div>*@                                  
+                                        <vxe-pulldown ref="pulldownRef" transfer >
+                                            @*<template #default>*@
+                                                <vxe-input v-model="data.goods_id" maxlength="18" class="input-customize my-search" @@change="checkGoodsId(data.goods_id)" >
+                                                    <template #suffix>
+                                                        <i class="iconfont icon-search1" @@click="showGoods(data)"></i>
+                                                    </template>
+                                                </vxe-input>
+                                            @*</template>*@
+                                            <template #dropdown>
+                                                <div class="my-dropdown4">
+                                                    <vxe-grid
+                                                    show-header-overflow
+                                                    border
+                                                    auto-resize
+                                                    height="auto"
+                                                    :row-config="{isHover: true,height: 20}"
+                                                    :data="tableGoodsList"
+                                                    :columns="tableColumn"
+                                                    @@cell-click="cellGoodsClick">
+                                                    </vxe-grid>
+                                                </div>
+                                            </template>
+                                        </vxe-pulldown>
+                                    @*</div>*@
+                            </template>                            
                         </vxe-form-item>
                         <vxe-form-item field="unit" title="單位" span="12" :item-render="{}" class="vxe-form-item-customize">
                             <template #default="{ data }">
@@ -327,14 +230,14 @@
                             <template #default="{ data }">
                                 <vxe-input v-model="data.goods_name" class="input-customize" disabled></vxe-input>
                             </template>
-                         </vxe-form-item>
-                         <vxe-form-item field="color" title="顏色" span="12" :item-render="{}" class="vxe-form-item-customize">
+                        </vxe-form-item>
+                        <vxe-form-item field="color" title="顏色" span="12" :item-render="{}" class="vxe-form-item-customize">
                             <template #default="{ data }">
                                 <vxe-input v-model="data.color" class="input-customize" disabled></vxe-input>
                             </template>
-                         </vxe-form-item>
-                        <vxe-form-item title="" :span="12" :item-render="{}" class="vxe-form-item-customize">                           
                         </vxe-form-item>
+                        <vxe-form-item title="" :span="12" :item-render="{}" class="vxe-form-item-customize"></vxe-form-item>
+
                         <vxe-form-item field="ib_qty" title="轉出倉存數量" span="12" :item-render="{}"title-overflow="title" class="vxe-form-item-customize">
                             <template #default="{ data }">
                                 <vxe-input v-model="data.ib_qty" type="integer" min="1" max="999999" class="input-customize"disabled></vxe-input>
@@ -342,9 +245,10 @@
                         </vxe-form-item>
                         <vxe-form-item field="i_amount" title="轉倉數量" span="12" :item-render="{}" class="vxe-form-item-customize">
                             <template #default="{ data }">
-                                <vxe-input v-model="data.i_amount" type="integer" min="1" max="999999" class="input-customize":controls="false"disabled></vxe-input>
+                                <vxe-input v-model="data.i_amount" type="integer" min="1" max="999999" class="input-customize":controls="false"></vxe-input>
                             </template>
                         </vxe-form-item>
+
                         <vxe-form-item field="ib_weight" title="轉出倉存重量" span="12" :item-render="{}"title-overflow="title" class="vxe-form-item-customize">
                             <template #default="{ data }">
                                 <vxe-input v-model="data.ib_qty" type="float" min="0.01" max="99999.99" class="input-customize"disabled></vxe-input>
@@ -352,33 +256,61 @@
                         </vxe-form-item>
                         <vxe-form-item field="i_weight" title="轉倉重量" span="12" :item-render="{}" class="vxe-form-item-customize">
                             <template #default="{ data }">
-                                <vxe-input v-model="data.i_weight" type="float" min="0.01" max="99999.99" class="input-customize" :controls="false"disabled></vxe-input>
+                                <vxe-input v-model="data.i_weight" type="float" min="0.01" max="99999.99" class="input-customize" :controls="false"></vxe-input>
                             </template>
-                        </vxe-form-item>                       
+                        </vxe-form-item>
+
                         <vxe-form-item field="inventory_issuance" title="轉出倉" span="12" :item-render="{}" class="vxe-form-item-customize">                            
                             <template #default="{ data }">
-                                <el-select v-model="data.inventory_issuance" @@change="getCartonCodeList(data.location_id)" filterable @*clearable*@ style="width:100%"disabled>
+                                <el-select v-model="data.inventory_issuance" filterable default-first-option style="width:100%">
                                     <el-option v-for="item in locationList":key="item.value" :value="item.value" :label="item.label"style="height:25px;font-size: 9px"/>
                                 </el-select>
                             </template>
-                        </vxe-form-item>
+                        </vxe-form-item>  
+                        <vxe-form-item field="ir_lot_no" title="批號" span="12" :item-render="{}" class="vxe-form-item-customize">
+                            <!--彈出多列下拉框,下拉容器 -->
+                            <template #default="{ data }">
+                                <div>
+                                    <vxe-pulldown ref="pulldownLotNoRef" transfer>
+                                        <template #default>
+                                            <vxe-input v-model="data.ir_lot_no" class="input-customize my-search" readonly>
+                                                <template #suffix>
+                                                    <i class="iconfont icon-search1" @@click="showLotNo(data)"></i>
+                                                </template>
+                                            </vxe-input>
+                                        </template>
+                                        <template #dropdown>
+                                            <div class="my-dropdown4">
+                                                <vxe-grid show-header-overflow
+                                                          border
+                                                          auto-resize
+                                                          height="auto"
+                                                          :row-config="{isHover: true,height: 20}"
+                                                          :data="tableLotNoList"
+                                                          :columns="tableColumnLotNo"
+                                                          @@cell-click="cellLotNoClick">
+                                                </vxe-grid>
+                                            </div>
+                                        </template>
+                                    </vxe-pulldown>
+                                </div>
+                            </template>
+                        </vxe-form-item>    
                         <vxe-form-item field="inventory_receipt" title="轉入倉" span="12" :item-render="{}" class="vxe-form-item-customize">                            
                             <template #default="{ data }">
-                                <el-select v-model="data.inventory_receipt" @@change="getCartonCodeList(data.location_id)" filterable @*clearable*@ style="width:100%" disabled>
+                                <el-select v-model="data.inventory_receipt" filterable default-first-option style="width:100%">
                                     <el-option v-for="item in locationList":key="item.value" :value="item.value" :label="item.label"style="height:25px;font-size: 9px"/>
                                 </el-select>
                             </template>
                         </vxe-form-item>
+
                         <vxe-form-item field="ref_id" title="參考單號" span="12" :item-render="{}" class="vxe-form-item-customize">
                             <template #default="{ data }">
                                 <vxe-input v-model="data.ref_id" class="input-customize" disabled></vxe-input>
                             </template>
                         </vxe-form-item>
-                        <vxe-form-item field="ir_lot_no" title="批號" span="12" :item-render="{}" class="vxe-form-item-customize">
-                            <template #default="{ data }">
-                                <vxe-input v-model="data.ir_lot_no" class="input-customize" disabled>></vxe-input>
-                            </template>
-                        </vxe-form-item>
+
+                        
                         <vxe-form-item field="so_no" title="銷售單號" span="12" :item-render="{}" class="vxe-form-item-customize">
                             <template #default="{ data }">
                                 <vxe-input v-model="data.so_no" class="input-customize" disabled></vxe-input>
@@ -389,16 +321,18 @@
                                 <vxe-input v-model="data.contract_cid" class="input-customize" disabled></vxe-input>
                             </template>
                         </vxe-form-item>
+
                         <vxe-form-item field="mrp_id" title="Mrp id" span="12" :item-render="{}" class="vxe-form-item-customize">
                             <template #default="{ data }">
                                 <vxe-input v-model="data.mrp_id" class="input-customize" disabled></vxe-input>
                             </template>
-                        </vxe-form-item>                        
+                        </vxe-form-item>      
                         <vxe-form-item field="ref_lot_no" title="參考批號" span="12" :item-render="{}" class="vxe-form-item-customize">
                             <template #default="{ data }">
                                 <vxe-input v-model="data.ref_lot_no" class="input-customize" disabled></vxe-input>
                             </template>
                         </vxe-form-item>
+
                         <vxe-form-item field="sign_by" title="簽收人" span="12" :item-render="{}" class="vxe-form-item-customize">
                             <template #default="{ data }">
                                 <vxe-input v-model="data.sign_by" class="input-customize"disabled></vxe-input>
@@ -409,6 +343,7 @@
                                 <vxe-input v-model="data.sign_date" class="input-customize"disabled></vxe-input>
                             </template>
                         </vxe-form-item>
+
                         <vxe-form-item field="vendor_id" title="供應商編號" span="12" :item-render="{}" class="vxe-form-item-customize">
                             <template #default="{ data }">
                                 <vxe-input v-model="data.vendor_id" class="input-customize" disabled></vxe-input>
@@ -479,6 +414,7 @@
 
 
 @section PageSpecificJavascriptIncludes{    
-    <script src="~/Areas/Store/js/ChangeStore.js?v=@Guid.NewGuid().ToString()"></script>
+    <script src="~/Areas/Store/js/ChangeStoreCj.js?v=@Guid.NewGuid().ToString()"></script>
 }
+
 

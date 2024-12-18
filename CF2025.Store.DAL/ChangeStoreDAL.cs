@@ -22,7 +22,7 @@ namespace CF2025.Store.DAL
         public static string ldt_check_date = "";
         public static StringBuilder sbSql = new StringBuilder();
 
-        //倉庫發料，倉庫轉倉共用
+        //倉庫發料/倉庫轉倉/R單轉正單共用
         public static st_inventory_mostly GetHeadByID(string id,string turnType)
         {
             /*批準日期需按這種格式轉換,否則反準比較對不上而出錯
@@ -59,7 +59,7 @@ namespace CF2025.Store.DAL
             return mdjHead;
         }
 
-        //倉庫發料，倉庫轉倉共用
+        //倉庫發料/倉庫轉倉/R單轉正單共用
         public static List<st_i_subordination> GetDetailsByID(string id)
         {
             string strSql = string.Format(
@@ -70,7 +70,7 @@ namespace CF2025.Store.DAL
             FROM st_i_subordination A with(nolock)
             INNER JOIN it_goods B ON A.within_code = B.within_code AND A.goods_id = B.id
             LEFT JOIN cd_color C ON B.within_code = C.within_code AND B.color = C.id
-            LEFT JOIN it_vendor D ON A.within_code = D.within_code AND Isnull(A.vendor_id,'')= C.id
+            LEFT JOIN it_vendor D ON A.within_code = D.within_code AND Isnull(A.vendor_id,'')= D.id
             Where A.id='{0}' And A.within_code='{1}' Order by A.id,A.sequence_id",id, within_code);
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             List<st_i_subordination> lstDetail = new List<st_i_subordination>();
@@ -180,7 +180,7 @@ namespace CF2025.Store.DAL
             return lstDetail;
         }
 
-        //倉庫發料，倉庫轉倉共用
+        //倉庫發料，倉庫轉倉/R單轉正單共用
         public static string DeleteHead(st_inventory_mostly head)
         {
             string strSql = "";
@@ -397,34 +397,45 @@ namespace CF2025.Store.DAL
         }//--end SaveCc
 
         /// <summary>
-        /// 保存倉庫轉倉
+        /// 保存倉庫轉倉/R單轉正單
         /// </summary>
         /// <param name="headData"></param>
         /// <param name="lstDetailData1"></param>      
         /// <param name="lstDelData1"></param>        
         /// <param name="user_id"></param>
+        /// <param name="moduleType"></param>
         /// <returns></returns>
-        public static string SaveCe(st_inventory_mostly headData, List<st_i_subordination> lstDetailData1, List<st_i_subordination> lstDelData1, string user_id)
+        public static string SaveCeCj(st_inventory_mostly headData, List<st_i_subordination> lstDetailData1, 
+                                        List<st_i_subordination> lstDelData1, string user_id,string moduleType)
         {
             string result = "00", str = "";          
             StringBuilder sbSql = new StringBuilder(" SET XACT_ABORT ON ");
             sbSql.Append(" BEGIN TRANSACTION ");
             string id = headData.id;
             string head_insert_status = headData.head_status;
-
+            string billType = moduleType; 
+            switch (moduleType)
+            {
+                case "B":
+                    billType = "ST10"; //"ST10:倉庫轉倉
+                    break;
+                case "C":
+                    billType = "ST09"; //ST09:R單轉正單
+                    break;
+            }
 
             if (head_insert_status == "NEW")//全新的單據
             {
-                string billType = "ST10";//倉庫轉倉
+                
                 bool id_exists = CommonDAL.CheckIdIsExists("st_inventory_mostly", id);
                 if (id_exists)
                 {
                     //已存在此單據號,重新取最大單據號
-                    headData.id = CommonDAL.GetMaxID(billType, 4); //DAB24010132
+                    headData.id = CommonDAL.GetMaxID(billType, 4); //DAB24010132，DAC24010132
                 }
                 //***begin 更新系統表倉庫轉倉最大單據編號               
                 string year_month = headData.id.Substring(3, 4); //2401
-                string bill_code = headData.id.Substring(1, 10); //AB24010132
+                string bill_code = headData.id.Substring(1, 10); //AB24010132,AC24010132
                 string sql_sys_update1 = string.Empty;
                 string sql_sys_id_insert = string.Format(
                 @" INSERT INTO sys_bill_max_separate(within_code,bill_code,bill_id,year_month,bill_text2,bill_text1,bill_text3,bill_text4,bill_text5) 
@@ -444,9 +455,9 @@ namespace CF2025.Store.DAL
                   @" Insert Into st_inventory_mostly(
                   within_code,id,inventory_date,origin,state,bill_type_no,department_id,linkman,handler,
                   remark,create_by,create_date,update_count,transfers_state,servername,turn_type) 
-                  Values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}',getdate(),'1','0','{11}','B' )",
+                  Values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}',getdate(),'1','0','{11}','{12}' )",
                   within_code, headData.id, headData.inventory_date, headData.origin, headData.state, headData.bill_type_no, headData.department_id,
-                  headData.linkman, headData.handler, headData.remark, headData.create_by, ls_servername);
+                  headData.linkman, headData.handler, headData.remark, headData.create_by, ls_servername, moduleType);
                 sbSql.Append(str);
 
                 //插入明細表一
@@ -458,10 +469,10 @@ namespace CF2025.Store.DAL
                     inventory_receipt, ir_code, ir_lot_no, remark, i_weight, ref_id, ref_sequence_id, mo_id, mrp_id,obligate_mo_id,jo_sequence_id,
                     rate,ib_qty,state,transfers_state,ib_weight,only_detail,vendor_id) Values                    
                     ('{0}','{1}','{2}','{3}','{4}','{5}',{6},'{7}','{8}','{9}','{10}','{11}','{12}','{13}',{14},'{15}','{16}','{17}','{18}','{19}','{20}',
-                    1,0,'0','0',0,'0','P')",
+                    1,0,'0','0',0,'1','{21}')",
                     within_code, headData.id, item.sequence_id, item.goods_id, item.base_unit, item.unit, item.i_amount, item.inventory_issuance,
-                    item.ii_code, item.ii_lot_no, item.inventory_receipt, item.ir_code, item.ir_lot_no, item.remark, item.i_weight, item.ref_id,
-                    item.ref_sequence_id, item.mo_id, item.mrp_id, item.obligate_mo_id, item.jo_sequence_id);
+                    item.inventory_issuance, item.ii_lot_no, item.inventory_receipt, item.inventory_receipt, item.ir_lot_no, item.remark, item.i_weight, item.ref_id,
+                    item.ref_sequence_id, item.mo_id, item.mrp_id, item.obligate_mo_id, item.jo_sequence_id,item.vendor_id);
                     sbSql.Append(str);
                 }
                 //生成移交單
@@ -505,10 +516,10 @@ namespace CF2025.Store.DAL
                                 inventory_receipt, ir_code, ir_lot_no, remark, i_weight, ref_id, ref_sequence_id, mo_id, mrp_id,obligate_mo_id,jo_sequence_id,
                                 rate,ib_qty,state,transfers_state,ib_weight,only_detail,vendor_id) Values 
                                 ('{0}','{1}','{2}','{3}','{4}','{5}',{6},'{7}','{8}','{9}','{10}','{11}','{12}','{13}',{14},'{15}','{16}','{17}','{18}','{19}','{20}',
-                                1,0,'0','0',0,'0','P')",
+                                1,0,'0','0',0,'1','{21}')",
                                 within_code, headData.id, item.sequence_id, item.goods_id, item.base_unit, item.unit, item.i_amount, item.inventory_issuance,
                                 item.inventory_issuance, item.ii_lot_no, item.inventory_receipt, item.inventory_receipt, item.ir_lot_no, item.remark, item.i_weight, item.ref_id,
-                                item.ref_sequence_id, item.mo_id, item.mrp_id, item.obligate_mo_id, item.jo_sequence_id);
+                                item.ref_sequence_id, item.mo_id, item.mrp_id, item.obligate_mo_id, item.jo_sequence_id, item.vendor_id);
                             }
                             if (item.row_status == "EDIT")
                             {
@@ -516,11 +527,11 @@ namespace CF2025.Store.DAL
                                 @" UPDATE st_i_subordination WITH(ROWLOCK)
                                 SET goods_id='{3}',base_unit='{4}',unit='{5}',i_amount={6},inventory_issuance='{7}',ii_code='{8}',ii_lot_no='{9}',
                                 inventory_receipt='{10}',ir_code='{11}',ir_lot_no='{12}',remark='{13}',i_weight={14},ref_id='{15}',ref_sequence_id='{16}',
-                                mo_id='{17}', mrp_id='{18}',obligate_mo_id='{19}',jo_sequence_id='{20}'
+                                mo_id='{17}', mrp_id='{18}',obligate_mo_id='{19}',jo_sequence_id='{20}',vendor_id='{21}'
                                 WHERE id='{0}' And sequence_id='{1}' And within_code='{2}'",
                                 headData.id, item.sequence_id, within_code, item.goods_id, item.base_unit, item.unit, item.i_amount, item.inventory_issuance,
                                 item.inventory_issuance, item.ii_lot_no, item.inventory_receipt, item.inventory_receipt, item.ir_lot_no, item.remark, item.i_weight, item.ref_id,
-                                item.ref_sequence_id, item.mo_id, item.mrp_id, item.obligate_mo_id, item.jo_sequence_id);
+                                item.ref_sequence_id, item.mo_id, item.mrp_id, item.obligate_mo_id, item.jo_sequence_id, item.vendor_id);
                             }
                             sbSql.Append(str);
                         }
@@ -532,20 +543,255 @@ namespace CF2025.Store.DAL
             sbSql.Clear();
             result = (result == "") ? "00" : "-1";
             return result;
-        } //--end SaveCe
+        } //--end SaveCeCj
 
-        //批準、反批準：倉庫發料,倉庫轉倉共用
-        public static string Approve(st_inventory_mostly head, string user_id, string approve_type,string turnType)
+
+        //批準、反批準：倉庫發料/倉庫轉倉/R單轉正單共用共用
+        public static string Approve(st_inventory_mostly head, string user_id, string approve_type, string turnType)
         {
-            string result = "", is_active_name, is_turn_type = "";
-            is_turn_type = turnType;  //区分类型,A:倉庫發料,:倉庫轉倉;
+            string result = "", is_active_name, is_turn_type = "", strSql = "", ls_dept2;
             string ls_id, ls_origin, ls_mrp_id, ls_sequence_id, ls_unit_code, ls_servername; //ls_error,ls_charge_dept;
             string ls_goods_id, ls_dept_id, ls_wp_id, ls_next_wp_id, ls_mo_id, ls_obligate_mo_id;
             int ll_count, ll_count2, ll_cnt, ll_cnt_state1, ll_cnt_state3, ll_cnt_state4; //, li_jo_ver,ll_rtn;
             decimal ldec_qty, ldec_i_amount, ldec_i_weight;
             string ldt_date, ldt_check_date;
+            is_turn_type = turnType;  //区分类型,A:倉庫發料,B:倉庫轉倉,C:R單轉正單;
             ldt_check_date = CommonDAL.GetDbDateTime("L");//批準日期(長日期時間);
             is_active_name = approve_type == "1" ? "pfc_ok" : "pfc_unok";
+            DataTable dtFind = new DataTable();     
+           
+            if (is_active_name == "pfc_ok")
+            {
+                //批準前的資料檢查
+                DataTable dtDetail = new DataTable();
+                strSql = string.Format(
+                @"Select sequence_id, mo_id, goods_id, inventory_issuance, inventory_receipt, obligate_mo_id
+                From st_i_subordination
+                Where id='{0}' and within_code='{1}' ORDER BY sequence_id", head.id, within_code);
+                dtDetail = sh.ExecuteSqlReturnDataTable(strSql);
+                for (int i = 0; i < dtDetail.Rows.Count; i++)
+                {
+                    ls_sequence_id = dtDetail.Rows[i]["sequence_id"].ToString();
+                    ls_mo_id = dtDetail.Rows[i]["mo_id"].ToString();
+                    ls_goods_id = dtDetail.Rows[i]["goods_id"].ToString();
+                    ls_wp_id = dtDetail.Rows[i]["inventory_issuance"].ToString();
+                    ls_next_wp_id = dtDetail.Rows[i]["inventory_receipt"].ToString();
+                    ls_obligate_mo_id = dtDetail.Rows[i]["obligate_mo_id"].ToString();
+                    ls_mo_id = !string.IsNullOrEmpty(ls_mo_id) ? ls_mo_id : "";
+                    ls_goods_id = !string.IsNullOrEmpty(ls_goods_id) ? ls_goods_id : "";
+                    ls_wp_id = !string.IsNullOrEmpty(ls_wp_id) ? ls_wp_id : "";
+                    ls_next_wp_id = !string.IsNullOrEmpty(ls_next_wp_id) ? ls_next_wp_id : "";
+                    ls_obligate_mo_id = !string.IsNullOrEmpty(ls_obligate_mo_id) ? ls_obligate_mo_id : "";
+                    if (turnType == "A")
+                    {
+                        if (ls_wp_id != "" && ls_next_wp_id != "" && ls_wp_id == ls_next_wp_id && ls_wp_id != "818")
+                        {
+                            result = "-1" + "Row[" + ls_sequence_id + "]" + "轉出倉與轉入倉不可以相同!";
+                            break;
+                        }
+                        ll_cnt = 0;
+                        strSql = string.Format(
+                        @"Select Count(1) as cnt From jo_bill_mostly A WITH(NOLOCK),jo_bill_goods_details B WITH(NOLOCK)
+                        Where A.within_code=B.within_code And A.id=B.id And A.ver=B.ver And A.state Not In('2','V') And 
+                        A.within_code='{0}' And A.mo_id='{1}' And B.goods_id='{2}' And B.wp_id='{3}' And B.next_wp_id='{4}'",
+                            within_code, ls_mo_id, ls_goods_id, ls_wp_id, ls_next_wp_id);
+                        dtFind = sh.ExecuteSqlReturnDataTable(strSql);
+                        ll_cnt = int.Parse(dtFind.Rows[0]["cnt"].ToString());
+                        if (ll_cnt == 0)
+                        {
+                            strSql = string.Format(
+                            @"Select Count(1) as cnt                 
+                            From jo_bill_mostly a WITH(NOLOCK),
+                                jo_bill_goods_details b WITH(NOLOCK),
+                                jo_bill_materiel_details c WITH(NOLOCK)
+                            Where a.within_code = b.within_code and a.id = b.id and a.ver = b.ver and a.state not in ('2','V') and
+                            b.within_code = c.within_code and b.id = c.id and b.ver = c.ver and b.sequence_id = c.upper_sequence and
+                            a.within_code='{0}' And a.mo_id='{1}' and c.materiel_id='{2}' and c.location='{3}' and b.wp_id='{4}'",
+                                within_code, ls_mo_id, ls_goods_id, ls_wp_id, ls_next_wp_id);
+                            dtFind = sh.ExecuteSqlReturnDataTable(strSql);
+                            ll_cnt = int.Parse(dtFind.Rows[0]["cnt"].ToString());
+                        }
+                        if (ll_cnt <= 0)
+                        {
+                            result = "-1" + "Row[" + ls_sequence_id + "]" + "流程上規定的交貨與實際交貨不一至！";
+                            break;
+                        }
+                        ll_cnt = 0;
+                        strSql = string.Format(
+                        @"Select Count(1) cnt       
+                        From jo_bill_mostly a WITH(NOLOCK),
+                            jo_bill_goods_details b WITH(NOLOCK),
+                            jo_bill_materiel_details c WITH(NOLOCK)
+                        Where a.within_code = b.within_code and a.id = b.id and a.ver = b.ver and a.state not in ('2', 'V') and
+                            b.within_code = c.within_code and b.id = c.id and b.ver = c.ver and b.sequence_id = c.upper_sequence and
+                            a.within_code='{0}' and a.mo_id='{1}' and c.materiel_id='{2}' and c.location='{3}' and b.wp_id='{4}' and isnull(b.hold,'')<>'' ",
+                        within_code, ls_mo_id, ls_goods_id, ls_wp_id, ls_next_wp_id);
+                        dtFind = sh.ExecuteSqlReturnDataTable(strSql);
+                        ll_cnt = int.Parse(dtFind.Rows[0]["cnt"].ToString());
+                        if (ll_cnt > 0)
+                        {
+                            result = "-1" + "Row[" + ls_sequence_id + "]" + "工單已经被Hold,不允许进行后续的流程！" + "],[" + ls_mo_id + "],[" + ls_goods_id + "]";
+                            break;
+                        }
+                        //--判断除了当前流程之后有没有对QC的流程(20130916 huangyun固定702部门)
+                        ls_dept2 = "";
+                        strSql = string.Format(
+                        @"Select Top 1 next_wp_id as dept2  
+                        From jo_bill_mostly a WITH(NOLOCK),jo_bill_goods_details b WITH(NOLOCK)
+                        Where a.within_code='{0}' And a.within_code=b.within_code And a.state not in ('2','V')
+				            And a.id = b.id And a.ver = b.ver And a.mo_id='{1}' And b.goods_id='{2}'
+                            And b.wp_id ='{3}' And b.next_wp_id='702' And Isnull(b.next_wp_id,'')<>'{4}'",
+                        within_code, ls_mo_id, ls_goods_id, ls_wp_id, ls_next_wp_id);
+                        dtFind = sh.ExecuteSqlReturnDataTable(strSql);
+                        if (dtFind.Rows.Count > 0)
+                        {
+                            ls_dept2 = dtFind.Rows[0]["dept2"].ToString();
+                        }
+                        ls_dept2 = string.IsNullOrEmpty(ls_dept2) ? "" : ls_dept2;
+                        if (ls_dept2 != "" && ls_next_wp_id != "702")
+                        {
+                            ll_cnt = 0;
+                            strSql = string.Format(
+                            @"Select Count(1) as cnt                 
+                            From so_order_manage a WITH(NOLOCK),so_order_details b WITH(NOLOCK),so_order_production_bom c WITH(NOLOCK)
+                            Where a.within_code = b.within_code and a.id = b.id and a.ver = b.ver and
+                                b.within_code = c.within_code and b.id = c.id and b.ver = c.ver and
+                                a.state not in('2', 'V') and b.state not in('2','V') and b.sequence_id = c.upper_sequence And
+                                c.within_code='{0}' And c.charge_dept='{1}' And c.next_wp_id='{2}' And b.mo_id='{3}' And c.goods_id='{4}'",
+                            within_code, ls_wp_id, ls_next_wp_id, ls_mo_id, ls_goods_id);
+                            dtFind = sh.ExecuteSqlReturnDataTable(strSql);
+                            ll_cnt = int.Parse(dtFind.Rows[0]["cnt"].ToString());
+                            if (ll_cnt == 0)
+                            {
+                                ll_cnt = 0;
+                                strSql = string.Format(
+                                @"Select Count(1) as cnt                    
+                                From st_inventory_mostly a WITH(NOLOCK),st_i_subordination b WITH(NOLOCK)
+                                Where a.within_code='{0}' And a.within_code = b.within_code And a.state not in ('2','V')
+						            And a.id=b.id And b.mo_id='{0}' And b.goods_id='{1}'
+                                    And b.inventory_issuance ='{2}' And b.inventory_receipt='{3}' And A.turn_type='{4}'",
+                                within_code, ls_mo_id, ls_goods_id, ls_wp_id, ls_dept2, "A");
+                                dtFind = sh.ExecuteSqlReturnDataTable(strSql);
+                                ll_cnt = int.Parse(dtFind.Rows[0]["cnt"].ToString());
+                                //判斷是否有相開對應QC生產計畫的移交單
+                                if (ll_cnt <= 0)
+                                {
+                                    result = "-1" + "Row[" + ls_sequence_id + "]" + "沒有相關QC的轉倉單!";
+                                    break;
+                                }
+                            }
+                        }
+                    } //--end if (turnType == "A")
+
+                    //--必須檢查轉出、轉入倉是倉管部門(部門資料)或倉庫組(倉位資料)時才允許保存。
+                    if (is_turn_type == "B") //正常仓库转仓,与计划单流程无关
+                    {
+                        //貨品編碼為原料(ML開頭)，保存時需檢查頁數與庫存頁數是否相同，不相同不允許保存                    
+                        if (ls_goods_id.Substring(0, 2).ToUpper() == "ML" && ls_mo_id != ls_obligate_mo_id)
+                        {
+                            result = "-1" + "Row[" + ls_sequence_id + "]" + "库存页数与当前页数必须相同!";
+                            break;
+                        }
+                        if (ls_wp_id != "802")//(P487)當轉出倉802原料倉時，不用檢查轉入倉庫是倉管部門或倉庫組，因802倉會定期發料到車間，是不按流程的.
+                        {
+                            ll_cnt = 0;
+                            strSql = string.Format(
+                            @"Select Count(1) as cnt From cd_productline WITH(NOLOCK)
+                            Where within_code='{0}' And id='{1}' And Isnull(state,'0')<>'2'", within_code, ls_wp_id);
+                            dtFind = sh.ExecuteSqlReturnDataTable(strSql);
+                            ll_cnt = int.Parse(dtFind.Rows[0]["cnt"].ToString());
+                            if (ll_cnt == 0)//去部门资料中判断
+                            {
+                                ll_cnt = 0;
+                                strSql = string.Format(
+                                @"Select Count(1) as cnt From cd_department A WITH(NOLOCK),cd_productline B WITH(NOLOCK)
+                                Where A.within_code=B.within_code And A.location=B.id
+                                    And B.within_code='{0}' And Isnull(A.wh_dept,'0')='1' And B.id='{1}'", within_code, ls_wp_id);
+                                dtFind = sh.ExecuteSqlReturnDataTable(strSql);
+                                ll_cnt = int.Parse(dtFind.Rows[0]["cnt"].ToString());
+                                if (ll_cnt == 0)
+                                {
+                                    result = "-1" + "Row[" + ls_sequence_id + "]" + "所選倉庫必须为倉管部門!" + "轉出倉[" + ls_wp_id + "]";
+                                    break;
+                                }
+                                //--判断转入仓
+                                ll_cnt = 0;
+                                strSql = string.Format(
+                                @"Select Count(1) as cnt From cd_productline WITH(NOLOCK)
+                                Where within_code='{0}' And id='{1}' And Isnull(state,'0')<>'2'", within_code, ls_next_wp_id);
+                                dtFind = sh.ExecuteSqlReturnDataTable(strSql);
+                                ll_cnt = int.Parse(dtFind.Rows[0]["cnt"].ToString());
+                                if (ll_cnt == 0)//去部门资料中判断
+                                {
+                                    ll_cnt = 0;
+                                    strSql = string.Format(
+                                    @"Select Count(1) as cnt From cd_department A WITH(NOLOCK),cd_productline B WITH(NOLOCK)
+                                    Where A.within_code=B.within_code And A.location=B.id
+                                       And B.within_code='{0}' And Isnull(A.wh_dept,'0')='1' And B.id='{1}'",within_code, ls_next_wp_id);
+                                    dtFind = sh.ExecuteSqlReturnDataTable(strSql);
+                                    ll_cnt = int.Parse(dtFind.Rows[0]["cnt"].ToString());
+                                }
+                                if (ll_cnt == 0)
+                                {
+                                    result = "-1" + "Row[" + ls_sequence_id + "]" + "所選倉庫必须为倉管部門!" + "轉入倉[" + ls_next_wp_id + "]";
+                                    break;
+                                }
+                            }
+                        }
+                    } // end of if (is_turn_type=="B")
+
+                    if (is_turn_type == "C")
+                    {
+                        //R单转仓时,页 数必须为R单
+                        if (ls_mo_id != "" && ls_obligate_mo_id != "" && ls_mo_id.Substring(0, 1) != "R" && ls_obligate_mo_id.Substring(0, 1) != "R")
+                        {
+                            result = "-1" + "Row[" + ls_sequence_id + "]" + "頁數或者庫存頁數必须為R單頁數!";
+                            break;
+                        }
+                        //R单转出,转入仓位必须相同
+                        if (ls_wp_id != "" && ls_next_wp_id != "" && ls_wp_id != ls_next_wp_id)
+                        {
+                            result = "-1" + "Row[" + ls_sequence_id + "]" + "當為R單時時,轉出倉和轉入倉必须相同!";
+                            break;
+                        }
+                        //轉入、轉出倉相同; 頁數、庫存頁數不能為空且不可以相同,庫存頁數或頁數中須有一個是R開頭;頁數(不是庫存頁數)中須存在此貨品編號//判断是否为R单的情况
+                        if (ls_wp_id == ls_next_wp_id && ls_mo_id != "" && ls_obligate_mo_id != "" && ls_mo_id != ls_obligate_mo_id)
+                        {
+                            ll_cnt = 0;
+                            strSql = string.Format(
+                            @"Select Count(1) as cnt                
+                            From jo_bill_mostly A WITH(NOLOCK),jo_bill_goods_details B WITH(NOLOCK)
+                            Where A.within_code=B.within_code And A.id=B.id And A.ver=B.ver And A.state Not In('2','V') And 
+                                  A.within_code='{0}' And A.mo_id='{1}' And B.goods_id='{2}'", within_code, ls_mo_id, ls_goods_id);
+                            dtFind = sh.ExecuteSqlReturnDataTable(strSql);
+                            ll_cnt = int.Parse(dtFind.Rows[0]["cnt"].ToString());
+                            if (ll_cnt == 0)
+                            {
+                                strSql = string.Format(
+                                @"Select Count(1) as cnt                
+                                From jo_bill_mostly a WITH(NOLOCK),jo_bill_goods_details b WITH(NOLOCK),jo_bill_materiel_details c WITH(NOLOCK)
+                                Where a.within_code = b.within_code And a.id = b.id And a.ver = b.ver And a.state not in ('2','V') And
+                                      b.within_code=c.within_code And b.id=c.id And b.ver=c.ver And b.sequence_id=c.upper_sequence And
+                                      a.within_code='{0}' And a.mo_id='{1}' And c.materiel_id='{2}'", within_code, ls_mo_id, ls_goods_id);
+                                dtFind = sh.ExecuteSqlReturnDataTable(strSql);
+                                ll_cnt = int.Parse(dtFind.Rows[0]["cnt"].ToString());
+                            }
+                            if (ll_cnt <= 0)
+                            {
+                                result = "-1" + "Row[" + ls_sequence_id + "]" + "當前頁數中不存此貨品編號!";
+                                break;
+                            }
+                        }
+                    }//end of if (is_turn_type=="C")
+
+                    if (result != "")
+                    {
+                        return result;
+                    }
+                } //--end for
+            }
+
+
             if (is_active_name == "pfc_ok" || is_active_name == "pfc_unok")
             {
                 ls_id = head.id;
@@ -557,12 +803,12 @@ namespace CF2025.Store.DAL
                 {
                     ldt_check_date = head.check_date;
                 }
-                string strSql = string.Format(
+                strSql = string.Format(
                 @"Select sequence_id,unit,Isnull(i_amount,0) as i_amount,Isnull(i_weight,0) as i_weight,inventory_issuance,
                 inventory_receipt,mo_id,goods_id,obligate_mo_id
 				From st_i_subordination WITH(nolock) Where id ='{0}' And within_code ='{1}'", head.id, within_code);
                 DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
-                DataTable dtFind = new DataTable();
+                //DataTable dtFind = new DataTable();
                 string sql_update = string.Empty;
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
@@ -719,6 +965,7 @@ namespace CF2025.Store.DAL
                             }
                         }// end of if (ll_count > 0)
                     } //-- end of if(is_turn_type == "A")
+
                     //更新交易表
                     ll_count = 0;
                     if (is_turn_type == "A")
@@ -756,7 +1003,8 @@ namespace CF2025.Store.DAL
 								    ii_location_id,ii_code,operator,check_date,sequence_id,ib_qty,qty,sec_unit,sec_qty,
 								    lot_no,
 								    mo_id,dept_id,servername)
-					            Select	a.within_code,a.id,a.goods_id,a.goods_name,a.unit,a.base_unit,a.rate,'{3}','28',
+					            Select	a.within_code,a.id,a.goods_id,a.goods_name,a.unit,a.base_unit,a.rate,'{3}',
+                                        '28',
 								        a.i_amount ,
 								        a.inventory_issuance,a.ii_code,'{4}','{5}',
 								        a.sequence_id,
@@ -769,7 +1017,7 @@ namespace CF2025.Store.DAL
 								        '{6}','{7}'
 					            From st_i_subordination A
 					            Where A.within_code='{0}' And A.id='{1}' And A.sequence_id='{2}'",
-                                within_code, ls_id, ls_sequence_id, ldt_date, user_id, ldt_check_date, ldt_date, ls_servername);
+                                within_code, ls_id, ls_sequence_id, ldt_date, user_id, ldt_check_date, ls_dept_id, ls_servername);
                                 sql_update = RetunSqlString(sql_update);
                                 result = sh.ExecuteSqlUpdate(sql_update);
                                 if (result == "")
@@ -1004,7 +1252,7 @@ namespace CF2025.Store.DAL
                 string checkDate = is_pfc_ok ? ldt_check_date : "";
                 string checkBy = is_pfc_ok ? user_id : "";
                 string state = is_pfc_ok ? "1" : "0";
-                string strSql = string.Format(
+                strSql = string.Format(
                 @"Update st_inventory_mostly with(Rowlock) 
                    SET check_date=(Case When '{2}'<>'' Then '{2}' Else null End), check_by='{3}',
                        update_date=(Case When '{2}'<>'' Then '{2}' Else getdate() End),update_by='{4}',state='{5}' 
@@ -1062,9 +1310,13 @@ namespace CF2025.Store.DAL
         }
 
         //倉庫轉倉：檢查庫存,返回庫存差異數
-        public static List<check_part_stock> CheckStorageCe(string id)
+        public static List<check_part_stock> CheckStorageCe(string id,string moduleType)
         {
-            string strSql = string.Format(
+            string strSql = "";
+            if (moduleType == "B")
+            {
+                //轉倉
+                strSql = string.Format(
                 @"SELECT TOP 1 S.out_dept,S.sequence_id,S.mo_id,S.goods_id,S.lot_no,(ISNULL(C.qty,0)-S.con_qty) AS qty,(ISNULL(C.sec_qty,0)-S.sec_qty) AS sec_qty 
                 FROM (SELECT A.within_code,B.inventory_issuance As out_dept,B.sequence_id,B.mo_id,B.goods_id,B.ii_lot_no AS lot_no,
                       B.i_amount As con_qty,B.i_weight As sec_qty
@@ -1076,6 +1328,23 @@ namespace CF2025.Store.DAL
 		                ON S.within_code=C.within_code AND S.out_dept=C.location_id AND S.out_dept=C.carton_code AND
 		                   S.goods_id=C.goods_id AND S.lot_no=C.lot_no AND S.mo_id=C.mo_id AND ISNULL(C.sec_qty,0)>0
                 WHERE S.con_qty>ISNULL(C.qty,0) OR S.sec_qty>ISNULL(C.sec_qty,0)", id, within_code);
+            }
+            if (moduleType == "C")
+            {               
+                //R單轉正單
+                strSql = string.Format(
+                @"SELECT TOP 1 S.out_dept,S.sequence_id,S.mo_id,S.goods_id,S.lot_no,(ISNULL(C.qty,0)-S.con_qty) AS qty,(ISNULL(C.sec_qty,0)-S.sec_qty) AS sec_qty 
+                FROM (SELECT A.within_code,B.inventory_issuance As out_dept,B.sequence_id,B.obligate_mo_id As mo_id,B.goods_id,B.ir_lot_no AS lot_no,
+                      B.i_amount As con_qty,B.i_weight As sec_qty
+	                  FROM st_inventory_mostly A With(nolock)
+                      Inner Join st_i_subordination B With(nolock) On A.within_code=B.within_code and A.id=B.id
+	                  WHERE A.id='{0}' AND A.within_code='{1}' AND A.state<>'2'
+	                 ) S  
+	                LEFT JOIN st_details_lot C with(nolock)
+		                ON S.within_code=C.within_code AND S.out_dept=C.location_id AND S.out_dept=C.carton_code AND
+		                   S.goods_id=C.goods_id AND S.lot_no=C.lot_no AND S.mo_id=C.mo_id AND ISNULL(C.sec_qty,0)>0
+                WHERE S.con_qty>ISNULL(C.qty,0) OR S.sec_qty>ISNULL(C.sec_qty,0)", id, within_code);               
+            }
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             List<check_part_stock> lstDetail = new List<check_part_stock>();
             for (int i = 0; i < dt.Rows.Count; i++)

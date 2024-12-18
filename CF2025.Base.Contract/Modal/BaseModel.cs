@@ -51,6 +51,7 @@
         public decimal qty { get; set; }
         public decimal sec_qty { get; set; }
         public string mo_id { get; set; }
+        public string vendor_id { get; set; }
         public string vendor_name { get; set; }
         
     }

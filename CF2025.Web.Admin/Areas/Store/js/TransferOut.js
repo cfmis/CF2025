@@ -198,7 +198,7 @@
         //主檔新增
         insertEvent:async function() {
             //--權限檢查,20067為模塊對應菜單的代碼,例子為轉出單            
-            var power = await comm.checkPermission(this.userId,"20067","pubAdd");
+            let power = await comm.checkPermission(this.userId,"20067","pubAdd");
             if (power === "0") {
                 return;
             }  
@@ -213,9 +213,9 @@
             this.tableData2 = [];
             this.originData2 = [];
             //新增后初始化相關對象的初始值            
-            var d = new Date();//生成日期對象:Fri Oct 15 2021 17:51:20 GMT+0800
-            var date = comm.getDate(d, 0);//轉成年月日字符串格式            
-            var dateTime = comm.datetimeFormat(d, "yyyy-MM-dd hh:mm:ss");
+            let d = new Date();//生成日期對象:Fri Oct 15 2021 17:51:20 GMT+0800
+            let date = comm.getDate(d, 0);//轉成年月日字符串格式            
+            let dateTime = comm.datetimeFormat(d, "yyyy-MM-dd hh:mm:ss");
             this.$set(this.headData, "transfer_date", date);
             this.$set(this.headData, "create_by", this.userId);
             this.$set(this.headData, "create_date", dateTime);   
@@ -288,12 +288,12 @@
                 return;
             }            
             //請求后臺Action并传多個參數,多個參數傳值方法:第一參數用url..."?id="++value,后面的參數用+"&Ver="+value
-            var $table = this.$refs.xTable1;
+            let $table = this.$refs.xTable1;
             axios.get("/TransferOut/GetMaxID?billId=" + billId + "&billType=" + billTypeNo + "&groupNo=" + groupNo + "&serialLen=2").then(
                 (response) => {
                     this.headData.id = response.data;
                     //直接更改表格中某單元格的值,不可以直接更改綁定數組的方式,否則將取不到數據的更改狀態
-                    for (var i = 0; i < $table.tableData.length; i++) {
+                    for (let i = 0; i < $table.tableData.length; i++) {
                         this.$set($table.tableData[i], "id", this.headData.id);
                         this.$set($table.tableData[i], "sequence_id", this.getSequenceId(i));
                     }
@@ -343,8 +343,8 @@
             //-------------
            
             let locationId = "801";
-            let rowEndIndex = -1;//添加至行尾// var
-            let $table = this.$refs.xTable1;// var
+            let rowEndIndex = -1;//添加至行尾
+            let $table = this.$refs.xTable1;
             let seqId = this.getSequenceId($table.tableData.length);
             this.clearRowDataEdit();
             this.selectRow = null;
@@ -370,10 +370,10 @@
             //debugger;
             //顯示彈窗
             this.cartonCodeList = null;
-            let index = $table.tableData.length-1;//新增的行號索引//?var
-           // let index = $table.$data.length-1;//新增的行號索引//?var
+            let index = $table.tableData.length-1;//新增的行號索引
+            //let index = $table.$data.length-1;//新增的行號索引
             this.curRowIndex = index; //記錄新增的行號索引
-            let rw = $table.tableData[index];  //取新增行對象值 //?var
+            let rw = $table.tableData[index];  //取新增行對象值
             this.setRowDataEdit(rw);
             this.selectRow = rw; //將當前行賦值給彈窗
             this.curRowSeqId = seqId;
@@ -501,7 +501,7 @@
                         let lenths = this.originData2.length;
                         if(lenths>0){ 
                             lenths =lenths -1;                            
-                            for( var i=lenths;i>=0;i--){
+                            for( let i=lenths;i>=0;i--){
                                 if(this.originData2[i].upper_sequence === this.selectRow.sequence_id){                                    
                                     this.originData2.splice(i,1);//移除
                                 }
@@ -510,7 +510,7 @@
                         if(this.selectRow.shipment_suit){
                             let conQty=0,conSecQty=0.00,totalSecQty=0.00;                        
                             let transferAmount = this.selectRow.transfer_amount;//表一中的轉倉數量
-                            for(var i=0;i<response.data.length;i++){
+                            for(let i=0;i<response.data.length;i++){
                                 if(response.data[i].qty === transferAmount){
                                     conQty = response.data[i].qty * response.data[i].dosage;
                                     conSecQty = (conQty * response.data[i].qty_rate).toFixed(2); // response.data[i].sec_qty;
@@ -781,7 +781,7 @@
                     lot_no:this.originData2[i].lot_no, con_qty:this.originData2[i].con_qty, sec_qty:this.originData2[i].sec_qty}
                 );
             }
-            var partData = this.partData;
+            let partData = this.partData;
             //此處必須加await,且checkStock函數也要設置成同步執行
             let strError = await this.checkStock(partData);
             if(this.validStockFlag===false){
@@ -792,12 +792,12 @@
             //******以上代碼是數據校驗部分
 
             this.headData.head_status = this.headStatus;//表頭新增或修改的標識           
-            var headData = JSON.parse(JSON.stringify(this.headData)); //{key1:value1,key2:value2}            
+            let headData = JSON.parse(JSON.stringify(this.headData)); //{key1:value1,key2:value2}            
             this.tableData1 = $table.tableData;
-            var lstDetailData1 = this.tableData1; //數組格式[{key1:value1},{key2:value2}]           
-            var lstDetailData2 = this.originData2; //數組格式[{key1:value1},{key2:value2}]
-            var lstDelData1 = this.delData1; 
-            var lstDelData2 = this.delData2;
+            let lstDetailData1 = this.tableData1; //數組格式[{key1:value1},{key2:value2}]           
+            let lstDetailData2 = this.originData2; //數組格式[{key1:value1},{key2:value2}]
+            let lstDelData1 = this.delData1; 
+            let lstDelData2 = this.delData2;
             let user_id = this.userId;
             axios.post("/TransferOut/Save",{headData,lstDetailData1,lstDetailData2,lstDelData1,lstDelData2,user_id}).then(
                 (response) => {
@@ -948,7 +948,7 @@
                         }
                         this.selectRow = this.tableData1[0];
                         //this.selectRow = JSON.parse(JSON.stringify(this.tableData1[0]));//this.tableData1[0];     
-                        var $table = this.$refs.xTable1;
+                        let $table = this.$refs.xTable1;
                         $table.setCurrentRow(this.selectRow);//定位至當前索引所在的行
                         $table.setActiveCell(this.selectRow, "mo_id");//設置單元格焦點
                     }
@@ -982,10 +982,10 @@
                     this.$XModal.alert({ content: "注銷狀態,當前操作無效!", mask: false });
                     return;
                 }
-                var ls_success= (approveType==='1')?"批準成功!":"反批準成功!";
-                var ls_error= (approveType==='1')?"批準失敗!":"反準失敗!";
-                var ls_type = (approveType==='1')?"批準":"反批準";
-                var ls_is_approve = `確定是否要進行【${ls_type}】操作？`;
+                let ls_success= (approveType==='1')?"批準成功!":"反批準成功!";
+                let ls_error= (approveType==='1')?"批準失敗!":"反準失敗!";
+                let ls_type = (approveType==='1')?"批準":"反批準";
+                let ls_is_approve = `確定是否要進行【${ls_type}】操作？`;
                 //取后端單據狀態
                 let status = comm.checkApproveState('st_transfer_mostly',this.headData.id);               
                 if(status==='2'){
@@ -993,7 +993,7 @@
                     return;
                 }
                 //--批準/反批準權限檢查,20067為模塊對應菜單的代碼,例子為轉出單            
-                var power = await comm.checkPermission(this.userId,"20067","pubApprove");
+                let power = await comm.checkPermission(this.userId,"20067","pubApprove");
                 if (power === "0") {
                     return;
                 }
@@ -1018,7 +1018,7 @@
                         return;
                     }                   
                     //檢查已批準日期是否為當日?,超過當日則不可反批準
-                    var isApprove = await comm.canApprove(this.headData.id,"w_transfer_out");//轉出單
+                    let isApprove = await comm.canApprove(this.headData.id,"w_transfer_out");//轉出單
                     if(isApprove ==="0"){
                         this.$XModal.alert({ content: "注意:【批準日期】必須為當前日期(只能對當日期的單據進行反批準)", mask: false });
                         return;
@@ -1027,9 +1027,9 @@
                 this.$XModal.confirm(ls_is_approve).then(type => {
                     if (type == "confirm") {
                         this.headData.check_by = this.userId;
-                        var head = JSON.parse(JSON.stringify(this.headData));//深拷貝轉成JSON數據格式
-                        var approve_type = approveType;
-                        var user_id = this.userId;
+                        let head = JSON.parse(JSON.stringify(this.headData));//深拷貝轉成JSON數據格式
+                        let approve_type = approveType;
+                        let user_id = this.userId;
                         this.loading = true;
                         //當按下反批準/批準按鈕立即禁止顯示當前按鈕,當操作失敗時再恢復顯示
                         this.showButtonApprove(approve_type,"1");//隱藏反批準/批準按鈕
@@ -1132,7 +1132,7 @@
                     }
                     if(editFlag){
                         if(this.selectRow2.row_status ==='EDIT'){
-                            for(var i=0;i < this.originData2.length;i++){
+                            for(let i=0;i < this.originData2.length;i++){
                                 if(this.originData2[i].upper_sequence === upper_sequence && this.originData2[i].sequence_id ===sequence_id){
                                     Object.assign(this.originData2[i], this.selectRow2);//當前行寫入數組
                                     break;
@@ -1141,7 +1141,7 @@
                         }
                         if(this.selectRow2.row_status ==='NEW'){
                             let existsFlag = false;
-                            for(var i=0;i < this.originData2.length;i++){
+                            for(let i=0;i < this.originData2.length;i++){
                                 if(this.originData2[i].upper_sequence === upper_sequence && this.originData2[i].sequence_id ===sequence_id){
                                     existsFlag = true;//已存在
                                     Object.assign(this.originData2[i], this.selectRow2);

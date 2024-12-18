@@ -18,7 +18,7 @@
             tableHeight1 :400,           
             btnItemTitle:"劉覽",           
             headData: { id: '', inventory_date: '', origin: '1', state: '0',bill_type_no:'01',department_id:'',linkman:'',handler:'',remark: '',create_by: '', 
-                create_date: '', update_by: '',update_date: '',check_by: '', check_date: '', tum_type:'B',update_count:'1',transfers_state:'0',
+                create_date: '', update_by: '',update_date: '',check_by: '', check_date: '', tum_type:'C',update_count:'1',transfers_state:'0',
                 servername:'hkserver.cferp.dbo',head_status:'' },
             rowDataEdit1: { id:'',sequence_id:'',mo_id:'',goods_id:'',goods_name:'',inventory_issuance:'',ii_code:'',ir_lot_no:null,obligate_mo_id:'',
                 i_amount:0,i_weight:0,inventory_receipt:'',ir_code:'',ii_lot_no:'',ref_lot_no:'',ib_qty:0,ib_weight:0,unit:'PCS',remark:null,
@@ -134,7 +134,7 @@
             }, 500);            
         },
         showFindWindos(){
-            comm.openWindos('ChangeStoreCe');
+            comm.openWindos('ChangeStoreCj');
         },
         printEvent(){
             //
@@ -288,7 +288,7 @@
             this.headData.update_date = "",
             this.headData.check_date = "",
             this.headData.state ="0",
-            this.headData.tum_type ="B",
+            this.headData.tum_type ="C",
             this.headData.transfers_state ="0",
             this.headData.servername ="hkserver.cferp.dbo",
             this.headData.head_status="NEW"
@@ -486,15 +486,15 @@
             }
         },
         //**批準&反批準 val: 1--批準,0--反批準
-        approveEvent:async function (val) {
+        approveEvent:async function (val) {           
             if ((this.headData.id != "") && (this.gridData1.length > 0)) {
                 //批準,反批準都要檢查是否是註銷狀態
                 if(this.headData.state === "2"){
                     this.$XModal.alert({ content: '注銷狀態,當前操作無效!', mask: false });
                     return;
                 }
-                let ls_success= (val==='1')?"批準成功!":"反批準成功!";
-                let ls_error= (val==='1')?"批準失敗!":"反準失敗!";
+                let ls_success = (val==='1')?"批準成功!":"反批準成功!";
+                let ls_error = (val==='1')?"批準失敗!":"反準失敗!";
                 let ls_type = (val==='1')?"批準":"反批準";
                 let ls_is_approve = `確定是否要進行【${ls_type}】操作？`;
                 //獲取后端單據狀態
@@ -542,7 +542,7 @@
                     //    return;
                     //}
                     //檢查已批準日期是否為當日,超過當日則不可反批準
-                    let isApprove = await comm.canApprove(this.headData.id,"w_changestore_ce");//倉庫轉倉
+                    let isApprove = await comm.canApprove(this.headData.id,"w_changestore_cj");//R單轉正單
                     if(isApprove ==="0"){
                         this.$XModal.alert({ content: "注意:【批準日期】必須為當前日期,方可進行此操作!", mask: false });
                         return;
@@ -560,7 +560,7 @@
                         let head = JSON.parse(JSON.stringify(this.headData));
                         let approve_type = val;
                         let user_id = this.userId;
-                        let moduleType = "B";
+                        let moduleType = "C";
                         axios.post("/ChangeStoreZc/Approve",{head,user_id,approve_type,moduleType}).then(
                             (res) => {
                                 if(res.data ==="OK"){
@@ -589,10 +589,10 @@
                 return;
             }
             if(this.rowDataEdit1.row_status != 'NEW'){
-                this.rowDataEdit1.row_status='EDIT';//編輯標記
+                this.rowDataEdit1.row_status ='EDIT';//編輯標記
             }
             let strItem = this.rowDataEdit1.goods_id;           
-            if(strItem.substring(0, 2)==='ML'){
+            if(strItem.substring(0, 2) ==='ML'){
                 this.$set(this.rowDataEdit1,"unit","KG");
                 this.$set(this.rowDataEdit1,"base_unit","KG");
             }            
@@ -623,7 +623,7 @@
         //**取主檔資料
         getHead(id) {
             //此處的URL需指定到祥細控制器及之下的動Action,否則在轉出待確認彈窗中的查詢將數出錯,請求相對路徑的問題
-            axios.get("/ChangeStoreZc/GetHeadByID", { params: { id: id,moduleType: 'B' }}).then(
+            axios.get("/ChangeStoreZc/GetHeadByID", { params: { id: id , moduleType: "C"}}).then(
                 (response) => {
                     this.headData = {
                         id: response.data.id,
@@ -675,7 +675,7 @@
             comm.showMessageDialog(url, "查詢", 1024, 768, true);
         },
         //**保存
-        saveAll: async function() {            
+        saveAll: async function() {
             const $table = this.$refs.xTable1;
             const errMap = $table.fullValidate().catch(errMap => errMap);
             let check_tableData1_flag = true;
@@ -720,7 +720,21 @@
 
             //START 2024/03/01              
             this.tempSaveData = [];
-            var items_update = null;
+            let items_update = null;
+            let flagMo = false;
+            //頁數與庫存頁數不可重復
+            for(let i=0;i<$table.tableData.length;i++){
+                items_update = $table.tableData[i];
+                if(items_update.mo_id === items_update.obligate_mo_id){
+                    flagMo = true;
+                    break;
+                }
+            }
+            if(flagMo ===true){
+                this.$XModal.alert({ content: "頁數與庫存頁數不可以相同!",status: 'info' , mask: false });
+                return;
+            }
+            items_update = null
             for(let i=0;i<$table.tableData.length;i++){
                 items_update = $table.tableData[i];
                 if(items_update.row_status==='NEW' || items_update.row_status==='EDIT'){
@@ -728,12 +742,12 @@
                 }
             }
             //END 2024/03/01
-            this.headData.head_status = this.headStatus;//表頭新增或修改的標識
+            this.headData.head_status = this.headStatus; //表頭新增或修改的標識           
             let headData = JSON.parse(JSON.stringify(this.headData));
-            let lstDetailData1 = this.tempSaveData;//新的方法            
+            let lstDetailData1 = this.tempSaveData; //新的方法
             let lstDelData1 = this.delData1;
             let user_id = this.userId;
-            let moduleType = "B";
+            let moduleType = "C";
             axios.post("/ChangeStoreZc/Save",{headData,lstDetailData1,lstDelData1,user_id,moduleType}).then(
               (response) => {
                   if(response.data ==="OK"){
@@ -752,9 +766,9 @@
             this.headStatus = "";
         },
         //**批準前檢查庫存是否夠扣除
-        checkStock:async function(id){
-            let rtn="";
-            await axios.post("/ChangeStoreZc/CheckStock",{ id:id,moduleType:"B"}).then((response) => {
+        checkStock:async function(id){            
+            let rtn="";           
+            await axios.post("/ChangeStoreZc/CheckStock",{ id:id,moduleType:"C" }).then((response) => {
                     if(response.data.length>0){
                         //庫存檢查不通過
                         let seqNo = response.data[0].sequence_id;
@@ -808,7 +822,7 @@
             }
         },
         showLotNo:async function(event){
-            if(this.headData.state==='0') {//單元格為可編輯狀態時                
+            if(this.headData.state ==='0') {//單元格為可編輯狀態時                
                 let location_id = this.rowDataEdit1.inventory_issuance;
                 let goods_id = this.rowDataEdit1.goods_id;
                 let mo_id = this.rowDataEdit1.mo_id;
@@ -816,13 +830,13 @@
                     //this.$refs.xTable2.setActiveCell(this.selectRow2, "goods_id");
                     return;
                 }
-                //**提取批号数据 //批號下拉列表框
-                await axios.get("/Base/Common/GetStDetailsLotNo", { params: { location_id:location_id,goods_id:goods_id,mo_id:mo_id } }).then(
+                //**R單轉正單，提取批号数据 //批號下拉列表框
+                await axios.get("/Base/Common/GetStockLotNo", { params: { location_id:location_id,goods_id:goods_id } }).then(
                     (response) => {
                         this.tableLotNoList = response.data;                        
                     }
                 ).catch(function (response) {
-                    this.tableLotNoList=[];
+                    this.tableLotNoList = [];
                     alert(response);
                 });
                 let $pulldown = this.$refs.pulldownLotNoRef;
@@ -831,25 +845,10 @@
                 }
             }
         },
-        //cellClickGetLotNo(row){
-        //    this.seledtLotNoRow = row.data[row.$rowIndex];
-        //},
-        //changeLotNo() {
-        //    if(this.seledtLotNoRow){
-        //        if(this.selectRow2.ir_lot_no != this.seledtLotNoRow.lot_no){
-        //            this.$set(this.selectRow2, "ir_lot_no", this.seledtLotNoRow.lot_no);
-        //            this.$set(this.selectRow, "ir_lot_no", this.seledtLotNoRow.lot_no);
-        //            this.$set(this.selectRow, "ii_lot_no", this.seledtLotNoRow.lot_no);
-        //        }
-        //        this.showLot = false;
-        //    }else{
-        //        this.$XModal.alert({ content: '請指定批號!', mask: false });
-        //    }
-        //},
         //**取最大單據號
         getMaxID:async function() {
-            //var $table = this.$refs.xTable1;
-            await axios.get("/Base/Common/GetMaxIDStock?bill_id=" + 'ST10' + "&serial_len=4" ).then(
+            //let $table = this.$refs.xTable1;
+            await axios.get("/Base/Common/GetMaxIDStock?bill_id=" + 'ST09' + "&serial_len=4" ).then(
                 (response) => {
                     this.headData.id = response.data;
                 }
@@ -871,15 +870,17 @@
             }
         },
         //**顯示是庫存中的批號列表
-        cellLotNoClick(row){
+        cellLotNoClick(row){         
             let $pulldown = this.$refs.pulldownLotNoRef;
             if ($pulldown) {
                 let rowIndex = row.$rowIndex;
                 let ir_lot_no = row.data[rowIndex].lot_no;
+                let obligate_mo_id = row.data[rowIndex].mo_id;
                 let vendor_id = row.data[rowIndex].vendor_id;
                 let vendor_name = row.data[rowIndex].vendor_name;
                 this.$set(this.rowDataEdit1,"ir_lot_no",ir_lot_no );
                 this.$set(this.rowDataEdit1,"ii_lot_no",ir_lot_no );
+                this.$set(this.rowDataEdit1,"obligate_mo_id",obligate_mo_id );
                 this.$set(this.rowDataEdit1,"vendor_id",vendor_id );
                 this.$set(this.rowDataEdit1,"vendor_name",vendor_name );
                 if(this.rowDataEdit1.row_status ===""){
