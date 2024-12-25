@@ -22,6 +22,7 @@ namespace CF2025.Store.DAL
         public static string ldt_check_date = "";
         public static StringBuilder sbSql = new StringBuilder();
 
+        //区分类型(turnType),A:倉庫發料;B:倉庫轉倉;C:R单转仓;D:转货品编号;E:废料合并
         //倉庫發料/倉庫轉倉/R單轉正單共用
         public static st_inventory_mostly GetHeadByID(string id,string turnType)
         {
@@ -30,7 +31,7 @@ namespace CF2025.Store.DAL
             */
             st_inventory_mostly mdjHead = new st_inventory_mostly();
             string strSql = string.Format(
-            @"Select id,Convert(nvarchar(10),inventory_date,121) As inventory_date,origin,bill_type_no,department_id,linkman,
+            @"Select id,Convert(nvarchar(10),inventory_date,121) As inventory_date,origin,bill_type_no,department_id,linkman,Isnull(ii_location,'') as ii_location,
             handler, remark, create_by,create_date, update_by, update_date,check_by,Convert(nvarchar(19),check_date,121) As check_date,update_count,state
             FROM st_inventory_mostly with(nolock) Where id='{0}' And within_code='{1}' And turn_type='{2}'", id, within_code, turnType);
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
@@ -55,6 +56,7 @@ namespace CF2025.Store.DAL
                 mdjHead.check_date = dr["check_date"].ToString();
                 mdjHead.update_count = dr["update_count"].ToString();
                 mdjHead.state = dr["state"].ToString();
+                mdjHead.ii_location = dr["ii_location"].ToString();
             }
             return mdjHead;
         }
@@ -65,13 +67,14 @@ namespace CF2025.Store.DAL
             string strSql = string.Format(
             @"SELECT A.id,A.sequence_id,A.mo_id,goods_id,B.name as goods_name,A.inventory_issuance,A.ii_code,A.ir_lot_no,A.obligate_mo_id,
             A.i_amount,A.i_weight,A.inventory_receipt,A.ir_code,A.ii_lot_no,A.ref_lot_no,A.ib_qty,A.ib_weight,A.unit,A.remark,A.ref_id,
-            A.jo_sequence_id,A.so_no,contract_cid,A.mrp_id,A.sign_by,A.sign_date,A.vendor_id,A.base_unit,A.rate,A.state,C.name as color,
-            D.name AS vendor_name
+            A.jo_sequence_id,A.so_no,contract_cid,A.mrp_id,A.sign_by,A.sign_date,A.vendor_id,A.base_unit,A.rate,A.state,A.goods_id_new,
+            C.name as color,D.name AS vendor_name,E.name as goods_name_new
             FROM st_i_subordination A with(nolock)
             INNER JOIN it_goods B ON A.within_code = B.within_code AND A.goods_id = B.id
             LEFT JOIN cd_color C ON B.within_code = C.within_code AND B.color = C.id
             LEFT JOIN it_vendor D ON A.within_code = D.within_code AND Isnull(A.vendor_id,'')= D.id
-            Where A.id='{0}' And A.within_code='{1}' Order by A.id,A.sequence_id",id, within_code);
+            LEFT JOIN it_goods E ON A.within_code = B.within_code AND ISNULL(A.goods_id_new,'')= E.id
+            Where A.id='{0}' And A.within_code='{1}' Order by A.id,A.sequence_id", id, within_code);
             DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
             List<st_i_subordination> lstDetail = new List<st_i_subordination>();
             for (int i = 0; i < dt.Rows.Count; i++)
@@ -81,7 +84,9 @@ namespace CF2025.Store.DAL
                 mdjDetail.sequence_id = dt.Rows[i]["sequence_id"].ToString();
                 mdjDetail.mo_id = dt.Rows[i]["mo_id"].ToString();
                 mdjDetail.goods_id = dt.Rows[i]["goods_id"].ToString();
+                mdjDetail.goods_id_new = dt.Rows[i]["goods_id_new"].ToString();
                 mdjDetail.goods_name = dt.Rows[i]["goods_name"].ToString();
+                mdjDetail.goods_name_new = dt.Rows[i]["goods_name_new"].ToString();
                 mdjDetail.inventory_issuance = dt.Rows[i]["inventory_issuance"].ToString();
                 mdjDetail.ir_lot_no = dt.Rows[i]["ir_lot_no"].ToString();
                 mdjDetail.obligate_mo_id = dt.Rows[i]["obligate_mo_id"].ToString();
@@ -176,6 +181,54 @@ namespace CF2025.Store.DAL
                 mdjDetail.goods_id = dt.Rows[i]["goods_id"].ToString();
                 mdjDetail.goods_name = dt.Rows[i]["goods_name"].ToString();
                 lstDetail.Add(mdjDetail);
+            }
+            return lstDetail;
+        }
+
+        //轉批號使用
+        public static List<PlanGoods> GetPlanItemListByMo(string mo_id,string ii_location)
+        {         
+            string strSql = "";
+            strSql = string.Format(
+                @"SELECT a.goods_id,b.name As goods_name,a.lot_no,a.qty,a.sec_qty,isnull(a.average_cost,0.00) as average_cost,a.mo_id,a.vendor_id,c.name as vendor_name
+                FROM st_details_lot a With(nolock)
+                  INNER JOIN it_goods b ON a.within_code = b.within_code and a.goods_id = b.id
+                  LEFT JOIN it_vendor c ON a.within_code = c.within_code and Isnull(a.vendor_id,'')=c.id
+                WHERE a.within_code='{0}' and a.location_id='{1}' and a.carton_code='{1}' and a.mo_id='{2}' and a.qty>0 and a.sec_qty>0", within_code, ii_location, mo_id);
+            //if (mo_id.Substring(0,1) !="Z")
+            //{
+            //    strSql = string.Format(
+            //    @"SELECT Distinct b.goods_id,it_goods.name As goods_name
+            //    FROM jo_bill_mostly a With(nolock),jo_bill_goods_details b With(nolock)
+            //      LEFT OUTER JOIN it_goods ON b.within_code=it_goods.within_code and b.goods_id= it_goods.id 
+            //    WHERE a.within_code=b.within_code and a.id=b.id and a.ver=b.ver and a.state not in('2','V')
+            //    And SubString(b.goods_id,1,3) <> 'F0-'
+            //    And b.within_code='{0}' and a.mo_id='{1}'", within_code, mo_id);
+            //}
+            //else
+            //{
+            //    strSql = string.Format(
+            //    @"SELECT a.goods_id,b.name As goods_name,a.lot_no,a.qty,a.sec_qty,a.mo_id,a.vendor_id,c.name as vendor_name
+            //    FROM st_details_lot a With(nolock)
+            //      INNER JOIN it_goods b ON a.within_code = b.within_code and a.goods_id = b.id
+            //      LEFT JOIN it_vendor c ON a.within_code = c.within_code and a.vendor_id=c.id
+            //    WHERE a.within_code='{0}' and a.location_id='{1}' and a.carton_code='{1}' and a.mo_id='{2}' and a.qty>0 and a.sec_qty>0", within_code, ii_location, mo_id);
+            //}             
+            DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
+            List<PlanGoods> lstDetail = new List<PlanGoods>();
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                PlanGoods mdj = new PlanGoods();
+                mdj.mo_id = dt.Rows[i]["mo_id"].ToString();
+                mdj.goods_id = dt.Rows[i]["goods_id"].ToString();
+                mdj.goods_name = dt.Rows[i]["goods_name"].ToString();
+                mdj.lot_no = dt.Rows[i]["lot_no"].ToString();
+                mdj.qty = decimal.Parse(dt.Rows[i]["qty"].ToString());
+                mdj.sec_qty = decimal.Parse(dt.Rows[i]["sec_qty"].ToString());
+                mdj.average_cost = decimal.Parse(dt.Rows[i]["average_cost"].ToString());
+                mdj.vendor_id = dt.Rows[i]["vendor_id"].ToString();
+                mdj.vendor_name = dt.Rows[i]["vendor_name"].ToString();                
+                lstDetail.Add(mdj);
             }
             return lstDetail;
         }
@@ -408,7 +461,7 @@ namespace CF2025.Store.DAL
         public static string SaveCeCj(st_inventory_mostly headData, List<st_i_subordination> lstDetailData1, 
                                         List<st_i_subordination> lstDelData1, string user_id,string moduleType)
         {
-            string result = "00", str = "";          
+            string result = "00", str = "";
             StringBuilder sbSql = new StringBuilder(" SET XACT_ABORT ON ");
             sbSql.Append(" BEGIN TRANSACTION ");
             string id = headData.id;
@@ -422,6 +475,9 @@ namespace CF2025.Store.DAL
                 case "C":
                     billType = "ST09"; //ST09:R單轉正單
                     break;
+                case "D":
+                    billType = "ST11"; //ST11:轉批號、轉貨品編號
+                    break;
             }
 
             if (head_insert_status == "NEW")//全新的單據
@@ -431,7 +487,7 @@ namespace CF2025.Store.DAL
                 if (id_exists)
                 {
                     //已存在此單據號,重新取最大單據號
-                    headData.id = CommonDAL.GetMaxID(billType, 4); //DAB24010132，DAC24010132
+                    headData.id = CommonDAL.GetMaxID(billType, 4); //DAB24010132，DAC24010132,DAD24010132
                 }
                 //***begin 更新系統表倉庫轉倉最大單據編號               
                 string year_month = headData.id.Substring(3, 4); //2401
@@ -449,32 +505,33 @@ namespace CF2025.Store.DAL
                 str = sql_sys_update1;
                 sbSql.Append(str);
                 //***end save form max id to system tabe 
+               
 
                 //插入主表               
                 str = string.Format(
                   @" Insert Into st_inventory_mostly(
                   within_code,id,inventory_date,origin,state,bill_type_no,department_id,linkman,handler,
-                  remark,create_by,create_date,update_count,transfers_state,servername,turn_type) 
-                  Values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}',getdate(),'1','0','{11}','{12}' )",
+                  remark,create_by,create_date,update_count,transfers_state,servername,turn_type,ii_location) 
+                  Values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}',getdate(),'1','0','{11}','{12}','{13}' )",
                   within_code, headData.id, headData.inventory_date, headData.origin, headData.state, headData.bill_type_no, headData.department_id,
-                  headData.linkman, headData.handler, headData.remark, headData.create_by, ls_servername, moduleType);
+                  headData.linkman, headData.handler, headData.remark, headData.create_by, ls_servername, moduleType, headData.ii_location);
                 sbSql.Append(str);
 
-                //插入明細表一
+                //插入明細表一             
                 foreach (var item in lstDetailData1)
                 {
                     str = string.Format(
                     @" Insert Into st_i_subordination(
                     within_code,id,sequence_id, goods_id, base_unit, unit,i_amount,inventory_issuance, ii_code, ii_lot_no,
                     inventory_receipt, ir_code, ir_lot_no, remark, i_weight, ref_id, ref_sequence_id, mo_id, mrp_id,obligate_mo_id,jo_sequence_id,
-                    rate,ib_qty,state,transfers_state,ib_weight,only_detail,vendor_id) Values                    
+                    rate,ib_qty,state,transfers_state,ib_weight,only_detail,vendor_id,goods_id_new,sec_unit) Values                    
                     ('{0}','{1}','{2}','{3}','{4}','{5}',{6},'{7}','{8}','{9}','{10}','{11}','{12}','{13}',{14},'{15}','{16}','{17}','{18}','{19}','{20}',
-                    1,0,'0','0',0,'1','{21}')",
+                    1,0,'0','0',0,'1','{21}','{22}')",
                     within_code, headData.id, item.sequence_id, item.goods_id, item.base_unit, item.unit, item.i_amount, item.inventory_issuance,
                     item.inventory_issuance, item.ii_lot_no, item.inventory_receipt, item.inventory_receipt, item.ir_lot_no, item.remark, item.i_weight, item.ref_id,
-                    item.ref_sequence_id, item.mo_id, item.mrp_id, item.obligate_mo_id, item.jo_sequence_id,item.vendor_id);
+                    item.ref_sequence_id, item.mo_id, item.mrp_id, item.obligate_mo_id, item.jo_sequence_id, item.vendor_id, item.goods_id_new, item.sec_unit);
                     sbSql.Append(str);
-                }
+                } 
                 //生成移交單
                 //GenNumberDAL objNum = new GenNumberDAL();
                 //index = 0; //index += 1; //sequence_id = objNum.GetSequenceID(index);// index.ToString().PadLeft(4, '0')+"h"; //移交單的序號
@@ -509,17 +566,19 @@ namespace CF2025.Store.DAL
                         if (!string.IsNullOrEmpty(item.row_status))
                         {
                             if (item.row_status == "NEW")
-                            {
-                                str = string.Format(
-                                @" Insert Into st_i_subordination(
-                                within_code,id,sequence_id, goods_id, base_unit, unit,i_amount,inventory_issuance, ii_code, ii_lot_no,
-                                inventory_receipt, ir_code, ir_lot_no, remark, i_weight, ref_id, ref_sequence_id, mo_id, mrp_id,obligate_mo_id,jo_sequence_id,
-                                rate,ib_qty,state,transfers_state,ib_weight,only_detail,vendor_id) Values 
-                                ('{0}','{1}','{2}','{3}','{4}','{5}',{6},'{7}','{8}','{9}','{10}','{11}','{12}','{13}',{14},'{15}','{16}','{17}','{18}','{19}','{20}',
-                                1,0,'0','0',0,'1','{21}')",
-                                within_code, headData.id, item.sequence_id, item.goods_id, item.base_unit, item.unit, item.i_amount, item.inventory_issuance,
-                                item.inventory_issuance, item.ii_lot_no, item.inventory_receipt, item.inventory_receipt, item.ir_lot_no, item.remark, item.i_weight, item.ref_id,
-                                item.ref_sequence_id, item.mo_id, item.mrp_id, item.obligate_mo_id, item.jo_sequence_id, item.vendor_id);
+                            {                                 
+                                    str = string.Format(
+                                    @" Insert Into st_i_subordination(
+                                    within_code,id,sequence_id, goods_id, base_unit, unit,i_amount,inventory_issuance, ii_code, ii_lot_no,
+                                    inventory_receipt, ir_code, ir_lot_no, remark, i_weight, ref_id, ref_sequence_id, mo_id, mrp_id,obligate_mo_id,jo_sequence_id,
+                                    rate,ib_qty,state,transfers_state,ib_weight,only_detail,vendor_id,goods_id_new,sec_unit) Values                    
+                                    ('{0}','{1}','{2}','{3}','{4}','{5}',{6},'{7}','{8}','{9}','{10}','{11}','{12}','{13}',{14},'{15}','{16}','{17}','{18}','{19}','{20}',
+                                    1,0,'0','0',0,'1','{21}','{22}','{23}')",
+                                    within_code, headData.id, item.sequence_id, item.goods_id, item.base_unit, item.unit, item.i_amount, item.inventory_issuance,
+                                    item.inventory_issuance, item.ii_lot_no, item.inventory_receipt, item.inventory_receipt, item.ir_lot_no, item.remark, item.i_weight, item.ref_id,
+                                    item.ref_sequence_id, item.mo_id, item.mrp_id, item.obligate_mo_id, item.jo_sequence_id, item.vendor_id, item.goods_id_new, item.sec_unit);
+                                    sbSql.Append(str);                                    
+                                
                             }
                             if (item.row_status == "EDIT")
                             {
@@ -527,11 +586,11 @@ namespace CF2025.Store.DAL
                                 @" UPDATE st_i_subordination WITH(ROWLOCK)
                                 SET goods_id='{3}',base_unit='{4}',unit='{5}',i_amount={6},inventory_issuance='{7}',ii_code='{8}',ii_lot_no='{9}',
                                 inventory_receipt='{10}',ir_code='{11}',ir_lot_no='{12}',remark='{13}',i_weight={14},ref_id='{15}',ref_sequence_id='{16}',
-                                mo_id='{17}', mrp_id='{18}',obligate_mo_id='{19}',jo_sequence_id='{20}',vendor_id='{21}'
+                                mo_id='{17}', mrp_id='{18}',obligate_mo_id='{19}',jo_sequence_id='{20}',vendor_id='{21}',goods_id_new='{22}',sec_unit='{23}'
                                 WHERE id='{0}' And sequence_id='{1}' And within_code='{2}'",
                                 headData.id, item.sequence_id, within_code, item.goods_id, item.base_unit, item.unit, item.i_amount, item.inventory_issuance,
                                 item.inventory_issuance, item.ii_lot_no, item.inventory_receipt, item.inventory_receipt, item.ir_lot_no, item.remark, item.i_weight, item.ref_id,
-                                item.ref_sequence_id, item.mo_id, item.mrp_id, item.obligate_mo_id, item.jo_sequence_id, item.vendor_id);
+                                item.ref_sequence_id, item.mo_id, item.mrp_id, item.obligate_mo_id, item.jo_sequence_id, item.vendor_id, item.goods_id_new, item.sec_unit);
                             }
                             sbSql.Append(str);
                         }
@@ -551,11 +610,11 @@ namespace CF2025.Store.DAL
         {
             string result = "", is_active_name, is_turn_type = "", strSql = "", ls_dept2;
             string ls_id, ls_origin, ls_mrp_id, ls_sequence_id, ls_unit_code, ls_servername; //ls_error,ls_charge_dept;
-            string ls_goods_id, ls_dept_id, ls_wp_id, ls_next_wp_id, ls_mo_id, ls_obligate_mo_id;
+            string ls_goods_id, ls_dept_id, ls_wp_id, ls_next_wp_id, ls_mo_id, ls_obligate_mo_id, ls_ir_lot_no, ls_ii_lot_no, ls_goods_id_new; 
             int ll_count, ll_count2, ll_cnt, ll_cnt_state1, ll_cnt_state3, ll_cnt_state4; //, li_jo_ver,ll_rtn;
             decimal ldec_qty, ldec_i_amount, ldec_i_weight;
             string ldt_date, ldt_check_date;
-            is_turn_type = turnType;  //区分类型,A:倉庫發料,B:倉庫轉倉,C:R單轉正單;
+            is_turn_type = turnType;  //区分类型,A:倉庫發料,B:倉庫轉倉,C:R單轉正單,D:轉貨品編碼、轉批號
             ldt_check_date = CommonDAL.GetDbDateTime("L");//批準日期(長日期時間);
             is_active_name = approve_type == "1" ? "pfc_ok" : "pfc_unok";
             DataTable dtFind = new DataTable();     
@@ -577,11 +636,18 @@ namespace CF2025.Store.DAL
                     ls_wp_id = dtDetail.Rows[i]["inventory_issuance"].ToString();
                     ls_next_wp_id = dtDetail.Rows[i]["inventory_receipt"].ToString();
                     ls_obligate_mo_id = dtDetail.Rows[i]["obligate_mo_id"].ToString();
+                    ls_goods_id_new = dtDetail.Rows[i]["goods_id_new"].ToString();
+                    ls_ir_lot_no = dtDetail.Rows[i]["ir_lot_no"].ToString();
+                    ls_ii_lot_no = dtDetail.Rows[i]["lot_no"].ToString();
                     ls_mo_id = !string.IsNullOrEmpty(ls_mo_id) ? ls_mo_id : "";
                     ls_goods_id = !string.IsNullOrEmpty(ls_goods_id) ? ls_goods_id : "";
                     ls_wp_id = !string.IsNullOrEmpty(ls_wp_id) ? ls_wp_id : "";
                     ls_next_wp_id = !string.IsNullOrEmpty(ls_next_wp_id) ? ls_next_wp_id : "";
-                    ls_obligate_mo_id = !string.IsNullOrEmpty(ls_obligate_mo_id) ? ls_obligate_mo_id : "";
+                    ls_obligate_mo_id = !string.IsNullOrEmpty(ls_obligate_mo_id) ? ls_obligate_mo_id : "";                   
+                    ls_ir_lot_no = !string.IsNullOrEmpty(ls_ir_lot_no) ? ls_ir_lot_no : "";
+                    ls_ii_lot_no = !string.IsNullOrEmpty(ls_ii_lot_no) ? ls_ii_lot_no : "";
+                    ls_goods_id_new = !string.IsNullOrEmpty(ls_goods_id_new) ? ls_goods_id_new : "";
+
                     if (turnType == "A")
                     {
                         if (ls_wp_id != "" && ls_next_wp_id != "" && ls_wp_id == ls_next_wp_id && ls_wp_id != "818")
@@ -783,6 +849,19 @@ namespace CF2025.Store.DAL
                             }
                         }
                     }//end of if (is_turn_type=="C")
+
+                    //D:轉貨品編號、轉批號
+                    if (is_turn_type == "D" || is_turn_type == "E")
+                    {
+                        if(is_turn_type == "D")
+                        {                           
+                            if((ls_ir_lot_no == ls_ii_lot_no && ls_goods_id == ls_goods_id_new) || (ls_ir_lot_no != ls_ii_lot_no && ls_goods_id != ls_goods_id_new))
+                            {
+                                result = "-1" + "Row[" + ls_sequence_id + "]" + "货品编码和批号必须且只能修改其中一个!";
+                                break;
+                            }
+                        }
+                    }
 
                     if (result != "")
                     {
@@ -1313,9 +1392,9 @@ namespace CF2025.Store.DAL
         public static List<check_part_stock> CheckStorageCe(string id,string moduleType)
         {
             string strSql = "";
-            if (moduleType == "B")
+            if (moduleType == "B" || moduleType == "D")
             {
-                //轉倉
+                //B:轉倉;D:轉貨品編號，轉批號
                 strSql = string.Format(
                 @"SELECT TOP 1 S.out_dept,S.sequence_id,S.mo_id,S.goods_id,S.lot_no,(ISNULL(C.qty,0)-S.con_qty) AS qty,(ISNULL(C.sec_qty,0)-S.sec_qty) AS sec_qty 
                 FROM (SELECT A.within_code,B.inventory_issuance As out_dept,B.sequence_id,B.mo_id,B.goods_id,B.ii_lot_no AS lot_no,

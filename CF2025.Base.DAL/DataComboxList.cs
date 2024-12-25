@@ -52,9 +52,9 @@ namespace CF2025.Base.DAL
                 case "MoGroupList"://負責組別
                     strSql += "SELECT id,id+'--'+name As name,english_name FROM cd_mo_type WHERE within_code='" + within_code + "' AND mo_type='3' Order By id";
                     break;
-                case "LocationList"://倉庫
-                    strSql += "SELECT id,id+'--'+ name AS name FROM cd_productline WHERE within_code='"+ within_code + "' AND state='0' AND id<>'ZZZ' ORDER BY id";
-                    break;                
+                case "LocationList"://倉庫,全部
+                    strSql += "SELECT id,id+'--'+ name AS name FROM cd_productline WHERE within_code='"+ within_code + "' AND type<>'07' AND state='0' AND id<>'ZZZ' ORDER BY id";
+                    break;               
                 case "CustomerList"://客戶編號
                     strSql += "SELECT id,id+'--' + name AS name FROM it_customer WHERE within_code='" + within_code + "' AND customer_group='1' AND state<>'2' ORDER BY id";
                     break;

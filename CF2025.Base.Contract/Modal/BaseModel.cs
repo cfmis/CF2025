@@ -53,7 +53,8 @@
         public string mo_id { get; set; }
         public string vendor_id { get; set; }
         public string vendor_name { get; set; }
-        
+        public decimal average_cost { get; set; }
+       
     }
 
     public class PermissonModels

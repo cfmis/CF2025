@@ -20,8 +20,7 @@
 
 <div id="app">
     <vxe-toolbar perfect size="small" style="height:35px;margin-bottom:5px">
-        <template #buttons style="height:35px;margin-bottom:10px">
-            @*<vxe-button type="text" status="danger" icon="iconfont icon-cancel5" v-if="(flagChild==='1')" @@click="closePage()">關閉</vxe-button>*@
+        <template #buttons style="height:35px;margin-bottom:10px">           
             <vxe-button type="text" icon="iconfont icon-file-add1" v-if="!(isEditHead)" @@click="insertEvent()">新增</vxe-button>
             <vxe-button type="text" status="danger" icon="iconfont icon-delete2" v-if="!(isEditHead)"@@click="delHeadEvent()" style="margin-left: -2px">注銷</vxe-button>
             <vxe-button type="text" icon="iconfont icon-edit2" v-if="!(isEditHead)" style="margin-left: -2px" @@click="editHeadEvent()">修改</vxe-button>

@@ -122,11 +122,13 @@ namespace CF2025.Prod.Contract.Model
         public string update_date { get; set; }
         public string check_by { get; set; }
         public string check_date { get; set; }
+        public string ii_location { get; set; }
         public string tum_type { get; set; }
         public string update_count { get; set; }
         public string transfers_state { get; set; }
         public string servername { get; set; }
         public string head_status { get; set; }
+
     }
 
     public class st_i_subordination
@@ -136,7 +138,9 @@ namespace CF2025.Prod.Contract.Model
         public string sequence_id { get; set; }
         public string mo_id { get; set; }
         public string goods_id { get; set; }
+        public string goods_id_new { get; set; }
         public string goods_name { get; set; }
+        public string goods_name_new { get; set; }
         public string color { get; set; }
         public string inventory_issuance { get; set; }
         public string ii_code { get; set; }
@@ -151,6 +155,7 @@ namespace CF2025.Prod.Contract.Model
         public decimal ib_qty { get; set; }
         public decimal ib_weight { get; set; }
         public string unit { get; set; }
+        public string sec_unit { get; set; }
         public string remark { get; set; }
         public string ref_id { get; set; }
         public string jo_sequence_id { get; set; }

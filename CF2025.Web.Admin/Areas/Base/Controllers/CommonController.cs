@@ -117,5 +117,12 @@ namespace CF2025.Web.Admin.Areas.Base.Controllers
             var result = CommonDAL.GetStockLotNo(location_id, goods_id);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+
+        //轉批號，轉貨品編號
+        public JsonResult GetStockLotNoConvert(string location_id, string goods_id, string mo_id)
+        {
+            var result = CommonDAL.GetStockLotNo(location_id, goods_id, mo_id);
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
     }
 }
