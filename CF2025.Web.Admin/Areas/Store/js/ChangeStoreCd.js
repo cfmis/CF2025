@@ -800,9 +800,9 @@ var Main = {
                 return
             }
 
-           
-            //END 2024/03/01
-            this.headData.head_status = this.headStatus; //表頭新增或修改的標識           
+            
+            //END 2024/03/01 head_status
+            this.headData.head_status = this.headStatus; //表頭新增或修改的標識    
             let headData = JSON.parse(JSON.stringify(this.headData));
             let lstDetailData1 = this.tempSaveData; //新的方法
             let lstDelData1 = this.delData1;
