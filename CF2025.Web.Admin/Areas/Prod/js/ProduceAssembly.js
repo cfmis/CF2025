@@ -1,4 +1,7 @@
-﻿var main={
+﻿/**
+ * 組裝轉換
+ */
+var main={
     data() {
         return {
             selectTab: "tab1",

@@ -1,4 +1,7 @@
-﻿var main ={
+﻿/**
+ * 移交單
+ */
+var main ={
     data()  {
         return {
             searchID: "", 

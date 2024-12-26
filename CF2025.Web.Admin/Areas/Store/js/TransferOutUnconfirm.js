@@ -1,4 +1,7 @@
-﻿var Main = {
+﻿/**
+ * 轉出待確認列表
+ */
+var Main = {
     data() {
         return {            
             selectRow: null,

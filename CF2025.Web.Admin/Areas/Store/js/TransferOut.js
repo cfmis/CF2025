@@ -1,4 +1,7 @@
-﻿var main = {
+﻿/**
+ * 轉出單
+ */
+var main = {
     data() {
         return {
             searchID:"", 

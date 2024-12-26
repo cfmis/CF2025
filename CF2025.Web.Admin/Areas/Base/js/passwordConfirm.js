@@ -1,4 +1,7 @@
-﻿var pwdConfirm = {
+﻿/**
+ * 密碼確認窗口
+ */
+var pwdConfirm = {
     data() {
         return {
             isPass: true,           

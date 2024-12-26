@@ -1,4 +1,7 @@
-﻿var main ={
+﻿/**
+ * 倉庫調整
+ */
+var main ={
     data()  {
         return {
             searchID: "", 

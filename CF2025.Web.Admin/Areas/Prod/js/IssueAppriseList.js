@@ -1,4 +1,7 @@
-﻿var main={
+﻿/**
+ * 領料申請明細表
+ */
+var main={
     data() {
         return {                       
             headEditFlag: '',//主檔為新增或編輯

@@ -1,4 +1,7 @@
-﻿var ItemQuery ={
+﻿/**
+ * 貨品編碼基本資料查詢
+ */
+var ItemQuery = {
     data() {
         return {           
             headerCellStyle:{background:'#F5F7FA',color:'#606266',height:'25px',padding:'2px'},

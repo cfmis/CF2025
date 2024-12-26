@@ -1,4 +1,7 @@
-﻿var MainIn = {
+﻿/**
+ * R單轉正單
+ */
+var MainIn = {
     data() {
         return {            
             searchID:"", 

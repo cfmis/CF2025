@@ -1,4 +1,7 @@
-﻿var publicQuery={
+﻿/**
+ * 頁面公共查詢模塊
+ */
+var publicQuery={
     data() {
         return {
             window_id: "",
