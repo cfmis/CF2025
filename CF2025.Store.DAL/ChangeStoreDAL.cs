@@ -459,7 +459,7 @@ namespace CF2025.Store.DAL
         /// <param name="moduleType"></param>
         /// <returns></returns>
         public static string SaveCeCj(st_inventory_mostly headData, List<st_i_subordination> lstDetailData1, 
-                                        List<st_i_subordination> lstDelData1, string user_id,string moduleType)
+                          List<st_i_subordination> lstDelData1, string user_id,string moduleType)
         {
             string result = "00", str = "";
             StringBuilder sbSql = new StringBuilder(" SET XACT_ABORT ON ");
@@ -526,7 +526,7 @@ namespace CF2025.Store.DAL
                     inventory_receipt, ir_code, ir_lot_no, remark, i_weight, ref_id, ref_sequence_id, mo_id, mrp_id,obligate_mo_id,jo_sequence_id,
                     rate,ib_qty,state,transfers_state,ib_weight,only_detail,vendor_id,goods_id_new,sec_unit) Values                    
                     ('{0}','{1}','{2}','{3}','{4}','{5}',{6},'{7}','{8}','{9}','{10}','{11}','{12}','{13}',{14},'{15}','{16}','{17}','{18}','{19}','{20}',
-                    1,0,'0','0',0,'1','{21}','{22}')",
+                    1,0,'0','0',0,'1','{21}','{22}','{23}')",
                     within_code, headData.id, item.sequence_id, item.goods_id, item.base_unit, item.unit, item.i_amount, item.inventory_issuance,
                     item.inventory_issuance, item.ii_lot_no, item.inventory_receipt, item.inventory_receipt, item.ir_lot_no, item.remark, item.i_weight, item.ref_id,
                     item.ref_sequence_id, item.mo_id, item.mrp_id, item.obligate_mo_id, item.jo_sequence_id, item.vendor_id, item.goods_id_new, item.sec_unit);
@@ -624,7 +624,7 @@ namespace CF2025.Store.DAL
                 //批準前的資料檢查
                 DataTable dtDetail = new DataTable();
                 strSql = string.Format(
-                @"Select sequence_id, mo_id, goods_id, inventory_issuance, inventory_receipt, obligate_mo_id
+                @"Select sequence_id, mo_id, goods_id, inventory_issuance, inventory_receipt, obligate_mo_id,goods_id_new,ii_lot_no,ir_lot_no
                 From st_i_subordination
                 Where id='{0}' and within_code='{1}' ORDER BY sequence_id", head.id, within_code);
                 dtDetail = sh.ExecuteSqlReturnDataTable(strSql);
@@ -638,7 +638,7 @@ namespace CF2025.Store.DAL
                     ls_obligate_mo_id = dtDetail.Rows[i]["obligate_mo_id"].ToString();
                     ls_goods_id_new = dtDetail.Rows[i]["goods_id_new"].ToString();
                     ls_ir_lot_no = dtDetail.Rows[i]["ir_lot_no"].ToString();
-                    ls_ii_lot_no = dtDetail.Rows[i]["lot_no"].ToString();
+                    ls_ii_lot_no = dtDetail.Rows[i]["ii_lot_no"].ToString();
                     ls_mo_id = !string.IsNullOrEmpty(ls_mo_id) ? ls_mo_id : "";
                     ls_goods_id = !string.IsNullOrEmpty(ls_goods_id) ? ls_goods_id : "";
                     ls_wp_id = !string.IsNullOrEmpty(ls_wp_id) ? ls_wp_id : "";

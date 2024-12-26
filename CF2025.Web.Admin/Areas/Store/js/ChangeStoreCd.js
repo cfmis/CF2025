@@ -89,12 +89,12 @@ var Main = {
             },
             loading : false,
             tableColumn: [
-                { field: 'goods_id', title: '貨品編號',width:175,showOverflow:true },
-                { field: 'goods_name', title: '貨品名稱',width:160,showOverflow:true },
+                { field: 'goods_id', title: '貨品編號',width:180,showOverflow:true },
+                { field: 'goods_name', title: '貨品名稱',width:140,showOverflow:true },
                 { field: 'lot_no', title: '批號',width:90 },
                 { field: 'qty', title: '數量',width:60 },
                 { field: 'sec_qty', title: '重量',width:50 },
-                { field: 'mo_id', title: '頁數',width:90 },
+                { field: 'mo_id', title: '頁數',width:100 },
                 { field: 'vendor_id', title: '供應商編號',width:85 },
                 { field: 'vendor_name', title: '供應商名稱', width:150,showOverflow:true },
                 { field: 'average_cost', title: '平均成本',width:80 }
@@ -105,7 +105,7 @@ var Main = {
                 { field: 'lot_no', title: '批號',width:100 },
                 { field: 'qty', title: '數量',width:70 },
                 { field: 'sec_qty', title: '重量',width:60 },
-                { field: 'mo_id', title: '頁數',width:90 },
+                { field: 'mo_id', title: '頁數',width:100 },
                 { field: 'vendor_name', title: '供應商名稱', width:200,showOverflow:true }             
             ],
             tableLotNoList: [{lot_no:'',qty:0,sec_qty:0,mo_id:0,vendor_name:''}],

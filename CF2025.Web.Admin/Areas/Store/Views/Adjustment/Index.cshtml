@@ -14,8 +14,8 @@
 }
 
 <div id="app">
-    <vxe-toolbar perfect size="small" style="height:30px;margin-bottom:0px;min-width:1024px;">
-        <template #buttons style="height:30px;margin-bottom:5px">
+    <vxe-toolbar perfect size="small" style="height:35px;margin-bottom:5px;min-width:1024px;">
+        <template #buttons style="height:35px;margin-bottom:10px">
             <vxe-button type="text" icon="iconfont icon-file-add1" :disabled="(isEditHead)" @@click="insertEvent()" content="新增"></vxe-button>
             <vxe-button type="text" status="danger" icon="iconfont icon-delete2" :disabled="isEditHead" @@click="delHeadEvent()" style="margin-left: -2px" content="注銷"></vxe-button>
 
@@ -33,70 +33,70 @@
     </vxe-toolbar>
     
     <div style="margin:5px 0px;">
-        <vxe-form :data="headData" ref="formHead" size="mini" style="min-width:1024px;max-width:1152px" title-align="right" title-width="100px" custom-layout>
-            <vxe-form-item title="編號" :item-render="{}" :span="6" class="vxe-form-item-group" style="color:blue">
-                <vxe-input v-model="headData.id" maxlength="13" class="input-customize" readonly></vxe-input>
-            </vxe-form-item>
-            <vxe-form-item title="調整日期" :item-render="{}" :span="6" class="vxe-form-item-group" style="color:blue">
-                <vxe-input type="date" v-model="headData.date" maxlength="13" class="input-customize" :readonly="isReadOnly"></vxe-input>
-            </vxe-form-item>
-            <vxe-form-item title="狀態" :item-render="{}" :span="6" class="vxe-form-item-group" :style=stateFontColor>
-                <vxe-select v-model="headData.state" size="mini" disabled>
-                    <vxe-option v-for="item in stateList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
-                </vxe-select>
-            </vxe-form-item>
-             <vxe-form-item title="修改次數" :item-render="{}" :span="6" class="vxe-form-item-group">
-                <vxe-input v-model="headData.update_count" class="input-customize" readonly></vxe-input>
-            </vxe-form-item>
-            <vxe-form-item title="倉庫" :item-render="{}" :span="6" class="vxe-form-item-group" style="color:blue">
-                <el-select v-model="headData.department_id" ref="dept_id"
-                           @@change="checkDept(headData.department_id)" 
-                           filterable clearable default-first-option style="width:100%" 
-                           :disabled="isDisableDept">
-                    <el-option v-for="item in deptList" :key="item.value" :value="item.value" :label="item.label" style="height:25px;font-size: 9px" />
-                </el-select>
-            </vxe-form-item>
-            <vxe-form-item title="原因編號" :item-render="{}" :span="6" class="vxe-form-item-group" style="color:blue">
-                <el-select v-model="headData.adjust_reason" filterable clearable default-first-option style="width:100%" :disabled="isDisable">
-                    <el-option v-for="item in reasonList" :key="item.value" :value="item.value" :label="item.label" style="height:25px;font-size: 9px" />
-                </el-select>
-            </vxe-form-item>
-            <vxe-form-item title="經手人" :item-render="{}" :span="6" class="vxe-form-item-group">
-                <vxe-input v-model="headData.handler" maxlength="20" class="input-customize" :readonly="isReadOnly"></vxe-input>
-            </vxe-form-item>
-            <vxe-form-item :span="6" class="vxe-form-item-group">               
-            </vxe-form-item>
+        <div class="my-div-header">
+            <vxe-form :data="headData" ref="formHead" size="mini" style="min-width:1024px;max-width:1152px" title-align="right" title-width="100px" custom-layout>
+                <vxe-form-item title="編號" :item-render="{}" :span="6" class="vxe-form-item-group" style="color:blue">
+                    <vxe-input v-model="headData.id" maxlength="13" class="input-customize" readonly></vxe-input>
+                </vxe-form-item>
+                <vxe-form-item title="調整日期" :item-render="{}" :span="6" class="vxe-form-item-group" style="color:blue">
+                    <vxe-input type="date" v-model="headData.date" maxlength="13" class="input-customize" :readonly="isReadOnly"></vxe-input>
+                </vxe-form-item>
+                <vxe-form-item title="狀態" :item-render="{}" :span="6" class="vxe-form-item-group" :style=stateFontColor>
+                    <vxe-select v-model="headData.state" size="mini" disabled>
+                        <vxe-option v-for="item in stateList" :key="item.value" :value="item.value" :label="item.label"></vxe-option>
+                    </vxe-select>
+                </vxe-form-item>
+                 <vxe-form-item title="修改次數" :item-render="{}" :span="6" class="vxe-form-item-group">
+                    <vxe-input v-model="headData.update_count" class="input-customize" readonly></vxe-input>
+                </vxe-form-item>
+                <vxe-form-item title="倉庫" :item-render="{}" :span="6" class="vxe-form-item-group" style="color:blue">
+                    <el-select v-model="headData.department_id" ref="dept_id"
+                               @@change="checkDept(headData.department_id)" 
+                               filterable clearable default-first-option style="width:100%" 
+                               :disabled="isDisableDept">
+                        <el-option v-for="item in deptList" :key="item.value" :value="item.value" :label="item.label" style="height:25px;font-size: 9px" />
+                    </el-select>
+                </vxe-form-item>
+                <vxe-form-item title="原因編號" :item-render="{}" :span="6" class="vxe-form-item-group" style="color:blue">
+                    <el-select v-model="headData.adjust_reason" filterable clearable default-first-option style="width:100%" :disabled="isDisable">
+                        <el-option v-for="item in reasonList" :key="item.value" :value="item.value" :label="item.label" style="height:25px;font-size: 9px" />
+                    </el-select>
+                </vxe-form-item>
+                <vxe-form-item title="經手人" :item-render="{}" :span="6" class="vxe-form-item-group">
+                    <vxe-input v-model="headData.handler" maxlength="20" class="input-customize" :readonly="isReadOnly"></vxe-input>
+                </vxe-form-item>
+                <vxe-form-item :span="6" class="vxe-form-item-group">               
+                </vxe-form-item>
 
-            <vxe-form-item title="備註" :item-render="{}" :span="12" style="width:500px" class="vxe-form-item-customize">
-                <vxe-input v-model="headData.remark" :readonly="isReadOnly"></vxe-input>
-            </vxe-form-item>                    
-            <vxe-form-item title="建檔人" :item-render="{}" :span="6" class="vxe-form-item-group">
-                <vxe-input v-model="headData.create_by" maxlength="20" class="input-customize" readonly></vxe-input>
-            </vxe-form-item>
-            <vxe-form-item title="建檔日期" :item-render="{}" :span="6" class="vxe-form-item-group">
-                <vxe-input v-model="headData.create_date" class="input-customize" readonly></vxe-input>
-            </vxe-form-item>
+                <vxe-form-item title="備註" :item-render="{}" :span="12" style="width:500px" class="vxe-form-item-customize">
+                    <vxe-input v-model="headData.remark" :readonly="isReadOnly"></vxe-input>
+                </vxe-form-item>                    
+                <vxe-form-item title="建檔人" :item-render="{}" :span="6" class="vxe-form-item-group">
+                    <vxe-input v-model="headData.create_by" maxlength="20" class="input-customize" readonly></vxe-input>
+                </vxe-form-item>
+                <vxe-form-item title="建檔日期" :item-render="{}" :span="6" class="vxe-form-item-group">
+                    <vxe-input v-model="headData.create_date" class="input-customize" readonly></vxe-input>
+                </vxe-form-item>
 
-            <vxe-form-item title="批準人" :item-render="{}" :span="6" class="vxe-form-item-group">
-                <vxe-input v-model="headData.check_by" class="input-customize" readonly></vxe-input>
-            </vxe-form-item>
-            <vxe-form-item title="批準日期" :item-render="{}" :span="6" class="vxe-form-item-group">
-                <vxe-input v-model="headData.check_date" class="input-customize" readonly></vxe-input>
-            </vxe-form-item>
-            <vxe-form-item title="修改人" :item-render="{}" :span="6" class="vxe-form-item-group">
-                <vxe-input v-model="headData.update_by" maxlength="20" class="input-customize" readonly></vxe-input>
-            </vxe-form-item>
-            <vxe-form-item title="修改日期" :item-render="{}" :span="6" class="vxe-form-item-group">
-                <vxe-input v-model="headData.update_date" class="input-customize" readonly></vxe-input>
-            </vxe-form-item>
-            
-            
-        </vxe-form>
-        <input class="" type="hidden" name="user_id" value="@ViewBag.user_id" id="user_id" />
+                <vxe-form-item title="批準人" :item-render="{}" :span="6" class="vxe-form-item-group">
+                    <vxe-input v-model="headData.check_by" class="input-customize" readonly></vxe-input>
+                </vxe-form-item>
+                <vxe-form-item title="批準日期" :item-render="{}" :span="6" class="vxe-form-item-group">
+                    <vxe-input v-model="headData.check_date" class="input-customize" readonly></vxe-input>
+                </vxe-form-item>
+                <vxe-form-item title="修改人" :item-render="{}" :span="6" class="vxe-form-item-group">
+                    <vxe-input v-model="headData.update_by" maxlength="20" class="input-customize" readonly></vxe-input>
+                </vxe-form-item>
+                <vxe-form-item title="修改日期" :item-render="{}" :span="6" class="vxe-form-item-group">
+                    <vxe-input v-model="headData.update_date" class="input-customize" readonly></vxe-input>
+                </vxe-form-item>
+            </vxe-form>
+            <input class="" type="hidden" name="user_id" value="@ViewBag.user_id" id="user_id" />
+        </div>
     </div>   
     
     <!--表格-->
-    <div style="float:left;width:100%;margin:15px 0px;">
+    <div style="float:left;width:100%;">
         <!--表格1-->
         <vxe-table border
                     show-overflow

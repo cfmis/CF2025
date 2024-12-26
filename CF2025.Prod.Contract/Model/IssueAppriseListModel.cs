@@ -166,7 +166,6 @@ namespace CF2025.Prod.Contract.Model
         public string sign_date { get; set; }
         public string vendor_id { get; set; }
         public string vendor_name { get; set; }
-
         public string base_unit { get; set; }
         public decimal rate { get; set; }
         public string state { get; set; }
@@ -203,7 +202,6 @@ namespace CF2025.Prod.Contract.Model
         public string so_no { get; set; }
         public string contract_cid { get; set; }
         public string mrp_id { get; set; }
-
         public string base_unit { get; set; } //null
         public decimal rate { get; set; } //null
         public decimal ib_qty { get; set; } //null
@@ -224,11 +222,5 @@ namespace CF2025.Prod.Contract.Model
 
         public string row_status { get; set; }
     }
-    //public class st_lot_no
-    //{
-    //    public string lot_no { get; set; }
-    //    public decimal qty { get; set; }
-    //    public decimal sec_qty { get; set; }
-    //    public string mo_id { get; set; }
-    //}
+   
 }
