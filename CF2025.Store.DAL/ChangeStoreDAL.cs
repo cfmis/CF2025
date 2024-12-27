@@ -260,8 +260,9 @@ namespace CF2025.Store.DAL
             List<st_i_subordination> lstDelData1, List<st_cc_details_schedule> lstDelData2, string user_id)
         {
             string result = "00";
-            string str = "";
-            StringBuilder sbSql = new StringBuilder(" SET XACT_ABORT ON ");
+            string str = "";           
+            sbSql.Clear();
+            sbSql.Append(" SET XACT_ABORT ON ");
             sbSql.Append(" BEGIN TRANSACTION ");
             string id = headData.id;
             string head_insert_status = headData.head_status;
@@ -461,8 +462,9 @@ namespace CF2025.Store.DAL
         public static string SaveCeCj(st_inventory_mostly headData, List<st_i_subordination> lstDetailData1, 
                           List<st_i_subordination> lstDelData1, string user_id,string moduleType)
         {
-            string result = "00", str = "";
-            StringBuilder sbSql = new StringBuilder(" SET XACT_ABORT ON ");
+            string result = "00", str = "";          
+            sbSql.Clear();
+            sbSql.Append(" SET XACT_ABORT ON ");
             sbSql.Append(" BEGIN TRANSACTION ");
             string id = headData.id;
             string head_insert_status = headData.head_status;
@@ -605,23 +607,23 @@ namespace CF2025.Store.DAL
         } //--end SaveCeCj
 
 
-        //批準、反批準：倉庫發料/倉庫轉倉/R單轉正單共用共用
+        //批準或反批準：倉庫發料/倉庫轉倉/R單轉正單/轉貨品編碼、轉批號 共用
         public static string Approve(st_inventory_mostly head, string user_id, string approve_type, string turnType)
         {
             string result = "", is_active_name, is_turn_type = "", strSql = "", ls_dept2;
-            string ls_id, ls_origin, ls_mrp_id, ls_sequence_id, ls_unit_code, ls_servername; //ls_error,ls_charge_dept;
+            string ls_id, ls_origin, ls_mrp_id, ls_sequence_id, ls_unit_code, ls_servername;
             string ls_goods_id, ls_dept_id, ls_wp_id, ls_next_wp_id, ls_mo_id, ls_obligate_mo_id, ls_ir_lot_no, ls_ii_lot_no, ls_goods_id_new; 
-            int ll_count, ll_count2, ll_cnt, ll_cnt_state1, ll_cnt_state3, ll_cnt_state4; //, li_jo_ver,ll_rtn;
+            int ll_count, ll_count2, ll_cnt, ll_cnt_state1, ll_cnt_state3, ll_cnt_state4;
             decimal ldec_qty, ldec_i_amount, ldec_i_weight;
             string ldt_date, ldt_check_date;
-            is_turn_type = turnType;  //区分类型,A:倉庫發料,B:倉庫轉倉,C:R單轉正單,D:轉貨品編碼、轉批號
-            ldt_check_date = CommonDAL.GetDbDateTime("L");//批準日期(長日期時間);
+            is_turn_type = turnType;  //区分类型：A--倉庫發料;B--倉庫轉倉;C--R單轉正單;D--轉貨品編碼、轉批號;E--廢料合拼
+            ldt_check_date = CommonDAL.GetDbDateTime("L");//批準日期(長日期時間格式);
             is_active_name = approve_type == "1" ? "pfc_ok" : "pfc_unok";
-            DataTable dtFind = new DataTable();     
-           
+            DataTable dtFind = new DataTable();           
+
             if (is_active_name == "pfc_ok")
             {
-                //批準前的資料檢查
+                //批準前各模塊資料合法性檢查
                 DataTable dtDetail = new DataTable();
                 strSql = string.Format(
                 @"Select sequence_id, mo_id, goods_id, inventory_issuance, inventory_receipt, obligate_mo_id,goods_id_new,ii_lot_no,ir_lot_no
@@ -696,7 +698,7 @@ namespace CF2025.Store.DAL
                         ll_cnt = int.Parse(dtFind.Rows[0]["cnt"].ToString());
                         if (ll_cnt > 0)
                         {
-                            result = "-1" + "Row[" + ls_sequence_id + "]" + "工單已经被Hold,不允许进行后续的流程！" + "],[" + ls_mo_id + "],[" + ls_goods_id + "]";
+                            result = "-1" + "Row[" + ls_sequence_id + "]" + "工單已經被Hold,不允許進行后續的流程！" + "],[" + ls_mo_id + "],[" + ls_goods_id + "]";
                             break;
                         }
                         //--判断除了当前流程之后有没有对QC的流程(20130916 huangyun固定702部门)
@@ -755,7 +757,7 @@ namespace CF2025.Store.DAL
                         //貨品編碼為原料(ML開頭)，保存時需檢查頁數與庫存頁數是否相同，不相同不允許保存                    
                         if (ls_goods_id.Substring(0, 2).ToUpper() == "ML" && ls_mo_id != ls_obligate_mo_id)
                         {
-                            result = "-1" + "Row[" + ls_sequence_id + "]" + "库存页数与当前页数必须相同!";
+                            result = "-1" + "Row[" + ls_sequence_id + "]" + "庫存頁數與當前頁數必須相同!";
                             break;
                         }
                         if (ls_wp_id != "802")//(P487)當轉出倉802原料倉時，不用檢查轉入倉庫是倉管部門或倉庫組，因802倉會定期發料到車間，是不按流程的.
@@ -857,7 +859,7 @@ namespace CF2025.Store.DAL
                         {                           
                             if((ls_ir_lot_no == ls_ii_lot_no && ls_goods_id == ls_goods_id_new) || (ls_ir_lot_no != ls_ii_lot_no && ls_goods_id != ls_goods_id_new))
                             {
-                                result = "-1" + "Row[" + ls_sequence_id + "]" + "货品编码和批号必须且只能修改其中一个!";
+                                result = "-1" + "Row[" + ls_sequence_id + "]" + "貨品编碼和批號必須且只能修改其中一个!";
                                 break;
                             }
                         }
@@ -870,7 +872,7 @@ namespace CF2025.Store.DAL
                 } //--end for
             }
 
-
+            
             if (is_active_name == "pfc_ok" || is_active_name == "pfc_unok")
             {
                 ls_id = head.id;
@@ -883,18 +885,15 @@ namespace CF2025.Store.DAL
                     ldt_check_date = head.check_date;
                 }
                 strSql = string.Format(
-                @"Select sequence_id,unit,Isnull(i_amount,0) as i_amount,Isnull(i_weight,0) as i_weight,inventory_issuance,
-                inventory_receipt,mo_id,goods_id,obligate_mo_id
+                @"Select sequence_id,unit,i_amount,i_weight,inventory_issuance,inventory_receipt,mo_id,goods_id,obligate_mo_id
 				From st_i_subordination WITH(nolock) Where id ='{0}' And within_code ='{1}'", head.id, within_code);
-                DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);
-                //DataTable dtFind = new DataTable();
+                DataTable dt = sh.ExecuteSqlReturnDataTable(strSql);               
                 string sql_update = string.Empty;
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
                     ls_sequence_id = dt.Rows[i]["sequence_id"].ToString();
                     if (is_turn_type == "A")
                     {
-                        //ls_sequence_id = dt.Rows[i]["sequence_id"].ToString();
                         ls_unit_code = dt.Rows[i]["unit"].ToString();
                         ldec_i_amount = decimal.Parse(dt.Rows[i]["i_amount"].ToString());
                         ldec_i_weight = decimal.Parse(dt.Rows[i]["i_weight"].ToString());
@@ -933,7 +932,7 @@ namespace CF2025.Store.DAL
 						    And A.state Not In('2','V') And A.within_code ='{0}' And A.mo_id ='{1}'
 						    And B.goods_id = '{2}' And B.next_wp_id ='{3}' And (b.wp_id ='{4}' Or Left('{5}',1)='R')",
                             within_code, ls_mo_id, ls_goods_id, ls_next_wp_id, ls_wp_id, ls_obligate_mo_id, is_active_name, ls_unit_code, ldec_i_amount, ldec_i_weight);
-                            sql_update = RetunSqlString(sql_update);
+                            sql_update = RetunSqlString(sql_update); //已包含事務代碼
                             result = sh.ExecuteSqlUpdate(sql_update);
                             if (result == "")
                             {
@@ -942,7 +941,7 @@ namespace CF2025.Store.DAL
                             else
                             {
                                 //保存失敗!
-                                result += "-1数据保存失败" + is_active_name + result;
+                                result += "-1數據保存失敗!" + is_active_name + result;
                                 break;
                             }
                             //--
@@ -963,7 +962,7 @@ namespace CF2025.Store.DAL
                             else
                             {
                                 //保存失敗!
-                                result += "-1数据保存失败" + is_active_name + result;
+                                result += "-1數據保存失敗!" + is_active_name + result;
                                 break;
                             }
                             //--
@@ -998,12 +997,12 @@ namespace CF2025.Store.DAL
                                 else
                                 {
                                     //保存失敗!
-                                    result += "-1数据保存失败" + is_active_name + result;
+                                    result += "-1數據保存失敗!" + is_active_name + result;
                                     break;
                                 }
                             }
 
-                            //--start 20130813 huangyun 从触发器中移过来
+                            //--start 从触发器中移过来
                             ll_cnt = 0;
                             ll_cnt_state1 = 0;
                             ll_cnt_state3 = 0;
@@ -1038,7 +1037,7 @@ namespace CF2025.Store.DAL
                                 }
                                 else
                                 {
-                                    result += "-1数据保存失败" + is_active_name + result;
+                                    result += "-1數據保存失敗!" + is_active_name + result;
                                     break;
                                 }
                             }
@@ -1105,14 +1104,15 @@ namespace CF2025.Store.DAL
                                 }
                                 else
                                 {
-                                    result = "-1数据保存失败<" + is_active_name + ">(" + "st_business_record)[28]" + result;
+                                    result = "-1數據保存失敗!<" + is_active_name + ">(" + "st_business_record)[28]" + result;
                                     break;
                                 }
+
                                 //--更新库存
                                 result = pubFunction.of_update_st_details("I", "28", ls_id, ls_sequence_id, ldt_check_date, "");
                                 if (result.Substring(0, 2) == "-1")
                                 {
-                                    result = "-1数据保存失败<" + is_active_name + ">(" + "st_details)" + result;
+                                    result = "-1數據保存失敗!<" + is_active_name + ">(" + "st_details)" + result;
                                     break;
                                 }
                             }
@@ -1137,7 +1137,7 @@ namespace CF2025.Store.DAL
                                 result = pubFunction.of_update_st_details("D", "28", ls_id, ls_sequence_id, ldt_check_date, "");
                                 if (result.Substring(0, 2) == "-1")
                                 {
-                                    result = "-1数据保存失败<" + is_active_name + ">(" + "st_details)" + result;
+                                    result = "-1數據保存失敗!<" + is_active_name + ">(" + "st_details)" + result;
                                     break;
                                 }
                                 sql_update = string.Format(
@@ -1151,7 +1151,7 @@ namespace CF2025.Store.DAL
                                 }
                                 else
                                 {
-                                    result = "-1数据保存失败<" + is_active_name + ">(" + "st_business_record)" + result;
+                                    result = "-1數據保存失敗!<" + is_active_name + ">(" + "st_business_record)" + result;
                                     break;
                                 }
                             }
@@ -1216,7 +1216,7 @@ namespace CF2025.Store.DAL
                             }
                             else
                             {
-                                result = "-1数据保存失败" + result;
+                                result = "-1數據保存失敗!" + result;
                                 break;
                             }
                             ll_count = 0;
@@ -1240,7 +1240,7 @@ namespace CF2025.Store.DAL
                             }
                             else
                             {
-                                result = "-1数据保存失败" + result;
+                                result = "-1數據保存失敗!" + result;
                                 break;
                             }
                         }
@@ -1278,14 +1278,14 @@ namespace CF2025.Store.DAL
                             }
                             else
                             {
-                                result = "-1数据保存失败<" + is_active_name + ">(st_business_record)[28]" + result;
+                                result = "-1數據保存失敗!<" + is_active_name + ">(st_business_record)[28]" + result;
                                 break;
                             }
                             //--更新库存
                             result = pubFunction.of_update_st_details("I", "28", ls_id, ls_sequence_id, ldt_check_date, "");//= -1 Then                           
                             if (result.Substring(0, 2) == "-1")
                             {
-                                result = "-1数据保存失败<" + is_active_name + ">(st_details)" + result;
+                                result = "-1數據保存失敗!<" + is_active_name + ">(st_details)" + result;
                                 break;
                             }
                         }
@@ -1300,7 +1300,7 @@ namespace CF2025.Store.DAL
                             result = pubFunction.of_update_st_details("D", "28", ls_id, ls_sequence_id, ldt_check_date, "");
                             if (result.Substring(0, 2) == "-1")
                             {
-                                result = "-1数据保存失败<" + is_active_name + ">(st_details)" + result;
+                                result = "-1數據保存失敗!<" + is_active_name + ">(st_details)" + result;
                                 break;
                             }
                             //--
@@ -1315,7 +1315,7 @@ namespace CF2025.Store.DAL
                             }
                             else
                             {
-                                result = "-1数据保存失败<" + is_active_name + ">(st_business_record)" + result;
+                                result = "-1數據保存失敗!<" + is_active_name + ">(st_business_record)" + result;
                                 break;
                             }
                         }
